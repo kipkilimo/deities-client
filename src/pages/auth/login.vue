@@ -64,15 +64,22 @@ const submitLogin = async () => {
   try {
     await userStore.login(username.value, password.value);
     // Handle successful login (e.g., redirect to home page)
+    if (userStore.user.activatedAccount === false) {
+      router.push("/auth/activate");
+      return
+    }
     router.push("/todo-app/todos");
 
     // You can use a router or state management solution like Vuex
   } catch (error) {
+    // if (userStore.user.activatedAccount === false) {
+    //   router.push("/auth/activate");
+    // }
     console.log({ error })
     loginError.value = "Check your credentials."; // Set error message
     setTimeout(() => {
       window.location.reload();
-    }, 42000);
+    }, 4200);
   }
 };
 </script>
@@ -86,6 +93,6 @@ const submitLogin = async () => {
 </style>
 
 <route lang="yaml">
-meta:
-  layout: AuthLayout
-</route>
+  meta:
+    layout: AuthLayout
+  </route>

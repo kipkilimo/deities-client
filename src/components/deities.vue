@@ -32,9 +32,10 @@
 
                 <div v-if="filteredDeities.length" dense>
 
-                    <v-chip size="large" v-for="deity in filteredDeities" :key="deity.id" color="lime" rounded
+                    <v-chip size="large" v-for="deity in filteredDeities" :key="deity.id" color="purple" rounded
                         variant="outlined" class="chip" @click="handleChipClick(deity)">
-                        {{ deity.name }} {{ deity.locality }} - Favs: {{ deity.favs }}
+                        {{ deity.name }} ({{ deity.locality }},{{ deity.favs }} <v-icon size="xs"
+                            color="red">mdi-heart-outline</v-icon>s)
                     </v-chip>
 
                 </div>
@@ -47,7 +48,7 @@
 <script lang="ts" setup>
 import { ref, watch, computed } from 'vue';
 import { onMounted } from 'vue';
-import { useDeityStore } from '../../stores/deities';
+import { useDeityStore } from '../stores/deities';
 import { storeToRefs } from 'pinia';
 // Define interface for Deity
 interface Deity {
@@ -72,7 +73,7 @@ const { deities } = storeToRefs(deityStore);
 const { fetchDeityNames, setDeities, sortDeities, filterDeities } = deityStore;
 const sortBy = ref<keyof Deity>('name'); // Sorting criteria
 
-import { useUserStore } from "../../stores/users";
+import { useUserStore } from "../stores/users";
 
 const userStore = useUserStore();
 function handleChipClick(deity) {

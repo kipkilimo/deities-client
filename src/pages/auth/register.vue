@@ -9,7 +9,7 @@
             <v-form @submit.prevent="submitRegister">
                 <v-text-field color="primary" v-model="email" label="Email" required autofocus />
                 <v-text-field color="primary" v-model="password" label="Password" type="password" required />
-                <h4> My favorite deity: <strong>
+                <h4> My favorite deity: <strong color="purple">
                         {{ userStore.username.length < 1 ? 'None' : userStore.username }}</strong>
 
                 </h4>
@@ -37,14 +37,14 @@
             </v-form>
         </v-card-text>
         <div v-if="loginError">
-            <v-alert :text="loginError" title="Login error" type="error"></v-alert>
+            <v-alert :text="loginError" title="Registration error" type="error"></v-alert>
         </div>
     </v-card>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed } from "vue";
-import Deity from './deities.vue'
+import Deity from '../../components/deities.vue'
 import { useUserStore } from "../../stores/users";
 
 const userStore = useUserStore();
@@ -71,7 +71,7 @@ const submitRegister = async () => {
         // You can use a router or state management solution like Vuex
     } catch (error) {
         console.log({ error })
-        loginError.value = "Check your credentials."; // Set error message
+        loginError.value = "Failed to register new user."; // Set error message
         setTimeout(() => {
             window.location.reload();
         }, 42000);

@@ -7,6 +7,12 @@ interface UserState {
   isLoggedIn: boolean;
   token?: string;
   username: string;
+  user:{
+    id: string,
+    username: string,
+    email: string,
+    activatedAccount:boolean;
+  }
   // Other user data
 }
 
@@ -14,10 +20,92 @@ export const useUserStore = defineStore('login', {
   state: (): UserState => ({
     isLoggedIn: false,
     token: undefined,
-    username: ''
+    username: '',
+    user:{
+      id: '',
+      username: '',
+      email: '',
+      activatedAccount:false
+    }
   }),
   actions: {
+// activationToken
+async resetPassword(activationToken: string, password: string) {
+  const RESET_PASSWORD = gql`
+    mutation resetPassword( $activationToken: String!, $password: String!) {
+      resetPassword( activationToken:$activationToken,password: $password) {
+        id
+        username
+        email
+      }
+    }
+  `;
 
+  try {
+    const response = await client.mutate({
+      mutation: RESET_PASSWORD,
+      variables: { password },
+    });
+
+    // Handle response 
+
+    return response.data?.resetPassword; // Return the registered user data if needed
+  } catch (error) { 
+    throw new Error('Reset failed'); // Optionally re-throw the error after logging it
+  }
+},
+async requestPasswordReset( email: string) {
+  const REQUEST_RESET_PASSWORD = gql`
+    mutation requestPasswordReset( $email: String!) {
+      requestPasswordReset( email: $email) {
+        id
+        username
+        email
+      }
+    }
+  `;
+
+  try {
+    const response = await client.mutate({
+      mutation: REQUEST_RESET_PASSWORD,
+      variables: { email },
+    });
+
+    // Handle response
+    console.log('Activation successful:', response.data?.requestPasswordReset);
+
+    return response.data?.requestPasswordReset; // Return the registered user data if needed
+  } catch (error) {
+    console.error('Activation error:', error);
+    throw new Error('Activation failed'); // Optionally re-throw the error after logging it
+  }
+},
+async activate( token: string) {
+  const ACTIVATE_ACCOUNT = gql`
+    mutation activateUser( $token: String!) {
+      activate( token: $token) {
+        id
+        username
+        email
+      }
+    }
+  `;
+
+  try {
+    const response = await client.mutate({
+      mutation: ACTIVATE_ACCOUNT,
+      variables: { token },
+    });
+
+    // Handle response
+    console.log('Activation successful:', response.data?.activate);
+
+    return response.data?.activate; // Return the registered user data if needed
+  } catch (error) {
+    console.error('Activation error:', error);
+    throw new Error('Activation failed'); // Optionally re-throw the error after logging it
+  }
+},
     async register(username: string, email: string, password: string) {
       const REGISTER_USER = gql`
         mutation registerUser($username: String!, $email: String!, $password: String!) {
@@ -52,6 +140,7 @@ export const useUserStore = defineStore('login', {
             accessToken
             user {
               id
+              activatedAccount
             }
           }
         }
