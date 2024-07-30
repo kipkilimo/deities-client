@@ -63,7 +63,6 @@ declare module 'vue-router/auto/routes' {
     '/home/components/Features/FeatureCard': RouteRecordInfo<'/home/components/Features/FeatureCard', '/home/components/Features/FeatureCard', Record<never, never>, Record<never, never>>,
     '/home/components/hero/Hero': RouteRecordInfo<'/home/components/hero/Hero', '/home/components/hero/Hero', Record<never, never>, Record<never, never>>,
     '/mis_data_disp/MisStations': RouteRecordInfo<'/mis_data_disp/MisStations', '/mis_data_disp/MisStations', Record<never, never>, Record<never, never>>,
-    '/todo-app/todos': RouteRecordInfo<'/todo-app/todos', '/todo-app/todos', Record<never, never>, Record<never, never>>,
   }
 }
 

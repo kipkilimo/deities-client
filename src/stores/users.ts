@@ -7,11 +7,11 @@ interface UserState {
   isLoggedIn: boolean;
   token?: string;
   username: string;
-  user:{
+  user: {
     id: string,
     username: string,
     email: string,
-    activatedAccount:boolean;
+    activatedAccount: boolean;
   }
   // Other user data
 }
@@ -21,91 +21,110 @@ export const useUserStore = defineStore('login', {
     isLoggedIn: false,
     token: undefined,
     username: '',
-    user:{
+    user: {
       id: '',
       username: '',
       email: '',
-      activatedAccount:false
+      activatedAccount: false
     }
   }),
   actions: {
-// activationToken
-async resetPassword(activationToken: string, password: string) {
-  const RESET_PASSWORD = gql`
-    mutation resetPassword( $activationToken: String!, $password: String!) {
-      resetPassword( activationToken:$activationToken,password: $password) {
-        id
-        username
-        email
-      }
+    // activationToken
+    async resetPassword(activationToken: string, password: string) {
+      const RESET_PASSWORD = gql`
+ mutation resetPassword($activationToken: String!, $password: String!) {
+  resetPassword(activationToken: $activationToken, password: $password) {
+    accessToken
+    user {
+      id
+      username
+      email
     }
+  }
+}
   `;
 
-  try {
-    const response = await client.mutate({
-      mutation: RESET_PASSWORD,
-      variables: { password },
-    });
+      try {
+        const response = await client.mutate({
+          mutation: RESET_PASSWORD,
+          variables: { activationToken, password },
+        });
 
-    // Handle response 
-
-    return response.data?.resetPassword; // Return the registered user data if needed
-  } catch (error) { 
-    throw new Error('Reset failed'); // Optionally re-throw the error after logging it
-  }
-},
-async requestPasswordReset( email: string) {
-  const REQUEST_RESET_PASSWORD = gql`
+        // Handle response 
+        this.user = response.data?.resetPassword?.user
+        const accessToken = response.data?.resetPassword?.accessToken;
+        if (accessToken) {
+          this.isLoggedIn = true;
+          this.token = accessToken;
+          //  Store token in secure storage (optional)
+        } else {
+          throw new Error("Invalid username or password");
+        }
+      } catch (error) {
+        throw new Error('Reset failed'); // Optionally re-throw the error after logging it
+      }
+    },
+    async requestPasswordReset(email: string) {
+      const REQUEST_RESET_PASSWORD = gql`
     mutation requestPasswordReset( $email: String!) {
       requestPasswordReset( email: $email) {
         id
         username
         email
-      }
+      } 
     }
   `;
 
-  try {
-    const response = await client.mutate({
-      mutation: REQUEST_RESET_PASSWORD,
-      variables: { email },
-    });
+      try {
+        const response = await client.mutate({
+          mutation: REQUEST_RESET_PASSWORD,
+          variables: { email },
+        });
 
-    // Handle response
-    console.log('Activation successful:', response.data?.requestPasswordReset);
+        // Handle response
+        console.log('Activation successful:', response.data?.requestPasswordReset);
 
-    return response.data?.requestPasswordReset; // Return the registered user data if needed
-  } catch (error) {
-    console.error('Activation error:', error);
-    throw new Error('Activation failed'); // Optionally re-throw the error after logging it
-  }
-},
-async activate( token: string) {
-  const ACTIVATE_ACCOUNT = gql`
+        return response.data?.requestPasswordReset; // Return the registered user data if needed
+      } catch (error) {
+        console.error('Activation error:', error);
+        throw new Error('Activation failed'); // Optionally re-throw the error after logging it
+      }
+    },
+    async activate(token: string) {
+      const ACTIVATE_ACCOUNT = gql`
     mutation activateUser( $token: String!) {
       activate( token: $token) {
-        id
-        username
-        email
+        accessToken
+    user {
+      id
+      username
+      email
+    }
       }
     }
   `;
 
-  try {
-    const response = await client.mutate({
-      mutation: ACTIVATE_ACCOUNT,
-      variables: { token },
-    });
+      try {
+        const response = await client.mutate({
+          mutation: ACTIVATE_ACCOUNT,
+          variables: { token },
+        });
 
-    // Handle response
-    console.log('Activation successful:', response.data?.activate);
-
-    return response.data?.activate; // Return the registered user data if needed
-  } catch (error) {
-    console.error('Activation error:', error);
-    throw new Error('Activation failed'); // Optionally re-throw the error after logging it
-  }
-},
+        // Handle response
+        this.user = response.data?.activate?.user
+        const accessToken = response.data?.activate?.accessToken;
+        if (accessToken) {
+          this.isLoggedIn = true;
+          this.token = accessToken;
+          //  Store token in secure storage (optional)
+        } else {
+          throw new Error("Invalid username or password");
+        }
+      } catch (error) {
+        console.error('Activation error:', error);
+        throw new Error('Activation failed'); // Optionally re-throw the error after logging it
+      }
+    },
     async register(username: string, email: string, password: string) {
       const REGISTER_USER = gql`
         mutation registerUser($username: String!, $email: String!, $password: String!) {
@@ -133,24 +152,26 @@ async activate( token: string) {
       }
     }
     ,
-    async login(username: string, password: string) {
+    async login(email: string, password: string) {
       const loginMutation = gql`
-        mutation Login($username: String!, $password: String!) {
-          login(username: $username, password: $password) {
+        mutation Login($email: String!, $password: String!) {
+          login(email: $email, password: $password) {
             accessToken
-            user {
-              id
+    user {
+      id
+      username
+      email 
               activatedAccount
-            }
+            } 
           }
         }
       `;
 
       const response = await client.mutate({
         mutation: loginMutation,
-        variables: { username, password },
+        variables: { email, password },
       });
-
+      this.user = response.data?.login?.user
       const token = response.data?.login?.accessToken;
       if (token) {
         this.isLoggedIn = true;

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useHead({
-    title: 'Vuetalize',
-    meta: [{ name: 'description', content: 'Opinionated Vuetify  Template' }],
+    title: 'OpalLearning',
+    meta: [{ name: 'description', content: 'Opal Learning' }],
 })
 
 // onInitApp()

@@ -8,17 +8,19 @@
         <v-card-text>
             <v-form @submit.prevent="submitRegister">
                 <v-text-field color="primary" v-model="email" label="Email" required autofocus />
-                <v-text-field color="primary" v-model="password" label="Password" type="password" required />
+                <v-text-field v-model="password" :type="showPassword ? 'text' : 'password'" label="Password"
+                    :append-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'" @input="validatePassword"
+                    :rules="passwordRules" @click:append="togglePassword" required />
                 <h4> My favorite deity: <strong color="purple">
                         {{ userStore.username.length < 1 ? 'None' : userStore.username }}</strong>
 
                 </h4>
-                <Deity />
+                <Deities />
 
 
                 <div class="d-flex justify-space-between mt-4">
-                    <v-btn :disabled="isButtonDisabled" style="width: 9rem" type="submit" color="primary"
-                        :loading="registerLoading">
+                    <v-btn :disabled="isButtonDisabled1 || isButtonDisabled2" style="width: 9rem" type="submit"
+                        color="primary" :loading="registerLoading">
                         <v-icon class="mr-sm">mdi-location-enter</v-icon> Register
                     </v-btn>
 
@@ -44,29 +46,42 @@
 
 <script lang="ts" setup>
 import { ref, computed } from "vue";
-import Deity from '../../components/deities.vue'
 import { useUserStore } from "../../stores/users";
 
 const userStore = useUserStore();
 
 import { useRouter } from "vue-router";
-const isButtonDisabled = computed(() => {
+const isButtonDisabled1 = computed(() => {
     return userStore.username === '' || email.value === '' || password.value === '';
 });
 const router = useRouter();
-
+const passwordRules = [
+    (v: any) => !!v || 'Password is required',
+    (v: string | any[]) => v.length >= 6 || 'Password must be at least 6 characters long',
+    (v: string | any[]) => v.length <= 12 || 'Password must be at most 12 characters long'
+];
 const username = ref("");
 const password = ref("");
 const email = ref('');
 const registerLoading = ref(false);
-const loginError = ref(""); // To store login error message
+const isButtonDisabled2 = ref(true);
 
+const loginError = ref(""); // To store login error message
+const showPassword = ref(false);
+const validatePassword = () => {
+    // Check if all rules pass
+    const allRulesPass = passwordRules.every(rule => rule(password.value) === true);
+    isButtonDisabled2.value = !allRulesPass;
+}
+const togglePassword = () => {
+    showPassword.value = !showPassword.value;
+};
 const submitRegister = async () => {
     registerLoading.value = true; // Indicate login in progress
     try {
         await userStore.register(userStore.username, email.value, password.value);
         // Handle successful login (e.g., redirect to home page)
-        router.push("/auth/verify");
+        router.push("/auth/activate");
 
         // You can use a router or state management solution like Vuex
     } catch (error) {
@@ -74,18 +89,18 @@ const submitRegister = async () => {
         loginError.value = "Failed to register new user."; // Set error message
         setTimeout(() => {
             window.location.reload();
-        }, 42000);
+        }, 4200);
     }
 };
 </script>
 
 <style scoped>
-  .login-card {
-    max-width: 400px;
-    margin: auto;
-    padding: 24px;
-  }
-  </style>
+.reset-card {
+  max-width: 98%;
+  margin: auto;
+  padding: 24px;
+}
+</style>
 
 <route lang="yaml">
   meta:

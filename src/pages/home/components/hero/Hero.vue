@@ -5,40 +5,43 @@
         <!-- <div class="glow glow-left"></div>
         <div class="glow glow-right"></div> -->
         <v-row style="flex: unset" class="hero-wrapper px-8">
-            <v-col sm="12" md="7">
-                <div class="flex flex-column justify-center align-center h-100 hero min-h-screen">
-                    <div class="flex flex-column">
-                        <h1 class="tagline font-extrabold min-w-2xl">
-                            {{ $t('hero.title') }}
-                        </h1>
-                        <p class="text-muted py-8 description dark:text-primary-50 text-primary-950">
-                            {{ $t('hero.subtitle') }}
-                        </p>
-                    </div>
+            <v-col cols="7">
 
-                    <div class="flex justify-start w-100 gap-6">
-                        <v-btn
-                            color="primary-darken-1"
-                            prepend-icon="mdi-view-dashboard"
-                            to="/dashboard/overview"
-                            class=""
-                        >
-                            {{ $t('hero.dashboard') }}
-                        </v-btn>
-                        <v-btn
-                            color="primary"
-                            variant="outlined"
-                            to="/auth/login"
-                            prepend-icon="mdi-lock" 
-                        >
-                            {{ $t('hero.login') }}
-                        </v-btn>
-                    </div>
+                <div class="flex flex-column justify-center align-center h-100 hero min-h-screen">
+                    <v-row style="flex: unset" class="hero-wrapper px-8">
+                        <v-col cols="7">
+                            <div class="flex flex-column">
+                                <h1 class="tagline font-extrabold min-w-2xl">
+                                    {{ $t('hero.title') }}
+                                </h1>
+                                <p class="text-muted py-8 description dark:text-primary-50 text-primary-950">
+                                    {{ $t('hero.subtitle') }}
+                                </p>
+                            </div>
+
+                            <div class="flex justify-start w-100 gap-6">
+                                <v-btn color="primary-darken-1" disabled prepend-icon="mdi-view-dashboard"
+                                    to="/dashboard/overview" class="">
+                                    {{ $t('hero.dashboard') }}
+                                </v-btn>
+                                <v-btn color="primary" variant="outlined" to="/auth/login" prepend-icon="mdi-lock">
+                                    {{ $t('hero.login') }}
+                                </v-btn>
+                            </div>
+                        </v-col>
+
+
+                        <v-col cols="4" class="align-right justify-end">
+
+                            <v-img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Logo_Institut_Curie.jpg" />
+
+                        </v-col>
+
+                    </v-row>
+
                 </div>
             </v-col>
-            <v-col sm="12" md="5" class="d-flex align-center justify-center logo">
-                <Logo />
-            </v-col>
+
         </v-row>
     </section>
 </template>

@@ -1,12 +1,14 @@
 <template>
   <v-card class="activate-card mt-4 ml-2" elevation="4" outlined rounded>
-    <v-card-title class="text-center">
-      <v-img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Logo_Institut_Curie.jpg" />
-      <h3 class="mt-4 mr-11" style="color: #777777">Activating OpalLearning</h3>
+    <v-card-title class="text-center" style="color: #777777">
+      <v-img style="max-height:7.5rem;"
+        src="https://upload.wikimedia.org/wikipedia/commons/7/77/Logo_Institut_Curie.jpg" />
+      <h3 class="mt-4 mr-11" style="color: #777777">Activation link sent.</h3>
+      <h5 class="mt-4 mr-11"><i>Check all mailboxes.</i></h5>
+      <p class="mt-4 mr-11">{{ userStore.user.email }}</p>
     </v-card-title>
-    <div class="" v-if="userStore.user.email.length > 5">
-      <h4>An activation link was sent to:</h4>
-      <p>{{ userStore.user.email }}</p>
+    <div class="">
+
 
     </div>
     <v-card-text>
@@ -17,7 +19,7 @@
 
 
         <div class="d-flex justify-space-between mt-4">
-          <v-btn style="width: 12.5rem" type="submit" color="primary" :loading="activateLoading">
+          <v-btn disabled style="width: 12.5rem" type="submit" color="primary" :loading="activateLoading">
             <v-icon class="mr-sm">mdi-location-enter</v-icon> Activating ...
           </v-btn>
           <!-- <v-tooltip location="top">
@@ -93,7 +95,7 @@ const accountActivate = async () => {
     // Handle successful activate (e.g., redirect to home page)
     activateSuccess.value = "Successfully activated account.";
     setTimeout(() => {
-      router.push("/auth/login");
+      router.push("/dashboard/overview");
     }, 4200);
     // You can use a router or state management solution like Vuex
   } catch (error) {
@@ -107,8 +109,8 @@ const accountActivate = async () => {
 </script>
 
 <style scoped>
-.activate-card {
-  max-width: 400px;
+.reset-card {
+  max-width: 98%;
   margin: auto;
   padding: 24px;
 }

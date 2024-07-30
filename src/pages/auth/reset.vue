@@ -1,7 +1,8 @@
 <template>
   <v-card class="reset-card mt-4 ml-2" elevation="4" outlined rounded>
     <v-card-title class="text-center">
-      <v-img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Logo_Institut_Curie.jpg" />
+      <v-img style="max-height:7.5rem;"
+        src="https://upload.wikimedia.org/wikipedia/commons/7/77/Logo_Institut_Curie.jpg" />
       <h3 class="mt-4 mr-11" style="color: #777777">Password Reset</h3>
     </v-card-title>
     <v-card-text>
@@ -16,11 +17,18 @@
         </v-container>
 
         <div class="d-flex justify-space-between mt-4">
-          <v-btn :disabled="password !== confirm" style="width: 10.5rem" type="submit" color="primary"
+          <v-btn :disabled="password !== confirm" style="width: 15rem" type="submit" color="primary"
             :loading="resetLoading">
             <v-icon class="mr-sm">mdi-location-enter</v-icon> Reset Password
           </v-btn>
-
+          <v-tooltip location="top">
+            <template v-slot:activator="{ props }">
+              <v-btn class="ml-xs" color="primary" icon height="30" variant="outlined" v-bind="props" to="/home">
+                <v-icon>mdi-home-account</v-icon>
+              </v-btn>
+            </template>
+            <span> Home</span>
+          </v-tooltip>
           <!-- <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn color="primary" icon height="30" variant="outlined" v-bind="props" to="/auth/register">
@@ -89,7 +97,7 @@ const submitReset = async () => {
       router.push("/auth/activate");
       return
     }
-    router.push("/todo-app/todos");
+    router.push("/dashboard/overview");
 
     // You can use a router or state management solution like Vuex
   } catch (error) {
@@ -97,17 +105,17 @@ const submitReset = async () => {
     //   router.push("/auth/activate");
     // }
     console.log({ error })
-    resetError.value = "Check your credentials."; // Set error message
+    resetError.value = "Failed to reset password."; // Set error message
     setTimeout(() => {
       window.location.reload();
-    }, 4200);
+    }, 42000);
   }
 };
 </script>
 
 <style scoped>
 .reset-card {
-  max-width: 400px;
+  max-width: 98%;
   margin: auto;
   padding: 24px;
 }
