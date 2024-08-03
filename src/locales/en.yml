@@ -12,11 +12,11 @@ hero:
     title: Features
 dashboard:
   sidebar:
-    dashboard-overview: Dashboard overview
-    rentals: Rentals
-    inventory: Inventory
-    customers: Customers
-    reports: Reports
+    dashboard-overview: Dashboard
+    papers: Papers
+    poster: Posters
+    poll: Poll
+    news: News
     settings: Settings
     help: Help
     logout: Logout

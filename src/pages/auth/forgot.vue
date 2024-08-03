@@ -109,8 +109,7 @@ const submitReset = async () => {
     email.value = ''
     // You can use a router or state management solution like Vuex
   } catch (error) {
-    console.log({ error })
-    resetError.value = "Check your credentials."; // Set error message
+     resetError.value = "Check your credentials."; // Set error message
     setTimeout(() => {
       window.location.reload();
     }, 42000);

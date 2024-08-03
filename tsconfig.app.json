@@ -9,9 +9,9 @@
     "src/**/__tests__/*"
   ],
   "compilerOptions": {
+    "module": "esnext",
     "composite": true,
     "allowJs": true,
-    "module": "ESNext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "jsx": "preserve",

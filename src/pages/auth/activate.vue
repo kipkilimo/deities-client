@@ -80,8 +80,7 @@ const activationToken = ref(''); // Replace with your token capturing logic
 onMounted(() => {
   const token = route.query.token;
   activationToken.value = String(token);
-  console.log({ token: activationToken.value })
-  setTimeout(() => {
+   setTimeout(() => {
     if (userStore.user.email.length < 5) {
       return;
     }
@@ -99,8 +98,7 @@ const accountActivate = async () => {
     }, 4200);
     // You can use a router or state management solution like Vuex
   } catch (error) {
-    console.log({ error })
-    activateError.value = "Failed to activate account."; // Set error message
+     activateError.value = "Failed to activate account."; // Set error message
     setTimeout(() => {
       router.push("/auth/register");
     }, 4200);

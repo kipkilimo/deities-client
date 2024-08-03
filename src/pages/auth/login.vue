@@ -10,10 +10,11 @@
     </v-card-title>
     <v-card-text>
       <v-form @submit.prevent="submitLogin">
-        <v-text-field color="primary" v-model="email" label="Username" required autofocus />
-        <v-text-field v-model="password" :type="showPassword ? 'text' : 'password'" label="Password"
-        :append-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'" @click:append="togglePassword"
-        required />
+        <v-text-field variant="outlined" color="primary" v-model="email" label="Registration email" required
+          autofocus />
+        <v-text-field variant="outlined" v-model="password" :type="showPassword ? 'text' : 'password'" label="Password"
+          :append-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'" @click:append="togglePassword"
+          required />
         <div class="d-flex justify-space-between mt-4">
           <v-btn style="width: 7.5rem" type="submit" color="primary" :loading="loginLoading">
             <v-icon class="mr-sm">mdi-location-enter</v-icon> Login
@@ -99,8 +100,7 @@ const submitLogin = async () => {
     }
 
     loginError.value = errorMessage;
-    console.log({ error })
-    setTimeout(() => {
+     setTimeout(() => {
       window.location.reload();
     }, 4200);
   }

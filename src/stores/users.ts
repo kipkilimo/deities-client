@@ -82,7 +82,6 @@ export const useUserStore = defineStore('login', {
         });
 
         // Handle response
-        console.log('Activation successful:', response.data?.requestPasswordReset);
 
         return response.data?.requestPasswordReset; // Return the registered user data if needed
       } catch (error) {
@@ -143,8 +142,7 @@ export const useUserStore = defineStore('login', {
         });
 
         // Handle response
-        console.log('Registration successful:', response.data?.register);
-
+ 
         return response.data?.register; // Return the registered user data if needed
       } catch (error) {
         console.error('Registration error:', error);
@@ -172,6 +170,11 @@ export const useUserStore = defineStore('login', {
         variables: { email, password },
       });
       this.user = response.data?.login?.user
+      const userObjRaw = [this.user]
+      const userObj = JSON.stringify(userObjRaw)
+      const userDetail = userObj // JSON.stringify(userObjRaw)
+
+      localStorage.setItem('user', userDetail)
       const token = response.data?.login?.accessToken;
       if (token) {
         this.isLoggedIn = true;
@@ -182,9 +185,21 @@ export const useUserStore = defineStore('login', {
       }
     },
     logout() {
+      // Set logged-in state to false
       this.isLoggedIn = false;
-      this.token = undefined;
-      // Clear token from secure storage (optional)
-    },
-  },
+
+      // Clear the token
+      this.token = '';
+      this.user = {} as UserState['user']; // Ensure user is an empty object of the correct type
+
+      // Clear all items from localStorage
+      localStorage.clear();
+
+      // Redirect to the login page
+      window.location.href = '/auth/login';
+
+      // Optionally, clear token from secure storage if applicable
+    }
+  }
+
 });

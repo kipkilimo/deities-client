@@ -77,8 +77,7 @@ const showConfirmPassword = ref(false);
 onMounted(() => {
   const token = route.query.token;
   activationToken.value = String(token);
-  console.log({ token: activationToken.value })
-
+ 
 });
 const togglePassword = () => {
   showPassword.value = !showPassword.value;
@@ -104,8 +103,7 @@ const submitReset = async () => {
     // if (userStore.user.activatedAccount === false) {
     //   router.push("/auth/activate");
     // }
-    console.log({ error })
-    resetError.value = "Failed to reset password."; // Set error message
+     resetError.value = "Failed to reset password."; // Set error message
     setTimeout(() => {
       window.location.reload();
     }, 42000);

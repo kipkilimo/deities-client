@@ -85,8 +85,7 @@ const submitRegister = async () => {
 
         // You can use a router or state management solution like Vuex
     } catch (error) {
-        console.log({ error })
-        loginError.value = "Failed to register new user."; // Set error message
+         loginError.value = "Failed to register new user."; // Set error message
         setTimeout(() => {
             window.location.reload();
         }, 4200);
