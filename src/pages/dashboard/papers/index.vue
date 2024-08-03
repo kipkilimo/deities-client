@@ -2,7 +2,16 @@
   <v-container>
     <v-row>
       <v-col cols="9">
-        <div class="content-box">Column 1 (9/12)</div>
+        <div>
+          <h3 v-if="!paperStore.paper.url">
+            <v-alert border="top" type="info" variant="outlined" prominent>
+              There is no paper to show at the moment. Check back later.
+            </v-alert>
+          </h3>
+          <div v-if="paperStore.paper.url">
+            <Highlighter />
+          </div>
+        </div>
       </v-col>
       <v-col cols="3">
         <v-row>
@@ -25,17 +34,27 @@
           <v-col cols="3">
             <v-btn
               variant="outlined"
-              color="blue-darken-3"
+              color="red-darken-3"
               :disabled="creatingJournal === false"
               @click="creatingJournal = false"
-              class="text-none mt-2"
-              icon="mdi-refresh"
-              size="x-small"
+              class="text-none mt-1"
+              icon="mdi-file-cancel"
+              size="small"
             ></v-btn>
           </v-col>
         </v-row>
         <v-sheet class="mx-auto" width="100%" v-if="creatingJournal">
-          <v-form fast-fail @submit.prevent="submitForm" v-if="isPaperEmpty">
+          <div v-if="successMessage">
+            <v-alert
+              :text="successMessage"
+              title="Success!"
+              type="success"
+            ></v-alert>
+          </div>
+          <div v-if="errorMessage">
+            <v-alert :text="errorMessage" title="Error!" type="error"></v-alert>
+          </div>
+          <v-form fast-fail @submit.prevent="submitForm" v-if="!isPaperCreated">
             <v-text-field
               style="max-width: 96%"
               class="mt-2 ml-sm"
@@ -69,7 +88,8 @@
           <v-divider></v-divider>
           <br />
 
-          <v-card class="ma-md dashed-border" v-if="!isPaperEmpty">
+          <v-card class="ma-md dashed-border" v-if="isPaperCreated">
+            <br />
             <v-file-input
               variant="outlined"
               v-model="pdfFile"
@@ -79,15 +99,17 @@
               truncate-length="15"
               show-size
               counter
+              style="max-width: 95%"
+              class="ma-md"
               prepend-icon="mdi-file-pdf-box"
               outlined
             ></v-file-input>
-            <v-card-actions>
+            <v-card-actions class="d-flex justify-center">
               <v-btn
                 class="me-2 text-none"
-                color="#4f545c"
+                color="#196279"
                 :disabled="!pdfFile"
-                prepend-icon="mdi-cloud-upload"
+                prepend-icon="mdi-cloud-upload-outline"
                 variant="flat"
                 @click="uploadJournalPaper"
               >
@@ -104,11 +126,24 @@
 <script setup lang="ts">
 import { ref, computed, onBeforeMount } from "vue";
 import { usePaperStore } from "../../../stores/papers";
+const paperStore = usePaperStore();
 import axios from "axios";
+// @ts-ignore
+import Highlighter from "../../../components/ArticleTextHighlighter.vue";
+// Reactive state variables
+// Computed property to check if the paper object is empty
+const isPaperCreated = ref(false);
+// computed(() => {
+//   const paper = paperStore.paper;
+//   return (
+//     paper && Object.keys(paper).length === 0 && paper.constructor === Object
+//   );
+// });
+// @ts-ignore
 const apiUrl = import.meta.env.VITE_BASE_URL;
 
 const user = ref<any>(null);
-onBeforeMount(() => {
+onBeforeMount(async () => {
   if (typeof localStorage !== "undefined") {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -120,19 +155,14 @@ onBeforeMount(() => {
       }
     }
   }
-});
-
-const paperStore = usePaperStore();
-// Reactive state variables
-// Computed property to check if the paper object is empty
-const isPaperEmpty = computed(() => {
-  const paper = paperStore.paper;
-  return (
-    paper && Object.keys(paper).length === 0 && paper.constructor === Object
-  );
+  await paperStore.getMostRecentPaper();
 });
 const loading = ref(false);
 const title = ref("");
+// successMessage,errorMessage
+const successMessage = ref("");
+const errorMessage = ref("");
+
 const paperSummary = ref("");
 const pdfFile = ref<File | null>(null);
 const creatingJournal = ref(false);
@@ -174,6 +204,8 @@ const showSubmit = () => {
 };
 // Form submission handler
 const submitForm = async () => {
+  loading.value = true;
+
   try {
     // Assuming that paperStore.createPaper is an asynchronous function that returns a promise
     await paperStore.createPaper(
@@ -183,13 +215,16 @@ const submitForm = async () => {
     );
 
     // Optionally, handle the success (e.g., showing a success message, clearing the form)
-    console.log("Paper successfully created");
+    loading.value = false;
+    isPaperCreated.value = true;
   } catch (error) {
     // Handle errors during paper creation
-    console.error("Error creating paper:", error);
+    loading.value = false;
+    errorMessage.value = "Error creating paper"; // successMessage,errorMessage
   }
 };
 const uploadJournalPaper = async function () {
+  loading.value = true;
   if (!pdfFile.value) {
     console.error("No file selected");
     return;
@@ -208,12 +243,20 @@ const uploadJournalPaper = async function () {
         },
       }
     );
+    const { message, url, updatedPaper } = response.data;
 
+    // Get the Pinia store instance
+
+    // Update the store with the response data
+    paperStore.setPaper(updatedPaper);
+    successMessage.value = message;
     // Handle success response
-    console.log("File uploaded successfully:", response.data);
+    loading.value = false;
   } catch (error) {
     // Handle error response
-    console.error("Error uploading file:", error);
+    loading.value = false;
+
+    errorMessage.value = "Error uploading file"; // successMessage,errorMessage
   }
 };
 </script>

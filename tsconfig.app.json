@@ -9,22 +9,26 @@
     "src/**/__tests__/*"
   ],
   "compilerOptions": {
-    "module": "esnext",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "lib": [
+      "DOM",
+      "ESNext"
+    ],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "composite": true,
     "allowJs": true,
-    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "jsx": "preserve",
     "noImplicitThis": true,
-    "strict": true,
     "isolatedModules": true,
     "baseUrl": ".",
     "verbatimModuleSyntax": true,
-    "target": "ESNext",
     "useDefineForClassFields": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
     "paths": {
       "@/*": [
         "./src/*"

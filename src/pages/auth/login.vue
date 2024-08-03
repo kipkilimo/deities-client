@@ -10,7 +10,7 @@
     </v-card-title>
     <v-card-text>
       <v-form @submit.prevent="submitLogin">
-        <v-text-field variant="outlined" color="primary" v-model="email" label="Registration email" required
+        <v-text-field variant="outlined" color="primary" style="width: 90%" v-model="email" label="Registration email" required
           autofocus />
         <v-text-field variant="outlined" v-model="password" :type="showPassword ? 'text' : 'password'" label="Password"
           :append-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'" @click:append="togglePassword"

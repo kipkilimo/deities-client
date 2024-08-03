@@ -19,11 +19,13 @@
   },
   "dependencies": {
     "@apollo/client": "^3.10.8",
+    "@jbtje/vite-vue3pdf": "^0.2.0",
     "@mdi/font": "^7.2.96",
     "@vue/apollo-composable": "^4.0.2",
     "@vueuse/core": "^10.4.1",
     "echarts": "^5.4.3",
     "graphql": "^16.9.0",
+    "or": "^0.2.0",
     "pinia": "^2.1.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

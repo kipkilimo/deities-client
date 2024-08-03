@@ -43,9 +43,55 @@ export const usePaperStore = defineStore("paper", {
     //     title,
     //     objective,
     //     publisherId,
+
+    async getMostRecentPaper() {
+      const getMostRecentPaper = gql`
+        query {
+          getMostRecentPaper {
+            id
+            title
+            objective
+            url
+            sessionId
+            discussion {
+              username
+              title
+              discussion
+              added
+            }
+            createdDate
+            createdBy {
+              id
+              username
+              email
+            }
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: getMostRecentPaper,
+        });
+
+        const paper = response.data?.getMostRecentPaper;
+        if (paper) {
+          this.paper = paper;
+          // this.setPapers(paper)
+        } else {
+          throw new Error("Failed to fetch paper");
+        }
+      } catch (error) {
+        console.error("Error fetching papers:", error);
+      }
+    },
+    //: Paper
+    setPaper(updatedPaper: Paper) {
+      this.paper = updatedPaper;
+    },
     async createPaper(title: string, objective: string, createdBy: string) {
       const CREATE_A_PAPER = gql`
-        mutation usePaperStore(
+        mutation createPaper(
           $title: String!
           $objective: String!
           $createdBy: ID!
@@ -60,13 +106,7 @@ export const usePaperStore = defineStore("paper", {
             objective
             url
             sessionId
-            discussion {
-              title
-            }
             createdDate
-            createdBy {
-              username
-            }
           }
         }
       `;
