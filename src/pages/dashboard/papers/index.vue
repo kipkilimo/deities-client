@@ -1,17 +1,13 @@
 <template>
   <v-container>
+    <h3 v-if="!paperStore.paper.url">
+      <v-alert border="top" type="info" variant="outlined" prominent>
+        There is no paper to show at the moment. Check back later.
+      </v-alert>
+    </h3>
     <v-row>
-      <v-col cols="9">
-        <div>
-          <h3 v-if="!paperStore.paper.url">
-            <v-alert border="top" type="info" variant="outlined" prominent>
-              There is no paper to show at the moment. Check back later.
-            </v-alert>
-          </h3>
-          <div v-if="paperStore.paper.url">
-            <Highlighter />
-          </div>
-        </div>
+      <v-col cols="9"> 
+          <Highlighter /> 
       </v-col>
       <v-col cols="3">
         <v-row>
@@ -44,20 +40,22 @@
           </v-col>
         </v-row>
         <v-sheet class="mx-auto" width="100%" v-if="creatingJournal">
-          <div v-if="successMessage">
+          <div v-if="successMessage" class="custom-alert">
             <v-alert
               :text="successMessage"
               title="Success!"
               type="success"
+              class="custom-alert"
             ></v-alert>
           </div>
           <div v-if="errorMessage">
             <v-alert :text="errorMessage" title="Error!" type="error"></v-alert>
           </div>
           <v-form fast-fail @submit.prevent="submitForm" v-if="!isPaperCreated">
+            <br />
             <v-text-field
-              style="max-width: 96%"
-              class="mt-2 ml-sm"
+              style="max-width: 93%"
+              class="mt-1 ml-sm"
               v-model="title"
               :rules="titleRules"
               label="Journal article title"
@@ -65,8 +63,8 @@
             ></v-text-field>
 
             <v-textarea
-              style="max-width: 96%"
-              class="mt-2 ml-sm"
+              style="max-width: 93%"
+              class="mt-1 ml-sm"
               variant="outlined"
               v-model="paperSummary"
               :rules="paperSummaryRules"
@@ -88,7 +86,11 @@
           <v-divider></v-divider>
           <br />
 
-          <v-card class="ma-md dashed-border" v-if="isPaperCreated">
+          <v-card
+            style="max-width: 95%"
+            class="ml-sm mb-lg dashed-border"
+            v-if="isPaperCreated"
+          >
             <br />
             <v-file-input
               variant="outlined"
@@ -99,7 +101,7 @@
               truncate-length="15"
               show-size
               counter
-              style="max-width: 95%"
+              style="max-width: 93%"
               class="ma-md"
               prepend-icon="mdi-file-pdf-box"
               outlined
@@ -117,6 +119,7 @@
               </v-btn>
             </v-card-actions>
           </v-card>
+          <br />
         </v-sheet>
       </v-col>
     </v-row>
@@ -170,12 +173,12 @@ const creatingJournal = ref(false);
 const titleRules = [
   (v: string) => !!v || "Title is required",
   (v: string) => v.length >= 2 || "Title must be at least 2 characters",
-  (v: string) => v.length <= 155 || "Title must be at most 150 characters",
+  (v: string) => v.length <= 255 || "Title must be at most 250 characters",
 ];
 const paperSummaryRules = [
   (v: string) => !!v || "Task is required",
   (v: string) => v.length >= 2 || "Task must be at least 2 characters",
-  (v: string) => v.length <= 555 || "Task must be at most 550 characters",
+  (v: string) => v.length <= 755 || "Task must be at most 750 characters",
 ];
 const pdfRules = [
   (v: File | null) => !!v || "PDF file is required",
@@ -251,6 +254,7 @@ const uploadJournalPaper = async function () {
     paperStore.setPaper(updatedPaper);
     successMessage.value = message;
     // Handle success response
+    creatingJournal.value = false;
     loading.value = false;
   } catch (error) {
     // Handle error response
@@ -271,6 +275,17 @@ const uploadJournalPaper = async function () {
 <style scoped>
 .dashed-border {
   border: 2px dashed #14a9ee; /* Customize the color and width as needed */
+}
+</style>
+<style scoped>
+.custom-alert {
+  background-color: #ffffff; /* Dark background */
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.custom-alert * {
+  color: white !important;
 }
 </style>
 <route lang="yaml">

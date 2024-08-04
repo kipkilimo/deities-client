@@ -9,12 +9,12 @@
     "src/**/__tests__/*"
   ],
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
+    "target": "esnext",
+    "module": "esnext",
     "moduleResolution": "node",
     "lib": [
       "DOM",
-      "ESNext"
+      "esnext"
     ],
     "strict": true,
     "esModuleInterop": true,

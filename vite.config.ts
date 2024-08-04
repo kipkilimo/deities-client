@@ -14,6 +14,9 @@ import vueJsx from "@vitejs/plugin-vue-jsx";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  esbuild: {
+    target: "esnext", // or 'es2015', 'es2018', etc., depending on your requirements
+  },
   plugins: [
     VueRouter({
       /* options */

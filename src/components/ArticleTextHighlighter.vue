@@ -1,99 +1,142 @@
 <template>
   <div>
-    <!-- <button @click="logContent">Log Content</button> -->
-    <pdf
-      ref="myPdfComponent"
-      :src="paperStore.paper.url"
-      @textLayerRendered="attachHighlightListeners"
-    ></pdf>
-    <div v-if="selectedText" class="annotation-box">
-      <textarea v-model="commentText" placeholder="Add your comment"></textarea>
-      <button @click="saveAnnotation">Save</button>
+    <div
+      ref="pdfContainer"
+      style="position: relative; width: 100%; overflow: auto"
+    >
+      <div
+        v-for="pageIndex in numPages"
+        :key="pageIndex"
+        class="page-container"
+      >
+        <canvas :ref="`canvas_${pageIndex}`" class="pdf-page"></canvas>
+        <div :ref="`textLayer_${pageIndex}`" class="textLayer"></div>
+      </div>
+    </div>
+    <div v-if="textDialogVisible" id="text-dialog">
+      <textarea v-model="selectedText" rows="5" cols="30"></textarea>
+      <button @click="closeDialog">Close</button>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, reactive, onMounted } from 'vue';
-import pdf from '@jbtje/vite-vue3pdf';
-import { usePaperStore } from '../../../client/src/stores/papers';
-// import { saveAnnotation as saveAnnotationService, fetchAnnotations as fetchAnnotationsService } from './annotationService';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { usePaperStore } from '../stores/papers';
+import * as pdfjsLib from 'pdfjs-dist/build/pdf';
+import 'pdfjs-dist/web/pdf_viewer.css';
+
+// Set the workerSrc property to the correct public path
+// @ts-ignore
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.js';
+
+// Define types
+
+// @ts-ignore
+type PDFDocumentProxy = pdfjsLib.PDFDocumentProxy;
+// @ts-ignore
+type PDFPageProxy = pdfjsLib.PDFPageProxy;
+
+const pdfContainer = ref<HTMLDivElement | null>(null);
+const numPages = ref<number>(0);
+const pdfInstance = ref<PDFDocumentProxy | null>(null);
+const textDialogVisible = ref<boolean>(false);
+const selectedText = ref<string>('');
 
 const paperStore = usePaperStore();
+const url = paperStore.paper.url;
 
-const myPdfComponent = ref(null);
-const selectedText = ref(null);
-const commentText = ref('');
-const annotations = reactive([]);
+const loadPdf = async (): Promise<void> => {
+  try {
+// @ts-ignore
+    const pdf = await pdfjsLib.getDocument({ url }).promise;
+    console.log('PDF loaded successfully', pdf);
 
-const logContent = () => {
-  if (myPdfComponent.value) {
-    myPdfComponent.value.pdf.forEachPage((page) =>
-      page.getTextContent().then((content) => {
-        const text = content.items.map((item) => item.str);
-        console.log(text);
-      })
-    );
+    pdfInstance.value = pdf;
+    numPages.value = pdf.numPages;
+    await renderAllPages();
+  } catch (error) {
+    console.error('Error loading PDF:', error);
   }
 };
 
-const attachHighlightListeners = () => {
-  const textLayer = myPdfComponent.value.$el.querySelector('.textLayer');
-  textLayer.addEventListener('mouseup', handleTextSelection);
+const renderAllPages = async (): Promise<void> => {
+  if (pdfInstance.value) {
+    for (let pageNumber = 1; pageNumber <= numPages.value; pageNumber++) {
+      await renderPage(pageNumber);
+    }
+  }
 };
 
-const handleTextSelection = () => {
+const renderPage = async (pageNumber: number): Promise<void> => {
+  try {
+    const page = await pdfInstance.value!.getPage(pageNumber);
+    const viewport = page.getViewport({ scale: 1 });
+
+    const canvas = pdfContainer.value!.querySelector<HTMLCanvasElement>(
+      `canvas:nth-of-type(${pageNumber})`
+    )!;
+    const context = canvas.getContext('2d')!;
+
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    const renderContext = {
+      canvasContext: context,
+      viewport: viewport,
+    };
+
+    await page.render(renderContext).promise;
+
+    const textLayerDiv = pdfContainer.value!.querySelector<HTMLDivElement>(
+      `.textLayer:nth-of-type(${pageNumber})`
+    )!;
+
+// @ts-ignore
+    await pdfjsLib.renderTextLayer().promise;
+  } catch (error) {
+    console.error('Error rendering page:', error);
+  }
+};
+
+const handleMouseUp = (): void => {
   const selection = window.getSelection();
   if (selection && selection.toString()) {
-    const range = selection.getRangeAt(0);
-    const rects = range.getClientRects();
-    selectedText.value = {
-      text: selection.toString(),
-      rects: Array.from(rects).map(rect => ({
-        left: rect.left,
-        top: rect.top,
-        width: rect.width,
-        height: rect.height,
-      })),
-    };
+    selectedText.value = selection.toString();
+    textDialogVisible.value = true;
   }
 };
 
-const saveAnnotation = async () => {
-  if (selectedText.value && commentText.value) {
-    const annotation = await saveAnnotationService({
-      text: selectedText.value.text,
-      comment: commentText.value,
-      user: 'Current User', // Replace with actual user data
-      rects: selectedText.value.rects,
-    });
-    annotations.push(annotation);
-    commentText.value = '';
-    selectedText.value = null;
-  }
+const closeDialog = (): void => {
+  textDialogVisible.value = false;
+  selectedText.value = '';
 };
-
-// const loadAnnotations = async () => {
-//   const fetchedAnnotations = await fetchAnnotationsService();
-//   fetchedAnnotations.forEach(annotation => annotations.push(annotation));
-// };
 
 onMounted(() => {
- //  loadAnnotations();
+  loadPdf();
+  document.addEventListener('mouseup', handleMouseUp);
 });
 </script>
 
-<style>
-.textLayer {
-  position: relative;
+<style scoped>
+.pdf-page {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
 }
-.annotation-box {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  background: white;
-  border: 1px solid black;
+
+.page-container {
+  position: relative;
+  width: 100%;
+}
+
+#text-dialog {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  background-color: white;
   padding: 10px;
-  z-index: 1000;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 </style>
