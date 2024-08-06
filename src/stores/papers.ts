@@ -9,13 +9,25 @@ createPaper(_: any, {
             objective,
             publisherId,
             */
+interface Discussion {
+  pageNumber: number;
+  title: string;
+  content: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  id: string;
+  username: string;
+  addedDate: string;
+}
 interface Paper {
   id: string;
   title: string;
   objective: string;
   url: string;
   sessionId: string;
-  discussion: [string];
+  discussion: [Discussion];
   createdDate: string;
   createdBy: string;
 }
@@ -54,10 +66,16 @@ export const usePaperStore = defineStore("paper", {
             url
             sessionId
             discussion {
-              username
+              pageNumber
               title
-              discussion
-              added
+              content
+              x
+              y
+              width
+              height
+              id
+              username
+              addedDate
             }
             createdDate
             createdBy {
@@ -89,6 +107,36 @@ export const usePaperStore = defineStore("paper", {
     setPaper(updatedPaper: Paper) {
       this.paper = updatedPaper;
     },
+
+    // SAVE PAPER DISCUSSION TO DISCUSSION ARRAY
+    async saveDiscussionComment(val: string) {
+      const CREATE_A_PAPER = gql`
+        mutation createPaper($val: String!) {
+          saveDiscussionComment(val: $val) {
+            id
+            title
+            objective
+            url
+            sessionId
+            createdDate
+          }
+        }
+      `;
+
+      const response = await client.mutate({
+        mutation: CREATE_A_PAPER,
+        variables: { val },
+      });
+
+      const paper = response.data?.saveDiscussionComment;
+      if (paper) {
+        this.paper = paper;
+        //  Store paper in secure storage (optional)
+      } else {
+        throw new Error("Could not add journal club material.");
+      }
+    },
+
     async createPaper(title: string, objective: string, createdBy: string) {
       const CREATE_A_PAPER = gql`
         mutation createPaper(

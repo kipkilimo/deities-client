@@ -13,11 +13,13 @@ hero:
 dashboard:
   sidebar:
     dashboard-overview: Dashboard
-    papers: Papers
+    papers: Journal Club
     poster: Posters
-    poll: Poll
+    poll: Live Quiz
     news: News
-    settings: Settings
+
+    events: Events
+    library: Resource Center
     help: Help
     logout: Logout
   main:

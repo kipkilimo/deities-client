@@ -1,20 +1,28 @@
 <template>
   <v-container>
-    <h3 v-if="!paperStore.paper.url">
-      <v-alert border="top" type="info" variant="outlined" prominent>
-        There is no paper to show at the moment. Check back later.
-      </v-alert>
-    </h3>
     <v-row>
-      <v-col cols="9"> 
-          <Highlighter /> 
+      <v-col cols="9">
+        <!-- Display message if no paper URL exists -->
+        <h3 v-if="!paperStore.paper.url">
+          <v-alert border="top" type="info" variant="outlined" prominent>
+            There is no paper to show at the moment. Check back later.
+          </v-alert>
+        </h3>
+
+        <!-- Display the highlighter component if the paper URL exists -->
+        <div v-if="paperStore.paper.url">
+          <Highlighter />
+        </div>
       </v-col>
+
       <v-col cols="3">
         <v-row>
           <v-col cols="9">
             <v-btn
               style="width: 70%"
-              :disabled="creatingJournal === true"
+              :disabled="
+                !isAddArticleEnabled || creatingJournal || isPaperCreated
+              "
               class="text-none mb-4"
               color="blue-darken-3"
               size="large"
@@ -31,15 +39,17 @@
             <v-btn
               variant="outlined"
               color="red-darken-3"
-              :disabled="creatingJournal === false"
-              @click="creatingJournal = false"
+              :disabled="!creatingJournal"
+              @click="cancelForm"
               class="text-none mt-1"
               icon="mdi-file-cancel"
               size="small"
             ></v-btn>
           </v-col>
         </v-row>
-        <v-sheet class="mx-auto" width="100%" v-if="creatingJournal">
+
+        <v-sheet class="mx-auto" width="100%">
+          <!-- Display success or error messages -->
           <div v-if="successMessage" class="custom-alert">
             <v-alert
               :text="successMessage"
@@ -51,11 +61,17 @@
           <div v-if="errorMessage">
             <v-alert :text="errorMessage" title="Error!" type="error"></v-alert>
           </div>
-          <v-form fast-fail @submit.prevent="submitForm" v-if="!isPaperCreated">
+
+          <!-- Display form to add journal -->
+          <v-form
+            fast-fail
+            @submit.prevent="submitForm"
+            v-if="creatingJournal && !isPaperCreated"
+          >
             <br />
             <v-text-field
               style="max-width: 93%"
-              class="mt-1 ml-sm"
+              class="mt-2 ml-sm"
               v-model="title"
               :rules="titleRules"
               label="Journal article title"
@@ -74,22 +90,25 @@
 
             <v-btn
               style="width: 90%"
-              class="mt-2 ml-sm"
+              class="mt-1 nb-2 ml-sm"
               align-centre
               :disabled="!isFormValid"
               type="submit"
-              >Submit</v-btn
             >
+              Submit
+            </v-btn>
+            <br />
+            <br />
           </v-form>
+
           <!-- File Upload for PDF -->
-          <br />
           <v-divider></v-divider>
           <br />
-
           <v-card
+            :disabled="loading"
             style="max-width: 95%"
             class="ml-sm mb-lg dashed-border"
-            v-if="isPaperCreated"
+            v-if="isPaperCreated && !paperStore.paper.url"
           >
             <br />
             <v-file-input
@@ -118,6 +137,9 @@
                 Upload Paper
               </v-btn>
             </v-card-actions>
+            <div class="" v-if="loading">
+              <v-progress-linear color="teal" indeterminate></v-progress-linear>
+            </div>
           </v-card>
           <br />
         </v-sheet>
@@ -125,27 +147,144 @@
     </v-row>
   </v-container>
 </template>
-
 <script setup lang="ts">
 import { ref, computed, onBeforeMount } from "vue";
 import { usePaperStore } from "../../../stores/papers";
-const paperStore = usePaperStore();
 import axios from "axios";
 // @ts-ignore
 import Highlighter from "../../../components/ArticleTextHighlighter.vue";
-// Reactive state variables
-// Computed property to check if the paper object is empty
-const isPaperCreated = ref(false);
-// computed(() => {
-//   const paper = paperStore.paper;
-//   return (
-//     paper && Object.keys(paper).length === 0 && paper.constructor === Object
-//   );
-// });
+
+const paperStore = usePaperStore();
 // @ts-ignore
 const apiUrl = import.meta.env.VITE_BASE_URL;
 
 const user = ref<any>(null);
+const loading = ref(false);
+const title = ref("");
+const paperSummary = ref("");
+const pdfFile = ref<File | null>(null);
+const creatingJournal = ref(false);
+const successMessage = ref("");
+const errorMessage = ref("");
+const isPaperCreated = ref(false);
+
+// Validate the title and summary
+const titleRules = [
+  (v: string) => !!v || "Title is required",
+  (v: string) => v.length >= 2 || "Title must be at least 2 characters",
+  (v: string) => v.length <= 255 || "Title must be at most 250 characters",
+];
+const paperSummaryRules = [
+  (v: string) => !!v || "Summary is required",
+  (v: string) => v.length >= 2 || "Summary must be at least 2 characters",
+  (v: string) => v.length <= 755 || "Summary must be at most 750 characters",
+];
+const maxFileSize = 10 * 1024 * 1024; // 10MB
+
+const pdfRules = [
+  (value: File | null) => !!value || "File is required.",
+  (value: File | null) => {
+    if (!value) return "File is required.";
+    if (value.size > maxFileSize) {
+      return `File size should be less than ${maxFileSize / (1024 * 1024)} MB.`;
+    }
+    return true;
+  },
+  (value: File | null) => {
+    if (!value) return true;
+    const fileName = value.name.toLowerCase();
+    return fileName.endsWith(".pdf") || "The file must have a .pdf extension.";
+  },
+];
+
+const isFormValid = computed(() => {
+  return (
+    titleRules.every((rule) =>
+      typeof rule === "function" ? rule(title.value) === true : true
+    ) &&
+    paperSummaryRules.every((rule) =>
+      typeof rule === "function" ? rule(paperSummary.value) === true : true
+    )
+  );
+});
+
+const isButtonDisabled = computed(() => {
+  const now = Date.now();
+  const oneDayInMs = 24 * 60 * 60 * 1000;
+  const twoWeeksInMs = 14 * 24 * 60 * 60 * 1000;
+
+  const createdDateMs = Number(paperStore.paper.createdDate);
+  const timeDiff = now - createdDateMs;
+
+  return timeDiff > oneDayInMs || timeDiff < twoWeeksInMs;
+});
+
+const isAddArticleEnabled = computed(() => {
+  const lastPublishedDate = paperStore.paper.createdDate;
+  if (!lastPublishedDate) return true;
+  const fourteenDaysAgo = new Date();
+  fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+  return new Date(lastPublishedDate) < fourteenDaysAgo;
+});
+
+const showSubmit = () => {
+  creatingJournal.value = true;
+};
+
+const cancelForm = () => {
+  creatingJournal.value = false;
+  isPaperCreated.value = false;
+};
+
+const submitForm = async () => {
+  loading.value = true;
+
+  try {
+    await paperStore.createPaper(
+      title.value,
+      paperSummary.value,
+      user.value.id
+    );
+
+    loading.value = false;
+    isPaperCreated.value = true;
+  } catch (error) {
+    loading.value = false;
+    errorMessage.value = "Error creating paper";
+  }
+};
+
+const uploadJournalPaper = async () => {
+  loading.value = true;
+  if (!pdfFile.value) {
+    console.error("No file selected");
+    return;
+  }
+  const formData = new FormData();
+  formData.append("file", pdfFile.value);
+
+  try {
+    const response = await axios.post(
+      `${apiUrl}/convert-pdf?paperId=${paperStore.paper.id}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    const { message, url, updatedPaper } = response.data;
+
+    paperStore.setPaper(updatedPaper);
+    successMessage.value = message;
+    creatingJournal.value = false;
+    loading.value = false;
+  } catch (error) {
+    loading.value = false;
+    errorMessage.value = "Error uploading file";
+  }
+};
+
 onBeforeMount(async () => {
   if (typeof localStorage !== "undefined") {
     const storedUser = localStorage.getItem("user");
@@ -160,134 +299,22 @@ onBeforeMount(async () => {
   }
   await paperStore.getMostRecentPaper();
 });
-const loading = ref(false);
-const title = ref("");
-// successMessage,errorMessage
-const successMessage = ref("");
-const errorMessage = ref("");
-
-const paperSummary = ref("");
-const pdfFile = ref<File | null>(null);
-const creatingJournal = ref(false);
-// Validation rules
-const titleRules = [
-  (v: string) => !!v || "Title is required",
-  (v: string) => v.length >= 2 || "Title must be at least 2 characters",
-  (v: string) => v.length <= 255 || "Title must be at most 250 characters",
-];
-const paperSummaryRules = [
-  (v: string) => !!v || "Task is required",
-  (v: string) => v.length >= 2 || "Task must be at least 2 characters",
-  (v: string) => v.length <= 755 || "Task must be at most 750 characters",
-];
-const pdfRules = [
-  (v: File | null) => !!v || "PDF file is required",
-  (v: File | null) =>
-    !v || v.type === "application/pdf" || "File must be a PDF",
-];
-// Computed property to determine if the form is valid
-const isFormValid = computed(() => {
-  // Validate title
-  const titleErrors = titleRules
-    .map((rule) => rule(title.value))
-    .filter((error) => error !== true);
-  if (titleErrors.length > 0) return false;
-
-  // Validate paper summary
-  const paperSummaryErrors = paperSummaryRules
-    .map((rule) => rule(paperSummary.value))
-    .filter((error) => error !== true);
-  if (paperSummaryErrors.length > 0) return false;
-
-  return true;
-});
-const showSubmit = () => {
-  // Implement form submission logic here
-  creatingJournal.value = true;
-};
-// Form submission handler
-const submitForm = async () => {
-  loading.value = true;
-
-  try {
-    // Assuming that paperStore.createPaper is an asynchronous function that returns a promise
-    await paperStore.createPaper(
-      title.value,
-      paperSummary.value,
-      user.value.id
-    );
-
-    // Optionally, handle the success (e.g., showing a success message, clearing the form)
-    loading.value = false;
-    isPaperCreated.value = true;
-  } catch (error) {
-    // Handle errors during paper creation
-    loading.value = false;
-    errorMessage.value = "Error creating paper"; // successMessage,errorMessage
-  }
-};
-const uploadJournalPaper = async function () {
-  loading.value = true;
-  if (!pdfFile.value) {
-    console.error("No file selected");
-    return;
-  }
-  // Create a FormData object to hold the file data
-  const formData = new FormData();
-  formData.append("file", pdfFile.value);
-
-  try {
-    const response = await axios.post(
-      `${apiUrl}/api/upload?paperId=${paperStore.paper.id}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-    const { message, url, updatedPaper } = response.data;
-
-    // Get the Pinia store instance
-
-    // Update the store with the response data
-    paperStore.setPaper(updatedPaper);
-    successMessage.value = message;
-    // Handle success response
-    creatingJournal.value = false;
-    loading.value = false;
-  } catch (error) {
-    // Handle error response
-    loading.value = false;
-
-    errorMessage.value = "Error uploading file"; // successMessage,errorMessage
-  }
-};
 </script>
 
 <style scoped>
-.content-box {
-  border: 1px solid #ccc;
-  padding: 16px;
-  text-align: center;
-}
-</style>
-<style scoped>
 .dashed-border {
-  border: 2px dashed #14a9ee; /* Customize the color and width as needed */
+  border: 2px dashed #14a9ee;
 }
-</style>
-<style scoped>
 .custom-alert {
-  background-color: #ffffff; /* Dark background */
+  background-color: #ffffff !important;
   padding: 20px;
-  border-radius: 5px;
+  border-radius: 5px !important;
 }
-
 .custom-alert * {
   color: white !important;
 }
 </style>
+
 <route lang="yaml">
 meta:
   layout: DashboardLayout

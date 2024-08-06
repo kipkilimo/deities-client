@@ -32,7 +32,7 @@
 
                 <div v-if="filteredDeities.length" dense>
 
-                    <v-chip size="large" v-for="deity in filteredDeities" :key="deity.id" color="purple" rounded
+                    <v-chip size="large" v-for="deity in filteredDeities" :key="deity.id" color="indigo darken-3" rounded
                         variant="outlined" class="chip" @click="handleChipClick(deity)">
                         {{ deity.name }} ({{ deity.locality }},{{ deity.favs }} <v-icon size="xs"
                             color="red">mdi-heart-outline</v-icon>s)

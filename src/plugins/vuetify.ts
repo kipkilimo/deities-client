@@ -11,20 +11,20 @@ import '@mdi/font/css/materialdesignicons.css'
 
 // Theme
 const light: ThemeDefinition = {
-    dark: false,
-    colors: {
-        background: '#efefef',
-        surface: '#fff',
-        primary: '#ef7f01',
-        'primary-darken-1': '#b2540b',
-        secondary: '#008ad1',
-        'secondary-darken-1': '#006ea9',
-        error: '#B00020',
-        info: '#4496F3',
-        success: '#16DB93',
-        warning: '#CB8C00',
-    },
-}
+  dark: false,
+  colors: {
+    background: "#efefef",
+    surface: "#fff",
+    primary: "#1867c0",
+    "primary-darken-1": "#0c0c0c",
+    secondary: "#08b5ed",
+    "secondary-darken-1": "#177fd4",
+    error: "#B00020",
+    info: "#4496F3",
+    success: "#16DB93",
+    warning: "#CB8C00",
+  },
+};
 
 const dark: ThemeDefinition = {
     dark: true,

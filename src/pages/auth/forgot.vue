@@ -112,7 +112,7 @@ const submitReset = async () => {
      resetError.value = "Check your credentials."; // Set error message
     setTimeout(() => {
       window.location.reload();
-    }, 42000);
+    }, 2700);
   }
 };
 </script>

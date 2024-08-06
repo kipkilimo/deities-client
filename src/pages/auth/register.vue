@@ -11,7 +11,7 @@
                 <v-text-field v-model="password" :type="showPassword ? 'text' : 'password'" label="Password"
                     :append-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'" @input="validatePassword"
                     :rules="passwordRules" @click:append="togglePassword" required />
-                <h4> My favorite deity: <strong color="purple">
+                <h4> My favorite deity: <strong color="indigo darken-3">
                         {{ userStore.username.length < 1 ? 'None' : userStore.username }}</strong>
 
                 </h4>
