@@ -1,352 +1,506 @@
 <template>
-  <div class="pdf-container">
-    <div>
+  <v-container>
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" v-if="loading" class="loading-indicator">
+      Loading...
+    </div>
+
+    <!-- PDF Container -->
+    <div
+      id="pdf-container"
+      ref="pdfContainer"
+      style="position: relative; overflow-y: auto; height: 100vh"
+      @scroll="handleScroll"
+    >
+      <PDF
+        :src="pdfUrl"
+        ref="pdfImage"
+        @onPageChange="updatePageNumber"
+        @mousedown="startSelection"
+        @page-change="onPageChange"
+        style="width: 100%; height: auto"
+      />
+      <!-- Selection Overlay -->
       <div
-        v-for="page in JSON.parse(paper.url)"
-        :key="page.image"
-        class="pdf-page"
-        @mousedown.prevent="startHighlight(page.number, $event)"
-        @mousemove="updateHighlight($event), showComment(page.number, $event)"
-        @mouseup="endHighlight"
-        @mouseleave="hideComment"
+        v-if="selectionActive"
+        :style="overlayStyle"
+        class="selection-overlay"
+      ></div>
+
+      <!-- Comment Markers -->
+      <div
+        v-for="(commentData, index) in filteredComments"
+        :key="index"
+        :style="commentStyle(commentData)"
+        class="comment-marker"
+        @mouseover="showTooltip = index"
+        @mouseleave="showTooltip = null"
       >
-        <img
-          :src="page.image" 
-          alt="PDF page"
-          class="pdf-image"
-        />
-        <div
-          v-for="highlight in page.highlights"
-          :key="highlight.id"
-          :style="highlight.style"
-          class="highlight-overlay"
-        ></div>
-        <div
-          v-if="currentLine.active"
-          :style="currentLine.style"
-          class="line-overlay"
-        ></div>
+        <v-tooltip bottom v-if="showTooltip === index">
+          <template #activator="{ on, attrs }">
+            <v-card
+              color="#F1FFFE"
+              v-bind="attrs"
+              v-on="on"
+              style="max-width: 27rem"
+            >
+              <div class="ma-4 text-h6">{{ commentData.title }}</div>
+              <div class="ma-4 text-h7">
+                <i>{{ commentData.text }}</i>
+              </div>
+
+              <v-divider />
+              <v-card-actions>
+                <v-card-subtitle class="pt-4">
+                  Added {{ reactiveTimeAgo(Number(commentData.timestamp)) }} by
+                  {{ commentData.author }}
+                </v-card-subtitle>
+              </v-card-actions>
+            </v-card>
+          </template>
+        </v-tooltip>
       </div>
     </div>
+
+    <!-- Comment Dialog -->
+    <v-dialog v-model="dialogVisible" max-width="500px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Add a comment</span>
+        </v-card-title>
+        <v-divider></v-divider>
+
+        <v-card-text>
+          <v-form fast-fail @submit.prevent>
+            <v-text-field
+              v-model="title"
+              :rules="titleRules"
+              label="Title"
+            ></v-text-field>
+            <v-textarea
+              v-model="text"
+              label="Discussion text"
+              rows="3"
+              :rules="textRules"
+              required
+            ></v-textarea>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn text @click="cancelComment">Cancel</v-btn>
+          <v-btn color="primary" @click="saveComment">Save Comment</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Filtered Comments Iterator Dialog -->
     <div
-      v-if="hoveredComment"
-      :style="hoveredComment.style"
-      class="comment-popup"
+      max-width="350px"
+      style="
+        position: fixed;
+        z-index: 1000;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+      "
+      :style="{ top: dialogTop, left: dialogLeft }"
+      @mousedown="onMouseDown"
     >
-      {{ hoveredComment.content }}
+      <v-card ref="draggableCard" class="draggable-card">
+        <v-card-title @mousedown.stop="onMouseDown">
+          <span class="headline"
+            >Page {{ currentPage }} Discussion Comments.</span
+          >
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-card-text>
+          <div class="" v-if="filteredComments.length === 0">
+            <h5>No discussion comments added yet.</h5>
+          </div>
+          <div class="scrollable-list-container">
+            <v-list>
+              <v-list-item-group
+                v-for="(comment, index) in filteredComments"
+                :key="index"
+              >
+                <v-card color="#DE9F9FF" flat style="max-width: 27rem">
+                  <div class="ma-4 text-h6">{{ comment.title }}</div>
+                  <div class="ma-4 text-h7">
+                    <i>{{ comment.text }}</i>
+                  </div>
+                  <v-card-actions>
+                    <v-card-subtitle class="pt-4">
+                      Added {{ reactiveTimeAgo(Number(comment.timestamp)) }} by
+                      {{ comment.author }}
+                    </v-card-subtitle>
+                  </v-card-actions>
+                  <v-divider />
+                </v-card>
+              </v-list-item-group>
+            </v-list>
+          </div>
+        </v-card-text>
+      </v-card>
     </div>
-    <div
-      v-if="newComment.visible"
-      class="new-comment-form"
-      :style="newComment.style"
-    >
-      <input v-model="newComment.title" placeholder="Discussion title" />
-      <textarea
-        v-model="newComment.text"
-        placeholder="Your journal article discussion"
-      ></textarea>
-      <div class="buttons">
-        <button @click="saveComment">Save</button>
-        <button @click="cancelComment">Cancel</button>
-      </div>
-    </div>
-  </div>
+  </v-container>
 </template>
 
-<script setup lang="ts">
-import { ref, reactive, onBeforeMount, onMounted, computed } from "vue";
+<script setup>
+import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
+import PDF from "pdf-vue3";
 import { usePaperStore } from "../stores/papers";
 
+// Paper store
 const paperStore = usePaperStore();
-const paper = paperStore.paper;
-const user = ref<any>(null);
+const pdfUrl = paperStore.paper.url;
+const commentsDialogVisible = ref(true);
+const titleRules = [
+  (value) =>
+    value?.length > 3 ? true : "Input must be at least 3 characters.",
+  (value) =>
+    value?.length < 125 ? true : "Input must be at most 120 characters.",
+];
 
-onBeforeMount(() => {
-  if (typeof localStorage !== "undefined") {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        user.value = parsedUser && parsedUser[0] ? parsedUser[0] : {};
-      } catch (error) {
-        console.error("Error parsing user data from localStorage:", error);
+const textRules = [
+  (value) =>
+    value?.length > 15 ? true : "Input must be at least 15 characters.",
+  (value) =>
+    value?.length < 355 ? true : "Input must be at most 350 characters.",
+];
+
+// Refs for managing state
+const title = ref("");
+const text = ref("");
+
+const comments = ref([]);
+const selectionStart = ref({ x: null, y: null });
+const selectionEnd = ref({ x: null, y: null });
+const selectedArea = ref({ x: null, y: null, width: null, height: null });
+const currentPage = ref(1);
+
+const selectionActive = ref(false);
+const dialogVisible = ref(false);
+const showTooltip = ref(null);
+const pdfContainer = ref(null);
+const pdfImage = ref(null);
+const loading = ref(false);
+
+let lastScrollTop = 0;
+const scrollThreshold = 100;
+const dialogTop = ref("6.6rem"); // Initial position
+const dialogLeft = ref("75%"); // Initial position
+const isDragging = ref(false);
+const dragStartX = ref(0);
+const dragStartY = ref(0);
+
+// Methods
+const onMouseDown = (event) => {
+  if (event.target.closest(".draggable-card")) {
+    isDragging.value = true;
+    dragStartX.value = event.clientX;
+    dragStartY.value = event.clientY;
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  }
+};
+
+const onMouseMove = (event) => {
+  if (isDragging.value) {
+    const deltaX = event.clientX - dragStartX.value;
+    const deltaY = event.clientY - dragStartY.value;
+    dialogTop.value = `${parseInt(dialogTop.value) + deltaY}px`;
+    dialogLeft.value = `${parseInt(dialogLeft.value) + deltaX}px`;
+    dragStartX.value = event.clientX;
+    dragStartY.value = event.clientY;
+  }
+};
+
+const onMouseUp = () => {
+  isDragging.value = false;
+  window.removeEventListener("mousemove", onMouseMove);
+  window.removeEventListener("mouseup", onMouseUp);
+};
+
+const viewComment = (comment) => {
+  // Handle viewing specific comment details
+};
+
+// Cleanup
+onBeforeUnmount(() => {
+  window.removeEventListener("mousemove", onMouseMove);
+  window.removeEventListener("mouseup", onMouseUp);
+});
+function updatePageNumber(newPage) {
+  currentPage.value = newPage;
+  loading.value = true;
+
+  loadContent(newPage)
+    .then(() => {
+      loading.value = false;
+    })
+    .catch((error) => {
+      console.error("Error loading content:", error);
+      loading.value = false;
+    });
+}
+
+function handleScroll() {
+  const scrollTop = pdfContainer.value.scrollTop;
+  const scrollHeight = pdfContainer.value.scrollHeight;
+  const clientHeight = pdfContainer.value.clientHeight;
+  const scrollDirection = scrollTop - lastScrollTop;
+
+  if (Math.abs(scrollDirection) > scrollThreshold) {
+    const containerBottom = scrollTop + clientHeight;
+    const pdfImageElement = pdfImage.value.$el;
+    const pdfRect = pdfImageElement.getBoundingClientRect();
+
+    if (scrollDirection > 0 && pdfRect.bottom < 0) {
+      // Scrolling down, previous page is out of view
+      updatePageNumber(currentPage.value + 1);
+    } else if (scrollDirection < 0 && pdfRect.top > clientHeight) {
+      // Scrolling up, next page is out of view
+      if (currentPage.value > 1) {
+        updatePageNumber(currentPage.value - 1);
       }
     }
+    lastScrollTop = scrollTop;
   }
-});
 
-const pages = ref<any[]>([]);
-const hoveredComment = ref<{
-  title: string;
-  content: string;
-  style: Record<string, string>;
-} | null>(null);
+  updateHighlightPositions();
+}
 
-const comments = reactive(paper.discussion || []);
-
-const newHighlight = reactive({
-  active: false,
-  pageNumber: 0,
-  startX: 0,
-  startY: 0,
-  currentX: 0,
-  currentY: 0,
-});
-
-const newComment = reactive({
-  visible: false,
-  title: "",
-  text: "",
-  x: 0,
-  y: 0,
-  pageNumber: 0,
-  style: {
-    left: "0px",
-    top: "0px",
-  },
-});
-
-const currentLine = ref({
-  active: false,
-  pageNumber: 0,
-  startY: 0,
-  height: 0,
-  style: {
-    left: "0px",
-    top: "0px",
-    height: "0px",
-    backgroundColor: "rgba(255, 200, 0, 0.3)", // Adjust color as needed
-  },
-});
-
-// Fetch and process pages data, adding highlights
-const fetchPages = async () => {
-  pages.value = JSON.parse(paper.url).map((pageData: any) => ({
-    ...pageData,
-    highlights: comments
-      .filter((comment) => comment.pageNumber === pageData.number)
-      .map((comment) => ({
-        ...comment,
-        style: {
-          left: `${comment.x}px`,
-          top: `${comment.y}px`,
-          width: "100px", // Example width, adjust based on comment data if available
-          height: "100px", // Example height, adjust based on comment data if available
-        },
-      })),
-  }));
-};
-
-// Function to extract timestamp from the image URL
-const extractTimestamp = (url: string) => {
-  const match = url.match(/t-(\d+)-page/);
-  return match ? parseInt(match[1], 10) : null;
-};
-
-// Sort pages based on timestamp
-const sortedPages = computed(() => {
-  return pages.value.slice().sort((a, b) => {
-    const timestampA = extractTimestamp(a.image);
-    const timestampB = extractTimestamp(b.image);
-    return (timestampA || 0) - (timestampB || 0);
+function loadContent(pageNumber) {
+  // Simulate content loading with a promise
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      // Simulate a successful load after 1 second
+      console.log(`Content for page ${pageNumber} loaded.`);
+      resolve();
+    }, 300);
   });
-});
+}
 
-// Show comment tooltip
-const showComment = (pageNumber: number, event: MouseEvent) => {
-  const target = event.currentTarget as HTMLDivElement;
-  const rect = target.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
+// Load comments from local storage
+function loadComments() {
+  const savedComments = localStorage.getItem("comments");
+  if (savedComments) {
+    comments.value = JSON.parse(savedComments);
+  }
+}
 
-  const comment = comments.find(
-    (comment) =>
-      comment.pageNumber === pageNumber &&
-      Math.abs(comment.x - x) < 10 &&
-      Math.abs(comment.y - y) < 10
-  );
+// Save comments to local storage
+function saveComments() {
+  localStorage.setItem("comments", JSON.stringify(comments.value));
+}
 
-  if (comment) {
-    hoveredComment.value = {
-      title: comment.title,
-      content: comment.content,
-      style: {
-        left: `${event.clientX}px`,
-        top: `${event.clientY}px`,
-      },
+// Filter comments for the current page
+const filteredComments = computed(() =>
+  comments.value.filter((comment) => comment.page === currentPage.value)
+);
+
+// Function to handle mouse down event to start selection
+function startSelection(event) {
+  const pdfImageElement = pdfImage.value.$el;
+  const rect = pdfImageElement.getBoundingClientRect();
+  selectionStart.value = {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+  selectionActive.value = true;
+}
+
+// Function to handle mouse move event to update selection
+function handleMouseMove(event) {
+  if (selectionActive.value) {
+    const pdfImageElement = pdfImage.value.$el;
+    const rect = pdfImageElement.getBoundingClientRect();
+    selectionEnd.value = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
     };
-  } else {
-    hoveredComment.value = null;
   }
-};
+}
 
-// Hide comment tooltip
-const hideComment = () => {
-  hoveredComment.value = null;
-};
+// Function to handle mouse up event to end selection
+function endSelection() {
+  selectionActive.value = false;
+  openCommentDialog();
+}
 
-// Start creating a highlight
-const startHighlight = (pageNumber: number, event: MouseEvent) => {
-  currentLine.value.active = true;
-  currentLine.value.pageNumber = pageNumber;
-  currentLine.value.startY = event.clientY;
-};
+// Function to open the comment dialog
+function openCommentDialog() {
+  const pdfImageElement = pdfImage.value.$el;
+  const rect = pdfImageElement.getBoundingClientRect();
+  const containerWidth = rect.width;
+  const x = Math.min(selectionStart.value.x, selectionEnd.value.x);
+  const y = Math.min(selectionStart.value.y, selectionEnd.value.y);
+  const width = Math.abs(selectionStart.value.x - selectionEnd.value.x);
+  const height = Math.abs(selectionStart.value.y - selectionEnd.value.y);
 
-// Update highlight dimensions during mouse move
-const updateHighlight = (event: MouseEvent) => {
-  if (!currentLine.value.active) return;
-
-  const pageElement = (
-    event.currentTarget as HTMLDivElement
-  ).getBoundingClientRect();
-  const offsetY = event.clientY - pageElement.top;
-
-  currentLine.value.height = Math.max(
-    0,
-    offsetY - (currentLine.value.startY - pageElement.top)
-  );
-  currentLine.value.style.top = `${Math.min(currentLine.value.startY - pageElement.top, offsetY)}px`;
-  currentLine.value.style.height = `${currentLine.value.height}px`;
-};
-
-// End highlighting, possibly create a new comment
-const endHighlight = async () => {
-  if (!currentLine.value.active) return;
-
-  currentLine.value.active = false;
-
-  const lineHeight = 20; // Example line height; replace with actual if known
-  if (currentLine.value.height <= lineHeight * 3) {
-    // Open dialog for single line selection
-    newComment.visible = true;
-    newComment.pageNumber = currentLine.value.pageNumber;
-    newComment.x = parseInt(currentLine.value.style.left, 10) || 0;
-    newComment.y = parseInt(currentLine.value.style.top, 10) || 0;
-    newComment.style.left = currentLine.value.style.left;
-    newComment.style.top = currentLine.value.style.top;
-  } else {
-    // Current selection is too large, reset line
-    currentLine.value.height = 0;
+  if (width / containerWidth > 0.25 && height <= 6 * 16) {
+    // 6rem is equivalent to 6 * 16 pixels
+    selectedArea.value = { x, y, width, height };
+    dialogVisible.value = true;
   }
-};
+}
 
-// Generate a unique base64 ID
-const generateBase64Id = (length = 12) => {
-  const array = new Uint8Array(Math.ceil((length * 3) / 4));
-  crypto.getRandomValues(array);
-  let base64 = btoa(String.fromCharCode(...array));
+// Function to handle comment submission
+function saveComment() {
+  if (title.value && text.value && selectedArea.value) {
+    const commentData = {
+      title: title.value,
+      text: text.value,
+      coordinates: selectedArea.value,
+      page: currentPage.value,
+      timestamp: String(Date.now()),
+      author: "current_user", // Replace with dynamic user data
+    };
 
-  base64 = base64.replace(/=/g, "");
-
-  if (base64.length > length) {
-    base64 = base64.substring(0, length);
+    comments.value.push(commentData);
+    saveComments();
+    resetForm();
+    dialogVisible.value = false;
   }
+}
 
-  return base64;
-};
+// Function to handle canceling the comment dialog
+function cancelComment() {
+  resetForm();
+  dialogVisible.value = false;
+}
 
-// Save the new comment to the store
-const saveComment = async () => {
-  const valRaw = [
-    {
-      pageNumber: newComment.pageNumber,
-      title: newComment.title,
-      content: newComment.text,
-      x: newComment.x,
-      y: newComment.y,
-      id: generateBase64Id(),
-      username: user.value.username,
-      addedDate: String(Date.now()),
-    },
-  ];
-  const val = JSON.stringify(valRaw);
-  await paperStore.saveDiscussionComment(val);
-  newComment.visible = false;
-};
+// Function to reset the form and selection
+function resetForm() {
+  title.value = "";
+  text.value = "";
+  selectedArea.value = { x: null, y: null, width: null, height: null };
+}
 
-// Cancel creating a new comment
-const cancelComment = () => {
-  newComment.visible = false;
-};
+// Compute the style for the selection overlay
+const overlayStyle = computed(() => {
+  if (!selectionActive.value && !selectionEnd.value.x) return {};
 
-// Fetch pages data on component mount
-onMounted(async () => {
-  await fetchPages();
+  const x = Math.min(selectionStart.value.x, selectionEnd.value.x);
+  const y = Math.min(selectionStart.value.y, selectionEnd.value.y);
+  const width = Math.abs(selectionStart.value.x - selectionEnd.value.x);
+  const height = Math.abs(selectionStart.value.y - selectionEnd.value.y);
+
+  return {
+    position: "absolute",
+    left: `${x}px`,
+    top: `${y}px`,
+    width: `${width}px`,
+    height: `${height}px`,
+    backgroundColor: "rgba(0, 0, 255, 0.3)",
+    border: "1px solid rgba(0, 0, 255, 0.5)",
+    pointerEvents: "none",
+  };
 });
+
+// Compute the style for comment markers
+function commentStyle(commentData) {
+  const pdfContainerElement = pdfContainer.value;
+  const scrollTop = pdfContainerElement.scrollTop;
+  const scrollLeft = pdfContainerElement.scrollLeft;
+  const newTop = commentData.coordinates.y - scrollTop;
+  const newLeft = commentData.coordinates.x - scrollLeft;
+
+  return {
+    position: "absolute",
+    left: `${newLeft}px`,
+    top: `${newTop}px`,
+    width: `${commentData.coordinates.width}px`,
+    height: `${commentData.coordinates.height}px`,
+    backgroundColor: "rgb(23, 127, 212, 0.1)",
+    padding: "4px",
+    borderRadius: "4px",
+    cursor: "pointer",
+  };
+}
+
+function updateHighlightPositions() {
+  // Updates positions of highlights based on scroll position
+  filteredComments.value.forEach((commentData, index) => {
+    const commentElement = document.querySelectorAll(`.comment-marker`)[index];
+    if (commentElement) {
+      const newStyle = commentStyle(commentData);
+      Object.assign(commentElement.style, newStyle);
+    }
+  });
+}
+
+// Lifecycle hooks to manage event listeners
+onMounted(() => {
+  loadComments();
+  document.addEventListener("mousemove", handleMouseMove);
+  document.addEventListener("mouseup", endSelection);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("mousemove", handleMouseMove);
+  document.removeEventListener("mouseup", endSelection);
+});
+
+const timeAgo = (timestamp) => {
+  const now = Date.now();
+  const diff = now - timestamp;
+
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(diff / (1000 * 60));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  if (seconds < 60) {
+    return seconds === 1 ? "1 second ago" : `${seconds} seconds ago`;
+  } else if (minutes < 60) {
+    return minutes === 1 ? "1 minute ago" : `${minutes} minutes ago`;
+  } else if (hours < 24) {
+    return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+  } else {
+    return days === 1 ? "1 day ago" : `${days} days ago`;
+  }
+};
+
+const reactiveTimeAgo = (timestamp) => {
+  return computed(() => timeAgo(timestamp));
+};
+
+// Example usage
+const timestamp = Date.now() - 5 * 60 * 60 * 1000; // 5 hours ago
+console.log(timeAgo(timestamp)); // Output: "5 hours ago"
 </script>
 
 <style scoped>
-.pdf-container {
-  display: flex;
-  flex-direction: column;
-  background-color: #fcfcfc;
-  align-items: center;
-  max-height: 100vh;
-  overflow-y: auto;
-  padding: 5px;
-}
-
-.pdf-page {
-  position: relative;
-  margin: 2px 0;
-}
-
-.pdf-image {
-  width: 100%;
-  max-width: 98%;
-  border: 1px solid #ccc;
-}
-
-.comment-popup {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 5px;
-  border-radius: 5px;
-  pointer-events: none;
-  z-index: 999;
-}
-
-.highlight-overlay {
-  position: absolute;
-  background-color: rgba(0, 255, 0, 0.5);
-  border: 1px solid rgba(0, 255, 0, 0.7);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.line-overlay {
-  position: absolute;
-  background-color: rgba(255, 200, 0, 0.3);
-  border: 1px solid rgba(255, 200, 0, 0.5);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.new-comment-form {
-  position: absolute;
-  background: white;
-  border: 1px solid #ccc;
-  padding: 10px;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.loading-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.9);
   z-index: 1000;
-  width: 300px;
+  text-align: center;
+  padding: 1rem;
+  font-size: 1.5rem;
+  color: #333;
 }
 
-.new-comment-form input,
-.new-comment-form textarea {
-  width: 100%;
+.selection-overlay {
+  display: block;
+  z-index: 1000;
 }
 
-.new-comment-form .buttons {
-  display: flex;
-  gap: 10px;
+.comment-marker {
+  display: inline-block;
+  z-index: 1000;
 }
-
-.new-comment-form button {
-  padding: 5px 10px;
+</style>
+<style scoped>
+.draggable-card {
+  cursor: move;
+}
+</style>
+<style scoped>
+.scrollable-list-container {
+  max-height: 400px; /* Adjust as needed */
+  overflow-y: auto;
 }
 </style>

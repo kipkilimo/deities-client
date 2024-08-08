@@ -108,7 +108,7 @@
             :disabled="loading"
             style="max-width: 95%"
             class="ml-sm mb-lg dashed-border"
-            v-if="isPaperCreated && !paperStore.paper.url"
+            v-if="paperStore.paper.id && !paperStore.paper.url"
           >
             <br />
             <v-file-input
@@ -265,7 +265,7 @@ const uploadJournalPaper = async () => {
 
   try {
     const response = await axios.post(
-      `${apiUrl}/convert-pdf?paperId=${paperStore.paper.id}`,
+      `${apiUrl}/api/upload?paperId=${paperStore.paper.id}`,
       formData,
       {
         headers: {
