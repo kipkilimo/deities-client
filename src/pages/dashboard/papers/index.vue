@@ -148,7 +148,7 @@
   </v-container>
 </template>
 <script setup lang="ts">
-import { ref, computed, onBeforeMount } from "vue";
+import { ref, computed,nextTick, onBeforeMount } from "vue";
 import { usePaperStore } from "../../../stores/papers";
 import axios from "axios";
 // @ts-ignore
@@ -167,6 +167,9 @@ const creatingJournal = ref(false);
 const successMessage = ref("");
 const errorMessage = ref("");
 const isPaperCreated = ref(false);
+const parentContainer = ref(null);
+const pdfImage = ref(null);
+
 
 // Validate the title and summary
 const titleRules = [
@@ -253,7 +256,7 @@ const submitForm = async () => {
     errorMessage.value = "Error creating paper";
   }
 };
-
+ 
 const uploadJournalPaper = async () => {
   loading.value = true;
   if (!pdfFile.value) {

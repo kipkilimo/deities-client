@@ -5,54 +5,59 @@
       Loading...
     </div>
 
-    <!-- PDF Container -->
+    
+<div class="header header-wrapper scroller">
+  <!-- PDF Container -->
+  <div
+    id="pdf-container"
+    ref="pdfContainer"
+    class="pdf-container z-index-common"
+    @scroll="handleScroll"
+  >
+    <PDF
+      :src="pdfUrl"
+      ref="pdfImage"
+      @onPageChange="updatePageNumber"
+      @mousedown="startSelection"
+      @page-change="onPageChange"
+      style="width: 100%; height: auto"
+      class="z-index-common"
+    />
+    <!-- Comment Markers -->
     <div
-      id="pdf-container"
-      ref="pdfContainer"
-      style="position: relative; overflow-y: auto; height: 100vh"
-      @scroll="handleScroll"
+      v-for="(commentData, index) in filteredComments"
+      :key="index"
+      :style="commentStyle(commentData)"
+      :id="'comment-' + index"
+      ref="commentData"
+      class="comment-marker z-index-common"
+      @mouseover="showTooltip = index"
+      @mouseleave="showTooltip = null"
     >
-      <PDF
-        :src="pdfUrl"
-        ref="pdfImage"
-        @onPageChange="updatePageNumber"
-        @mousedown="startSelection"
-        @page-change="onPageChange"
-        style="width: 100%; height: auto"
-      />
-      <!-- Selection Overlay -->
-      <div
-        v-if="selectionActive"
-        :style="overlayStyle"
-        class="selection-overlay"
-      ></div>
-
-      <!-- Comment Markers -->
-      <div
-        v-for="(commentData, index) in filteredComments"
-        :key="index"
-        :style="commentStyle(commentData)"
-        class="comment-marker"
-        @mouseover="showTooltip = index"
-        @mouseleave="showTooltip = null"
-      >
+      <br />
+      <br />
+      <br />
+      <br />
+      <div class="tooltip-wrapper">
         <v-tooltip bottom v-if="showTooltip === index">
           <template #activator="{ on, attrs }">
+            <div class="triangle"></div>
+
             <v-card
-              color="#F1FFFE"
+              color="#FFFB95"
               v-bind="attrs"
               v-on="on"
-              style="max-width: 27rem"
+              class="tooltip-card custom-tooltip z-index-common"
             >
               <div class="ma-4 text-h6">{{ commentData.title }}</div>
               <div class="ma-4 text-h7">
                 <i>{{ commentData.text }}</i>
               </div>
-
               <v-divider />
               <v-card-actions>
-                <v-card-subtitle class="pt-4">
-                  Added {{ reactiveTimeAgo(Number(commentData.timestamp)) }} by
+                <v-card-subtitle class="ml-11" align-right>
+                  Added
+                  {{ reactiveTimeAgo(Number(commentData.timestamp)) }} by
                   {{ commentData.author }}
                 </v-card-subtitle>
               </v-card-actions>
@@ -61,12 +66,26 @@
         </v-tooltip>
       </div>
     </div>
+    <!-- Selection Overlay with Secondary Scrollbar -->
+    <div
+      v-if="selectionActive"
+      :style="overlayStyle"
+      class="selection-overlay z-index-common"
+      id="selectionOverlay"
+      ref="selectionOverlay"
+    ></div>
+  </div>
+</div>
 
     <!-- Comment Dialog -->
-    <v-dialog v-model="dialogVisible" max-width="500px">
-      <v-card>
+    <v-dialog v-model="dialogVisible" max-width="30rem" persistent>
+      <v-card :disabled="paperStore.paper.discussion.length >= 30">
         <v-card-title>
-          <span class="headline">Add a comment</span>
+          <span class="headline ml-2">{{
+            paperStore.paper.discussion.length >= 30
+              ? "Article discussion closed."
+              : "Add a comment"
+          }}</span>
         </v-card-title>
         <v-divider></v-divider>
 
@@ -87,9 +106,15 @@
           </v-form>
         </v-card-text>
         <v-card-actions>
-          <v-btn text @click="cancelComment">Cancel</v-btn>
-          <v-btn color="primary" @click="saveComment">Save Comment</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn variant="outlined" color="primary" @click="saveComment"
+            >Save Comment</v-btn
+          >
+          <v-btn text color="orange" @click="cancelComment">Cancel</v-btn>
+
+          <v-spacer></v-spacer>
         </v-card-actions>
+        <br />
       </v-card>
     </v-dialog>
 
@@ -115,25 +140,32 @@
           <div class="" v-if="filteredComments.length === 0">
             <h5>No discussion comments added yet.</h5>
           </div>
-          <div class="scrollable-list-container">
+          <div class="scrollable-list-container" id="draggableComments">
             <v-list>
               <v-list-item-group
                 v-for="(comment, index) in filteredComments"
                 :key="index"
+                :id="'card-' + index"
+                @mouseover="highlightComment(index), toggleHoverColorIn(index)"
+                @mouseleave="
+                  unhighlightComment(index), toggleHoverColorOut(index)
+                "
               >
-                <v-card color="#DE9F9FF" flat style="max-width: 27rem">
+                <v-card :color="hoverColor" flat style="max-width: 27rem">
                   <div class="ma-4 text-h6">{{ comment.title }}</div>
                   <div class="ma-4 text-h7">
                     <i>{{ comment.text }}</i>
                   </div>
+                  <v-divider />
                   <v-card-actions>
-                    <v-card-subtitle class="pt-4">
+                    <v-card-subtitle>
                       Added {{ reactiveTimeAgo(Number(comment.timestamp)) }} by
                       {{ comment.author }}
                     </v-card-subtitle>
                   </v-card-actions>
                   <v-divider />
                 </v-card>
+                <br />
               </v-list-item-group>
             </v-list>
           </div>
@@ -147,23 +179,38 @@
 import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
 import PDF from "pdf-vue3";
 import { usePaperStore } from "../stores/papers";
+import { useUserStore } from "../stores/users";
 
+const userStore = useUserStore();
+const user = computed(() => userStore.user);
 // Paper store
 const paperStore = usePaperStore();
 const pdfUrl = paperStore.paper.url;
+const scrollerDivs = ref([]);
+onBeforeUnmount(() => {
+  if (pdfContainer.value) {
+    pdfContainer.value.removeEventListener("scroll", handleScroll);
+  }
+});
+// Function to scroll all elements to the same scroll position
+const scrollAll = (scrollLeft) => {
+  scrollerDivs.value.forEach((element) => {
+    element.scrollLeft = scrollLeft;
+  });
+};
 const commentsDialogVisible = ref(true);
 const titleRules = [
   (value) =>
     value?.length > 3 ? true : "Input must be at least 3 characters.",
   (value) =>
-    value?.length < 125 ? true : "Input must be at most 120 characters.",
+    value?.length < 75 ? true : "Input must be at most 70 characters.",
 ];
 
 const textRules = [
   (value) =>
     value?.length > 15 ? true : "Input must be at least 15 characters.",
   (value) =>
-    value?.length < 355 ? true : "Input must be at most 350 characters.",
+    value?.length < 255 ? true : "Input must be at most 250 characters.",
 ];
 
 // Refs for managing state
@@ -175,6 +222,7 @@ const selectionStart = ref({ x: null, y: null });
 const selectionEnd = ref({ x: null, y: null });
 const selectedArea = ref({ x: null, y: null, width: null, height: null });
 const currentPage = ref(1);
+const index = ref(null);
 
 const selectionActive = ref(false);
 const dialogVisible = ref(false);
@@ -182,7 +230,7 @@ const showTooltip = ref(null);
 const pdfContainer = ref(null);
 const pdfImage = ref(null);
 const loading = ref(false);
-
+const hoverColor = ref("#FFFFCC");
 let lastScrollTop = 0;
 const scrollThreshold = 100;
 const dialogTop = ref("6.6rem"); // Initial position
@@ -190,8 +238,35 @@ const dialogLeft = ref("75%"); // Initial position
 const isDragging = ref(false);
 const dragStartX = ref(0);
 const dragStartY = ref(0);
+onMounted(() => {
+  console.log({ user: user.value });
+  comments.value = paperStore.paper.discussion;
+  if (pdfContainer.value) {
+    pdfContainer.value.addEventListener("scroll", handleScroll);
+  }
+  const scrollers = document.getElementsByClassName("scroller");
 
+  // Filter the scrollers to get only the DIV elements
+  scrollerDivs.value = Array.from(scrollers).filter((element) => {
+    return element.nodeName === "DIV";
+  });
+
+  // Add scroll event listeners to each div
+  scrollerDivs.value.forEach((element) => {
+    element.addEventListener("scroll", (e) => {
+      scrollAll(e.target.scrollLeft);
+    });
+  });
+});
 // Methods
+function toggleHoverColorIn(index) {
+  index.value = index;
+  hoverColor.value = "#FFFB95";
+}
+function toggleHoverColorOut() {
+  hoverColor.value = "#FFFFCC";
+  index.value = null;
+}
 const onMouseDown = (event) => {
   if (event.target.closest(".draggable-card")) {
     isDragging.value = true;
@@ -202,189 +277,39 @@ const onMouseDown = (event) => {
   }
 };
 
-const onMouseMove = (event) => {
-  if (isDragging.value) {
-    const deltaX = event.clientX - dragStartX.value;
-    const deltaY = event.clientY - dragStartY.value;
-    dialogTop.value = `${parseInt(dialogTop.value) + deltaY}px`;
-    dialogLeft.value = `${parseInt(dialogLeft.value) + deltaX}px`;
-    dragStartX.value = event.clientX;
-    dragStartY.value = event.clientY;
-  }
-};
+function highlightComment(index) {
+  const commentElement = document.getElementById(`comment-${index}`);
+  if (commentElement) {
+    commentElement.style.backgroundColor = "rgba(255, 255, 0, 0.5)"; // Highlight color
+    commentElement.style.border = "2px solid rgba(255, 255, 0, 0.8)"; // Optional border
 
-const onMouseUp = () => {
-  isDragging.value = false;
-  window.removeEventListener("mousemove", onMouseMove);
-  window.removeEventListener("mouseup", onMouseUp);
-};
+    // Check if the element is out of view and scroll to it if necessary
+    const containerRect = pdfContainer.value.getBoundingClientRect();
+    const elementRect = commentElement.getBoundingClientRect();
 
-const viewComment = (comment) => {
-  // Handle viewing specific comment details
-};
-
-// Cleanup
-onBeforeUnmount(() => {
-  window.removeEventListener("mousemove", onMouseMove);
-  window.removeEventListener("mouseup", onMouseUp);
-});
-function updatePageNumber(newPage) {
-  currentPage.value = newPage;
-  loading.value = true;
-
-  loadContent(newPage)
-    .then(() => {
-      loading.value = false;
-    })
-    .catch((error) => {
-      console.error("Error loading content:", error);
-      loading.value = false;
-    });
-}
-
-function handleScroll() {
-  const scrollTop = pdfContainer.value.scrollTop;
-  const scrollHeight = pdfContainer.value.scrollHeight;
-  const clientHeight = pdfContainer.value.clientHeight;
-  const scrollDirection = scrollTop - lastScrollTop;
-
-  if (Math.abs(scrollDirection) > scrollThreshold) {
-    const containerBottom = scrollTop + clientHeight;
-    const pdfImageElement = pdfImage.value.$el;
-    const pdfRect = pdfImageElement.getBoundingClientRect();
-
-    if (scrollDirection > 0 && pdfRect.bottom < 0) {
-      // Scrolling down, previous page is out of view
-      updatePageNumber(currentPage.value + 1);
-    } else if (scrollDirection < 0 && pdfRect.top > clientHeight) {
-      // Scrolling up, next page is out of view
-      if (currentPage.value > 1) {
-        updatePageNumber(currentPage.value - 1);
-      }
+    if (
+      elementRect.top < containerRect.top ||
+      elementRect.bottom > containerRect.bottom
+    ) {
+      pdfContainer.value.scrollTop =
+        commentElement.offsetTop - containerRect.top;
     }
-    lastScrollTop = scrollTop;
-  }
-
-  updateHighlightPositions();
-}
-
-function loadContent(pageNumber) {
-  // Simulate content loading with a promise
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      // Simulate a successful load after 1 second
-      console.log(`Content for page ${pageNumber} loaded.`);
-      resolve();
-    }, 300);
-  });
-}
-
-// Load comments from local storage
-function loadComments() {
-  const savedComments = localStorage.getItem("comments");
-  if (savedComments) {
-    comments.value = JSON.parse(savedComments);
   }
 }
+// Function to update the position of the selection overlay on scroll
+function updateOverlayPosition() {
+  if (!selectionActive.value) return;
 
-// Save comments to local storage
-function saveComments() {
-  localStorage.setItem("comments", JSON.stringify(comments.value));
-}
-
-// Filter comments for the current page
-const filteredComments = computed(() =>
-  comments.value.filter((comment) => comment.page === currentPage.value)
-);
-
-// Function to handle mouse down event to start selection
-function startSelection(event) {
   const pdfImageElement = pdfImage.value.$el;
   const rect = pdfImageElement.getBoundingClientRect();
-  selectionStart.value = {
-    x: event.clientX - rect.left,
-    y: event.clientY - rect.top,
-  };
-  selectionActive.value = true;
-}
+  const scrollTop = pdfContainer.value.scrollTop;
 
-// Function to handle mouse move event to update selection
-function handleMouseMove(event) {
-  if (selectionActive.value) {
-    const pdfImageElement = pdfImage.value.$el;
-    const rect = pdfImageElement.getBoundingClientRect();
-    selectionEnd.value = {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-    };
-  }
-}
-
-// Function to handle mouse up event to end selection
-function endSelection() {
-  selectionActive.value = false;
-  openCommentDialog();
-}
-
-// Function to open the comment dialog
-function openCommentDialog() {
-  const pdfImageElement = pdfImage.value.$el;
-  const rect = pdfImageElement.getBoundingClientRect();
-  const containerWidth = rect.width;
   const x = Math.min(selectionStart.value.x, selectionEnd.value.x);
-  const y = Math.min(selectionStart.value.y, selectionEnd.value.y);
+  const y = Math.min(selectionStart.value.y, selectionEnd.value.y) - scrollTop;
   const width = Math.abs(selectionStart.value.x - selectionEnd.value.x);
   const height = Math.abs(selectionStart.value.y - selectionEnd.value.y);
 
-  if (width / containerWidth > 0.25 && height <= 6 * 16) {
-    // 6rem is equivalent to 6 * 16 pixels
-    selectedArea.value = { x, y, width, height };
-    dialogVisible.value = true;
-  }
-}
-
-// Function to handle comment submission
-function saveComment() {
-  if (title.value && text.value && selectedArea.value) {
-    const commentData = {
-      title: title.value,
-      text: text.value,
-      coordinates: selectedArea.value,
-      page: currentPage.value,
-      timestamp: String(Date.now()),
-      author: "current_user", // Replace with dynamic user data
-    };
-
-    comments.value.push(commentData);
-    saveComments();
-    resetForm();
-    dialogVisible.value = false;
-  }
-}
-
-// Function to handle canceling the comment dialog
-function cancelComment() {
-  resetForm();
-  dialogVisible.value = false;
-}
-
-// Function to reset the form and selection
-function resetForm() {
-  title.value = "";
-  text.value = "";
-  selectedArea.value = { x: null, y: null, width: null, height: null };
-}
-
-// Compute the style for the selection overlay
-const overlayStyle = computed(() => {
-  if (!selectionActive.value && !selectionEnd.value.x) return {};
-
-  const x = Math.min(selectionStart.value.x, selectionEnd.value.x);
-  const y = Math.min(selectionStart.value.y, selectionEnd.value.y);
-  const width = Math.abs(selectionStart.value.x - selectionEnd.value.x);
-  const height = Math.abs(selectionStart.value.y - selectionEnd.value.y);
-
-  return {
+  overlayStyle.value = {
     position: "absolute",
     left: `${x}px`,
     top: `${y}px`,
@@ -394,22 +319,23 @@ const overlayStyle = computed(() => {
     border: "1px solid rgba(0, 0, 255, 0.5)",
     pointerEvents: "none",
   };
-});
+}
 
 // Compute the style for comment markers
 function commentStyle(commentData) {
   const pdfContainerElement = pdfContainer.value;
   const scrollTop = pdfContainerElement.scrollTop;
   const scrollLeft = pdfContainerElement.scrollLeft;
-  const newTop = commentData.coordinates.y - scrollTop;
-  const newLeft = commentData.coordinates.x - scrollLeft;
+
+  const newTop = commentData.y - scrollTop; // Adjusting for scroll
+  const newLeft = commentData.x - scrollLeft;
 
   return {
     position: "absolute",
     left: `${newLeft}px`,
     top: `${newTop}px`,
-    width: `${commentData.coordinates.width}px`,
-    height: `${commentData.coordinates.height}px`,
+    width: `${commentData.width}px`,
+    height: `${commentData.height}px`,
     backgroundColor: "rgb(23, 127, 212, 0.1)",
     padding: "4px",
     borderRadius: "4px",
@@ -417,8 +343,79 @@ function commentStyle(commentData) {
   };
 }
 
+// Update positions of highlights and comments on scroll
+function handleScroll(event) {
+  const container = this.$refs.pdfContainer;
+
+  // Ensure all elements within the container scroll together
+  const scrollTop = container.scrollTop;
+  const scrollLeft = container.scrollLeft;
+
+  // Propagate the scroll to other elements as necessary
+  if (this.$refs.pdfImage) {
+    this.$refs.pdfImage.scrollTop = scrollTop;
+    this.$refs.pdfImage.scrollLeft = scrollLeft;
+  }
+
+  // If there are other elements that need synchronized scrolling:
+  // (You can add similar lines for other elements, such as comment markers)
+  this.$refs.selectionOverlay.style.top = `${scrollTop}px`;
+  this.$refs.selectionOverlay.style.left = `${scrollLeft}px`;
+
+  const pdfImage = this.$refs.pdfImage.$el || this.$refs.pdfImage; // Reference to PDF element
+  const selectionOverlay = this.$refs.selectionOverlay; // Reference to overlay element
+
+  // Sync overlay scroll position with PDF scroll position
+  if (event.target === this.$refs.parentContainer) {
+    const scrollTop = this.$refs.parentContainer.scrollTop;
+    const scrollLeft = this.$refs.parentContainer.scrollLeft;
+
+    pdfImage.scrollTop = scrollTop;
+    pdfImage.scrollLeft = scrollLeft;
+
+    if (selectionOverlay) {
+      selectionOverlay.scrollTop = scrollTop;
+      selectionOverlay.scrollLeft = scrollLeft;
+    }
+  }
+  // Get the scroll position of the PDF component
+
+  // Apply the scroll position to each commentData div
+  const commentDivs = this.$refs.commentData;
+
+  if (Array.isArray(commentDivs)) {
+    commentDivs.forEach((commentDiv) => {
+      commentDiv.style.transform = `translateY(${scrollTop}px)`;
+    });
+  } else {
+    commentDivs.style.transform = `translateY(${scrollTop}px)`;
+  }
+  this.updateHighlightPositions(); // Update the comment markers
+  this.updateOverlayPosition(); // Update the selection overlay
+
+  const pdfImageElement = pdfImage;
+  const containerRect = this.$refs.parentContainer.getBoundingClientRect();
+  const pdfRect = pdfImageElement.getBoundingClientRect();
+
+  // Calculate visible area
+  const visibleHeight =
+    Math.min(containerRect.bottom, pdfRect.bottom) -
+    Math.max(containerRect.top, pdfRect.top);
+  const totalHeight = pdfRect.height;
+  const visibilityPercentage = (visibleHeight / totalHeight) * 100;
+
+  // Show comments when 60% of the page is visible
+  if (visibilityPercentage >= 60) {
+    this.showCommentsForPage(this.currentPage);
+  } else {
+    this.hideCommentsForPage(this.currentPage);
+  }
+
+  lastScrollTop = this.$refs.parentContainer.scrollTop;
+}
+
+// Update positions of comments when scroll occurs
 function updateHighlightPositions() {
-  // Updates positions of highlights based on scroll position
   filteredComments.value.forEach((commentData, index) => {
     const commentElement = document.querySelectorAll(`.comment-marker`)[index];
     if (commentElement) {
@@ -428,17 +425,168 @@ function updateHighlightPositions() {
   });
 }
 
-// Lifecycle hooks to manage event listeners
-onMounted(() => {
-  loadComments();
-  document.addEventListener("mousemove", handleMouseMove);
-  document.addEventListener("mouseup", endSelection);
+function unhighlightComment(index) {
+  const commentElement = document.getElementById(`comment-${index}`);
+  if (commentElement) {
+    commentElement.style.backgroundColor = "rgb(23, 127, 212, 0.1)";
+    commentElement.style.border = "none";
+  }
+}
+
+const onMouseMove = (event) => {
+  if (isDragging.value) {
+    const dx = event.clientX - dragStartX.value;
+    const dy = event.clientY - dragStartY.value;
+
+    // Update dialog position
+    dialogTop.value = `${parseInt(dialogTop.value) + dy}px`;
+    dialogLeft.value = `${parseInt(dialogLeft.value) + dx}px`;
+
+    // Update start positions for the next move
+    dragStartX.value = event.clientX;
+    dragStartY.value = event.clientY;
+  }
+};
+
+const onMouseUp = () => {
+  if (isDragging.value) {
+    isDragging.value = false;
+    window.removeEventListener("mousemove", onMouseMove);
+    window.removeEventListener("mouseup", onMouseUp);
+  }
+};
+
+const overlayStyle = ref({
+  position: "absolute",
+  left: "0",
+  top: "0",
+  width: "0",
+  height: "0",
+  backgroundColor: "rgba(0, 0, 255, 0.3)",
+  border: "1px solid rgba(0, 0, 255, 0.5)",
+  pointerEvents: "none",
 });
 
-onBeforeUnmount(() => {
-  document.removeEventListener("mousemove", handleMouseMove);
-  document.removeEventListener("mouseup", endSelection);
-});
+// Calculate the mouse coordinates on mousedown event
+function startSelection(event) {
+  const containerRect = pdfContainer.value.getBoundingClientRect();
+
+  selectionStart.value = {
+    x: event.clientX - containerRect.left,
+    y: event.clientY - containerRect.top + pdfContainer.value.scrollTop,
+  };
+
+  selectionActive.value = true;
+
+  // Listen to mousemove and mouseup events
+  pdfContainer.value.addEventListener("mousemove", moveSelection);
+  pdfContainer.value.addEventListener("mouseup", endSelection);
+}
+
+// Calculate the mouse coordinates on mousemove event
+function moveSelection(event) {
+  const containerRect = pdfContainer.value.getBoundingClientRect();
+
+  selectionEnd.value = {
+    x: event.clientX - containerRect.left,
+    y: event.clientY - containerRect.top + pdfContainer.value.scrollTop,
+  };
+
+  let height = Math.abs(selectionStart.value.y - selectionEnd.value.y);
+
+  // Limit the height to a maximum of 7.5rem
+  const maxHeight =
+    parseFloat(getComputedStyle(document.documentElement).fontSize) * 7.5;
+  if (height > maxHeight) {
+    height = maxHeight;
+    selectionEnd.value.y =
+      selectionStart.value.y > selectionEnd.value.y
+        ? selectionStart.value.y - maxHeight
+        : selectionStart.value.y + maxHeight;
+  }
+
+  updateOverlayPosition();
+}
+
+// End the selection
+function endSelection(event) {
+  // Remove event listeners
+  pdfContainer.value.removeEventListener("mousemove", moveSelection);
+  pdfContainer.value.removeEventListener("mouseup", endSelection);
+
+  const width = Math.abs(selectionStart.value.x - selectionEnd.value.x);
+  const height = Math.abs(selectionStart.value.y - selectionEnd.value.y);
+
+  selectedArea.value = {
+    x: Math.min(selectionStart.value.x, selectionEnd.value.x),
+    y: Math.min(selectionStart.value.y, selectionEnd.value.y),
+    width: width,
+    height: height,
+  };
+
+  console.log("Selected Area:", selectedArea.value); // Debugging line
+
+  // Open the comment dialog
+  dialogVisible.value = true;
+
+  selectionActive.value = false;
+}
+
+// Handle comment save
+async function saveComment() {
+  const commentData = {
+    page: Number(currentPage.value),
+    title: title.value,
+    text: text.value,
+    x: Number(selectedArea.value.x),
+    y: Number(selectedArea.value.y),
+    width: Number(selectedArea.value.width),
+    height: Number(selectedArea.value.height),
+    author: userStore.user.username,
+    timestamp: String(Date.now()),
+  };
+
+  // comments.value.push(commentData);
+  /*
+  Well written to include key variables and methodology.
+
+            {
+            "page": null,
+            "title": "Good title.",
+            "text": null,
+            "x": null,
+            "y": null,
+            "width": null,
+            "height": null,
+            "id": "66b5cd267839d79573531daf",
+            "author": null,
+            "timestamp": null
+          }
+
+  */
+  const discussionData = JSON.stringify([
+    {
+      id: paperStore.paper.id,
+      data: commentData,
+    },
+  ]);
+  console.log({ discussionData });
+  await paperStore.addPaperDiscussion(discussionData);
+  title.value = "";
+  text.value = "";
+  dialogVisible.value = false;
+
+  // Force update of comments
+  updateHighlightPositions();
+  window.location.reload;
+}
+
+// Handle comment cancel
+function cancelComment() {
+  title.value = "";
+  text.value = "";
+  dialogVisible.value = false;
+}
 
 const timeAgo = (timestamp) => {
   const now = Date.now();
@@ -464,43 +612,235 @@ const reactiveTimeAgo = (timestamp) => {
   return computed(() => timeAgo(timestamp));
 };
 
-// Example usage
-const timestamp = Date.now() - 5 * 60 * 60 * 1000; // 5 hours ago
-console.log(timeAgo(timestamp)); // Output: "5 hours ago"
+const updatePageNumber = (pageNumber) => {
+  currentPage.value = pageNumber;
+};
+
+// Filter comments for the current page
+const filteredComments = computed(() => {
+  return comments.value.filter((comment) => comment.page === currentPage.value);
+});
+
+const showCommentsForPage = (page) => {
+  filteredComments.value.forEach((commentData, index) => {
+    const commentElement = document.getElementById(`card-${index}`);
+    if (commentElement) {
+      commentElement.style.display = "block";
+    }
+  });
+};
+
+const hideCommentsForPage = (page) => {
+  filteredComments.value.forEach((commentData, index) => {
+    const commentElement = document.getElementById(`card-${index}`);
+    if (commentElement) {
+      commentElement.style.display = "none";
+    }
+  });
+};
 </script>
 
 <style scoped>
+/* Loading Indicator */
 .loading-indicator {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background-color: rgba(255, 255, 255, 0.9);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 1000;
-  text-align: center;
-  padding: 1rem;
-  font-size: 1.5rem;
-  color: #333;
+  font-size: 2rem;
+  color: #666;
 }
 
+/* PDF Container */
+
+/* PDF Image */
+.pdf-image {
+  width: 100%;
+  height: auto;
+}
+
+/* Selection Overlay */
 .selection-overlay {
-  display: block;
-  z-index: 1000;
+  position: absolute;
+  background-color: rgba(0, 0, 255, 0.3);
+  border: 1px solid rgba(0, 0, 255, 0.5);
+  pointer-events: none;
 }
 
+/* Comment Markers */
 .comment-marker {
-  display: inline-block;
+  position: absolute;
+  background-color: rgb(23, 127, 212, 0.1);
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Comment Tooltip */
+.comment-tooltip {
+  max-width: 27rem;
+}
+
+/* Draggable Card */
+.draggable-card-wrapper {
+  position: fixed;
   z-index: 1000;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 }
-</style>
-<style scoped>
+
 .draggable-card {
-  cursor: move;
+  max-width: 27rem;
 }
-</style>
-<style scoped>
+
+/* Scrollable List Container */
 .scrollable-list-container {
-  max-height: 400px; /* Adjust as needed */
+  max-height: 300px;
   overflow-y: auto;
 }
+
+/* Comment Card */
+.comment-card {
+  max-width: 27rem;
+}
+</style>
+
+<style>
+/* Example styles for pdf-container */
+.pdf-container {
+  width: 100%;
+  height: 100vh; /* Full viewport height for scrolling */
+  overflow: auto; /* Scrollbar on the container */
+  position: relative;
+}
+.comment-marker {
+  position: absolute; /* Absolute positioning for comment markers */
+  /* More styling as necessary */
+}
+.selection-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  /* More styling as necessary */
+}
+</style>
+<style scoped>
+/* Customize the scrollbar for the scroll-container */
+.scroll-container {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #888 #f1f1f1; /* Firefox */
+}
+
+/* WebKit Browsers (Chrome, Safari, Edge) */
+.scroll-container::-webkit-scrollbar {
+  width: 12px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+  border: 2px solid #f1f1f1;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+/* Secondary scrollbar styling */
+.selection-overlay {
+  overflow-y: scroll;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #555 #ddd; /* Firefox */
+}
+
+.selection-overlay::-webkit-scrollbar {
+  width: 8px;
+}
+
+.selection-overlay::-webkit-scrollbar-track {
+  background: #ddd;
+}
+
+.selection-overlay::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+}
+
+.selection-overlay::-webkit-scrollbar-thumb:hover {
+  background-color: #333;
+}
+</style>
+<style scoped>
+.custom-tooltip .v-tooltip__content {
+  position: relative;
+}
+
+.custom-tooltip .v-tooltip__content::after {
+  content: "";
+  position: absolute;
+  bottom: -10px; /* Adjust based on your needs */
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 10px;
+  border-style: solid;
+  border-color: #fffb95 transparent transparent transparent; /* Matches the tooltip background color */
+}
+
+.tooltip-card {
+  max-width: 27rem;
+}
+</style>
+<style scoped>
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.triangle {
+  position: absolute;
+  top: -10px; /* Adjust to align properly */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 3rem solid transparent;
+  border-right: 3rem solid transparent;
+  border-bottom: 3rem solid #fffb95; /* Match the card's color */
+}
+
+.tooltip-card {
+  position: relative;
+  padding-top: 5px; /* Adjust for spacing */
+}
+</style>
+<style>
+  /* Style for unified z-index */
+  .z-index-common {
+    position: absolute; /* Or relative based on layout needs */
+    z-index: 10; /* Common z-index value */
+  }
+
+  /* Additional styles if needed */
+ 
+
+  /* Example positioning and overflow styles */
+  .pdf-container {
+    position: relative;
+    overflow: auto;
+  }
+  
+  .comment-marker {
+    position: absolute;
+    /* Adjust styles as needed for comments */
+  }
+  
+  .selection-overlay {
+    position: absolute;
+    /* Adjust styles as needed for overlay */
+  }
 </style>

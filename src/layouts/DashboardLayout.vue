@@ -36,7 +36,7 @@
         </template>
 
         <v-list density="compact" nav>
-          <v-list-item
+          <v-list-item 
             height="100"
             :prepend-avatar="`https://ui-avatars.com/api/?name=${user.username}&background=0D8ABC&color=fff`"
             :title="user.username"
@@ -98,14 +98,12 @@ import { ref, computed, onBeforeMount } from "vue";
 const { t, locale } = useI18n();
 import { useUserStore } from "../stores/users";
 
-const user = ref<any>(null);
-onBeforeMount(() => {
+onBeforeMount(async () => {
   if (typeof localStorage !== "undefined") {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem("sessionId");
     if (storedUser) {
       try {
-        const parsedUser = JSON.parse(storedUser);
-        user.value = parsedUser && parsedUser[0] ? parsedUser[0] : {};
+        await userStore.getCurrentUser(storedUser);
       } catch (error) {
         console.error("Error parsing user data from localStorage:", error);
       }
@@ -114,6 +112,8 @@ onBeforeMount(() => {
 });
 
 const userStore = useUserStore();
+const user = computed(() => userStore.user);
+
 function logout() {
   userStore.logout();
 }

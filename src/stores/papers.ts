@@ -66,16 +66,16 @@ export const usePaperStore = defineStore("paper", {
             url
             sessionId
             discussion {
-              pageNumber
+              page
               title
-              content
+              text
               x
               y
               width
               height
               id
-              username
-              addedDate
+              author
+              timestamp
             }
             createdDate
             createdBy {
@@ -109,10 +109,10 @@ export const usePaperStore = defineStore("paper", {
     },
 
     // SAVE PAPER DISCUSSION TO DISCUSSION ARRAY
-    async saveDiscussionComment(val: string) {
-      const CREATE_A_PAPER = gql`
-        mutation createPaper($val: String!) {
-          saveDiscussionComment(val: $val) {
+    async addPaperDiscussion(discussionItem: string) {
+      const ADD_PAPER_DISCUSSION = gql`
+        mutation addPaperDiscussion($discussionItem: String!) {
+          addPaperDiscussion(discussionItem: $discussionItem) {
             id
             title
             objective
@@ -124,11 +124,11 @@ export const usePaperStore = defineStore("paper", {
       `;
 
       const response = await client.mutate({
-        mutation: CREATE_A_PAPER,
-        variables: { val },
+        mutation: ADD_PAPER_DISCUSSION,
+        variables: { discussionItem },
       });
 
-      const paper = response.data?.saveDiscussionComment;
+      const paper = response.data?.addPaperDiscussion;
       if (paper) {
         this.paper = paper;
         //  Store paper in secure storage (optional)
