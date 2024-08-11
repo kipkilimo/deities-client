@@ -24,25 +24,29 @@
                   }"
                   class="headline mb-4"
                 >
-                  Advancing Research Through Collaboration
+                  Advancing Research through collaboration
                 </h1>
 
                 <br />
                 <br />
                 <br />
                 <br />
+                <br />
+                <br />
+                <br />
+                <br />
                 <div class="button-container">
                   <v-btn
-                    :style="{ backgroundColor: buttonBgColor, width: '200px' }"
-                    large
+                    :style="{ backgroundColor: buttonBgColor, width: '21rem' }"
+                    size="x-large"
                     class="mr-xl"
                     @click="scrollToCallToAction"
                   >
                     <v-icon>mdi-login</v-icon>
-                    Login
+                    Continue to Platform
                   </v-btn>
 
-                  <v-btn
+                  <!-- <v-btn
                     :style="{ backgroundColor: buttonBgColor, width: '200px' }"
                     large
                     variant="outlined"
@@ -51,7 +55,7 @@
                   >
                     <v-icon left>mdi-account-search</v-icon>
                     Guest Explore
-                  </v-btn>
+                  </v-btn> -->
                 </div>
               </v-col>
             </v-row>
@@ -80,19 +84,22 @@
       <v-col cols="12" md="4">
         <v-card class="research-card">
           <v-img
-            src="https://picsum.photos/id/1076/400/300?grayscale"
+            src="https://www.ohsu.edu/sites/default/files/2019-01/clin-epiicon.jpg"
             height="200px"
             class="card-image"
             cover
             :aspect-ratio="1"
           />
-          <v-card-title>Clinical Trial Recruitment</v-card-title>
-          <v-card-subtitle
-            >Contribute to new medical treatments.</v-card-subtitle
+          <v-card-title
+            >Epidemiology: Patterns of disease and exposure</v-card-title
           >
+          <v-card-subtitle
+            >How often diseases occur in different groups of people and why?
+          </v-card-subtitle>
           <v-card-text>
-            Become a participant in our ongoing clinical trials and help advance
-            medical research.
+            Epidemiology is the study of the patterns, causes, and effects of
+            health and disease in patient populations and the relationships
+            between exposures or treatments and health outcomes.
           </v-card-text>
           <v-card-actions>
             <v-btn color="primary">Learn More</v-btn>
@@ -103,22 +110,25 @@
       <v-col cols="12" md="4">
         <v-card class="research-card">
           <v-img
-            src="https://picsum.photos/id/1075/400/300?grayscale"
+            src="https://sph.umich.edu/biostat/biostat-virtual-admitted-day-experience/images/rshbanner.jpg"
             height="200px"
             class="card-image"
             cover
             :aspect-ratio="1"
           />
-          <v-card-title>Data Analysis & Insights</v-card-title>
+          <v-card-title>Biostatistical Methods & Data Analysis</v-card-title>
           <v-card-subtitle
-            >Explore the latest medical research findings.</v-card-subtitle
+            >Explore the art and science of collecting, analyzing, and
+            interpreting data.</v-card-subtitle
           >
           <v-card-text>
-            Access our comprehensive data analysis and gain valuable insights
-            into various medical fields.
+            Biostatistics is the application of statistical techniques to
+            scientific research in health-related fields, including medicine,
+            biology, and public health, and the development of new tools to
+            study these areas.
           </v-card-text>
           <v-card-actions>
-            <v-btn color="primary">Explore Data</v-btn>
+            <v-btn color="primary">Learn More</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -126,22 +136,23 @@
       <v-col cols="12" md="4">
         <v-card class="research-card">
           <v-img
-            src="https://picsum.photos/id/1077/400/300?grayscale"
+            src="https://blogassets.leverageedu.com/blog/wp-content/uploads/2020/03/28214113/Types-of-Research-Design.jpg"
             class="card-image"
             cover
             :aspect-ratio="1"
           />
-          <v-card-title>Educational Resources</v-card-title>
+          <v-card-title>Research Methods</v-card-title>
           <v-card-subtitle
-            >Expand your knowledge in healthcare.</v-card-subtitle
+            >Expand your knowledge in research methods.</v-card-subtitle
           >
           <v-card-text>
-            Access our library of educational resources and stay up-to-date on
-            the latest medical advancements.
+            The best method for your project largely depends on your topic, the
+            type of data you will need, and the people or items from which you
+            will be collecting data.
           </v-card-text>
 
           <v-card-actions>
-            <v-btn color="primary">Learn More</v-btn>
+            <v-btn color="primary">Explore Resources</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -152,10 +163,14 @@
       <v-row class="text-center">
         <v-col cols="12">
           <p>
-            &copy; {{ currentYear }} Nairobi Epidemiology and Biostatistics Forum, NEMBi. All rights
-            reserved.
+            &copy; {{ currentYear }} Nairobi Epidemiology and Biostatistical
+            Methods Colloquium, NEMBi. All rights reserved.
           </p>
-          <v-btn varianr="outlined" @click="scrollToTop">Back to Top</v-btn>
+          <br />
+          <v-divider />
+          <v-btn class="mt-2" varianr="outlined" @click="scrollToTop"
+            ><v-icon>mdi-arrow-up</v-icon>Back to Top</v-btn
+          >
         </v-col>
       </v-row>
     </v-footer>
@@ -169,8 +184,12 @@ const currentYear = ref(new Date().getFullYear());
 import { useRouter } from "vue-router";
 const router = useRouter();
 const scrollToCallToAction = () => {
- router.push("/auth/login");
-
+  const session = localStorage.getItem("sessionId");
+  if (session) {
+    router.push("/dashboard/overview");
+  } else {
+    router.push("/auth/login");
+  }
 };
 const scrollToCallToAction2 = () => {
   const el = document.querySelector('v-row.ref="callToAction"');

@@ -9,8 +9,10 @@
           </v-alert>
         </h3>
 
-        <!-- Display the highlighter component if the paper URL exists -->
-        <div v-if="paperStore.paper.url">
+        <div
+          v-if="paperStore.paper.url"
+          style="z-index: 90000 !important; overflow-y: auto"
+        >
           <Highlighter />
         </div>
       </v-col>
@@ -148,7 +150,7 @@
   </v-container>
 </template>
 <script setup lang="ts">
-import { ref, computed,nextTick, onBeforeMount } from "vue";
+import { ref, computed, nextTick, onBeforeMount } from "vue";
 import { usePaperStore } from "../../../stores/papers";
 import axios from "axios";
 // @ts-ignore
@@ -169,7 +171,6 @@ const errorMessage = ref("");
 const isPaperCreated = ref(false);
 const parentContainer = ref(null);
 const pdfImage = ref(null);
-
 
 // Validate the title and summary
 const titleRules = [
@@ -256,7 +257,7 @@ const submitForm = async () => {
     errorMessage.value = "Error creating paper";
   }
 };
- 
+
 const uploadJournalPaper = async () => {
   loading.value = true;
   if (!pdfFile.value) {
@@ -317,7 +318,14 @@ onBeforeMount(async () => {
   color: white !important;
 }
 </style>
-
+<style scoped>
+.scroll-container {
+  display: flex;
+  flex-direction: column; /* Change to 'row' if horizontal scrolling is desired */
+  overflow-y: auto; /* Change to 'overflow-x' for horizontal scrolling */
+  height: 1000vh; /* Set your desired maximum height */
+}
+</style>
 <route lang="yaml">
 meta:
   layout: DashboardLayout

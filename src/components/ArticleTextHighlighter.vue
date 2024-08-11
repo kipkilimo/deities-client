@@ -1,83 +1,83 @@
 <template>
   <v-container>
     <!-- Loading Indicator -->
+
     <div id="loading-indicator" v-if="loading" class="loading-indicator">
       Loading...
     </div>
+    <div class="header header-wrapper scroller">
+      <!-- PDF Container -->
+      <div
+        id="pdf-container"
+        ref="pdfContainer"
+        class="pdf-container z-index-common"
+        @scroll="handleScroll"
+      >
+        <PDF
+          :src="pdfUrl"
+          ref="pdfImage"
+          @onPageChange="updatePageNumber"
+          @mousedown="startSelection"
+          @page-change="onPageChange"
+          style="width: 100%; height: auto"
+          class="z-index-common"
+        />
+        <!-- Comment Markers -->
+        <div
+          v-for="(commentData, index) in filteredComments"
+          :key="index"
+          :style="commentStyle(commentData)"
+          :id="'comment-' + index"
+          ref="commentData"
+          class="comment-marker z-index-common"
+          @mouseover="showTooltip = index"
+          @mouseleave="showTooltip = null"
+        >
+          <br />
+          <br />
+          <br />
+          <br />
+          <div class="tooltip-wrapper">
+            <v-tooltip bottom v-if="showTooltip === index">
+              <template #activator="{ on, attrs }">
+                <div class="triangle"></div>
 
-    
-<div class="header header-wrapper scroller">
-  <!-- PDF Container -->
-  <div
-    id="pdf-container"
-    ref="pdfContainer"
-    class="pdf-container z-index-common"
-    @scroll="handleScroll"
-  >
-    <PDF
-      :src="pdfUrl"
-      ref="pdfImage"
-      @onPageChange="updatePageNumber"
-      @mousedown="startSelection"
-      @page-change="onPageChange"
-      style="width: 100%; height: auto"
-      class="z-index-common"
-    />
-    <!-- Comment Markers -->
-    <div
-      v-for="(commentData, index) in filteredComments"
-      :key="index"
-      :style="commentStyle(commentData)"
-      :id="'comment-' + index"
-      ref="commentData"
-      class="comment-marker z-index-common"
-      @mouseover="showTooltip = index"
-      @mouseleave="showTooltip = null"
-    >
-      <br />
-      <br />
-      <br />
-      <br />
-      <div class="tooltip-wrapper">
-        <v-tooltip bottom v-if="showTooltip === index">
-          <template #activator="{ on, attrs }">
-            <div class="triangle"></div>
-
-            <v-card
-              color="#FFFB95"
-              v-bind="attrs"
-              v-on="on"
-              class="tooltip-card custom-tooltip z-index-common"
-            >
-              <div class="ma-4 text-h6">{{ commentData.title }}</div>
-              <div class="ma-4 text-h7">
-                <i>{{ commentData.text }}</i>
-              </div>
-              <v-divider />
-              <v-card-actions>
-                <v-card-subtitle class="ml-11" align-right>
-                  Added
-                  {{ reactiveTimeAgo(Number(commentData.timestamp)) }} by
-                  {{ commentData.author }}
-                </v-card-subtitle>
-              </v-card-actions>
-            </v-card>
-          </template>
-        </v-tooltip>
+                <v-card
+                  color="#FFFB95"
+                  v-bind="attrs"
+                  v-on="on"
+                  class="tooltip-card custom-tooltip z-index-common"
+                >
+                  <div class="ma-4 text-h6">{{ commentData.title }}</div>
+                  <div class="ma-4 text-h7">
+                    <i>{{ commentData.text }}</i>
+                  </div>
+                  <v-divider />
+                  <v-card-actions>
+                    <v-card-subtitle class="ml-11" align-right>
+                      Added
+                      {{ reactiveTimeAgo(Number(commentData.timestamp)) }} by
+                      {{ commentData.author }}
+                    </v-card-subtitle>
+                  </v-card-actions>
+                </v-card>
+              </template>
+            </v-tooltip>
+          </div>
+        </div>
+        <!-- Selection Overlay with Secondary Scrollbar -->
+        <div
+          v-if="selectionActive"
+          :style="overlayStyle"
+          class="selection-overlay z-index-common"
+          id="selectionOverlay"
+          ref="selectionOverlay"
+        ></div>
       </div>
     </div>
-    <!-- Selection Overlay with Secondary Scrollbar -->
-    <div
-      v-if="selectionActive"
-      :style="overlayStyle"
-      class="selection-overlay z-index-common"
-      id="selectionOverlay"
-      ref="selectionOverlay"
-    ></div>
-  </div>
-</div>
 
     <!-- Comment Dialog -->
+
     <v-dialog v-model="dialogVisible" max-width="30rem" persistent>
       <v-card :disabled="paperStore.paper.discussion.length >= 30">
         <v-card-title>
@@ -96,6 +96,7 @@
               :rules="titleRules"
               label="Title"
             ></v-text-field>
+
             <v-textarea
               v-model="text"
               label="Discussion text"
@@ -105,11 +106,13 @@
             ></v-textarea>
           </v-form>
         </v-card-text>
+
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn variant="outlined" color="primary" @click="saveComment"
             >Save Comment</v-btn
           >
+
           <v-btn text color="orange" @click="cancelComment">Cancel</v-btn>
 
           <v-spacer></v-spacer>
@@ -119,6 +122,7 @@
     </v-dialog>
 
     <!-- Filtered Comments Iterator Dialog -->
+
     <div
       max-width="350px"
       style="
@@ -140,6 +144,7 @@
           <div class="" v-if="filteredComments.length === 0">
             <h5>No discussion comments added yet.</h5>
           </div>
+
           <div class="scrollable-list-container" id="draggableComments">
             <v-list>
               <v-list-item-group
@@ -151,7 +156,7 @@
                   unhighlightComment(index), toggleHoverColorOut(index)
                 "
               >
-                <v-card :color="hoverColor" flat style="max-width: 27rem">
+                <v-card flat :style="cardStyle(index)" style="max-width: 27rem" class="mr-3">
                   <div class="ma-4 text-h6">{{ comment.title }}</div>
                   <div class="ma-4 text-h7">
                     <i>{{ comment.text }}</i>
@@ -159,7 +164,8 @@
                   <v-divider />
                   <v-card-actions>
                     <v-card-subtitle>
-                      Added {{ reactiveTimeAgo(Number(comment.timestamp)) }} by
+                      Added
+                      {{ reactiveTimeAgo(Number(comment.timestamp)) }} by
                       {{ comment.author }}
                     </v-card-subtitle>
                   </v-card-actions>
@@ -187,11 +193,7 @@ const user = computed(() => userStore.user);
 const paperStore = usePaperStore();
 const pdfUrl = paperStore.paper.url;
 const scrollerDivs = ref([]);
-onBeforeUnmount(() => {
-  if (pdfContainer.value) {
-    pdfContainer.value.removeEventListener("scroll", handleScroll);
-  }
-});
+
 // Function to scroll all elements to the same scroll position
 const scrollAll = (scrollLeft) => {
   scrollerDivs.value.forEach((element) => {
@@ -241,17 +243,13 @@ const dragStartY = ref(0);
 onMounted(() => {
   console.log({ user: user.value });
   comments.value = paperStore.paper.discussion;
-  if (pdfContainer.value) {
-    pdfContainer.value.addEventListener("scroll", handleScroll);
-  }
-  const scrollers = document.getElementsByClassName("scroller");
 
-  // Filter the scrollers to get only the DIV elements
+  const scrollers = document.getElementsByClassName("scroller"); // Filter the scrollers to get only the DIV elements
+
   scrollerDivs.value = Array.from(scrollers).filter((element) => {
     return element.nodeName === "DIV";
-  });
+  }); // Add scroll event listeners to each div
 
-  // Add scroll event listeners to each div
   scrollerDivs.value.forEach((element) => {
     element.addEventListener("scroll", (e) => {
       scrollAll(e.target.scrollLeft);
@@ -259,6 +257,8 @@ onMounted(() => {
   });
 });
 // Methods
+/*
+
 function toggleHoverColorIn(index) {
   index.value = index;
   hoverColor.value = "#FFFB95";
@@ -267,6 +267,8 @@ function toggleHoverColorOut() {
   hoverColor.value = "#FFFFCC";
   index.value = null;
 }
+
+*/
 const onMouseDown = (event) => {
   if (event.target.closest(".draggable-card")) {
     isDragging.value = true;
@@ -277,13 +279,40 @@ const onMouseDown = (event) => {
   }
 };
 
+const hoverIndex = ref(null); // Tracks the index of the hovered card
+
+const toggleHoverColorIn = (index) => {
+  hoverIndex.value = index;
+};
+
+const toggleHoverColorOut = () => {
+  hoverIndex.value = null;
+};
+
+const cardStyle = (index) => {
+  return computed(() => {
+    if (hoverIndex.value === index) {
+      return {
+        backgroundColor: "#FFFB95", // Darker background color on hover
+        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)", // Add shadow on hover
+        transition: "background-color 0.3s ease, box-shadow 0.3s ease", // Smooth transition
+      };
+    }
+    return {
+      backgroundColor: "#FFFFCC", // Default color
+      boxShadow: "none", // No shadow by default
+      transition: "background-color 0.3s ease, box-shadow 0.3s ease", // Smooth transition
+    };
+  }).value;
+};
+
 function highlightComment(index) {
   const commentElement = document.getElementById(`comment-${index}`);
   if (commentElement) {
     commentElement.style.backgroundColor = "rgba(255, 255, 0, 0.5)"; // Highlight color
     commentElement.style.border = "2px solid rgba(255, 255, 0, 0.8)"; // Optional border
-
     // Check if the element is out of view and scroll to it if necessary
+
     const containerRect = pdfContainer.value.getBoundingClientRect();
     const elementRect = commentElement.getBoundingClientRect();
 
@@ -345,27 +374,24 @@ function commentStyle(commentData) {
 
 // Update positions of highlights and comments on scroll
 function handleScroll(event) {
-  const container = this.$refs.pdfContainer;
+  const container = this.$refs.pdfContainer; // Ensure all elements within the container scroll together
 
-  // Ensure all elements within the container scroll together
   const scrollTop = container.scrollTop;
-  const scrollLeft = container.scrollLeft;
+  const scrollLeft = container.scrollLeft; // Propagate the scroll to other elements as necessary
 
-  // Propagate the scroll to other elements as necessary
   if (this.$refs.pdfImage) {
     this.$refs.pdfImage.scrollTop = scrollTop;
     this.$refs.pdfImage.scrollLeft = scrollLeft;
-  }
-
-  // If there are other elements that need synchronized scrolling:
+  } // If there are other elements that need synchronized scrolling:
   // (You can add similar lines for other elements, such as comment markers)
+
   this.$refs.selectionOverlay.style.top = `${scrollTop}px`;
   this.$refs.selectionOverlay.style.left = `${scrollLeft}px`;
 
   const pdfImage = this.$refs.pdfImage.$el || this.$refs.pdfImage; // Reference to PDF element
   const selectionOverlay = this.$refs.selectionOverlay; // Reference to overlay element
-
   // Sync overlay scroll position with PDF scroll position
+
   if (event.target === this.$refs.parentContainer) {
     const scrollTop = this.$refs.parentContainer.scrollTop;
     const scrollLeft = this.$refs.parentContainer.scrollLeft;
@@ -377,9 +403,7 @@ function handleScroll(event) {
       selectionOverlay.scrollTop = scrollTop;
       selectionOverlay.scrollLeft = scrollLeft;
     }
-  }
-  // Get the scroll position of the PDF component
-
+  } // Get the scroll position of the PDF component
   // Apply the scroll position to each commentData div
   const commentDivs = this.$refs.commentData;
 
@@ -395,16 +419,14 @@ function handleScroll(event) {
 
   const pdfImageElement = pdfImage;
   const containerRect = this.$refs.parentContainer.getBoundingClientRect();
-  const pdfRect = pdfImageElement.getBoundingClientRect();
+  const pdfRect = pdfImageElement.getBoundingClientRect(); // Calculate visible area
 
-  // Calculate visible area
   const visibleHeight =
     Math.min(containerRect.bottom, pdfRect.bottom) -
     Math.max(containerRect.top, pdfRect.top);
   const totalHeight = pdfRect.height;
-  const visibilityPercentage = (visibleHeight / totalHeight) * 100;
+  const visibilityPercentage = (visibleHeight / totalHeight) * 100; // Show comments when 60% of the page is visible
 
-  // Show comments when 60% of the page is visible
   if (visibilityPercentage >= 60) {
     this.showCommentsForPage(this.currentPage);
   } else {
@@ -436,13 +458,11 @@ function unhighlightComment(index) {
 const onMouseMove = (event) => {
   if (isDragging.value) {
     const dx = event.clientX - dragStartX.value;
-    const dy = event.clientY - dragStartY.value;
+    const dy = event.clientY - dragStartY.value; // Update dialog position
 
-    // Update dialog position
     dialogTop.value = `${parseInt(dialogTop.value) + dy}px`;
-    dialogLeft.value = `${parseInt(dialogLeft.value) + dx}px`;
+    dialogLeft.value = `${parseInt(dialogLeft.value) + dx}px`; // Update start positions for the next move
 
-    // Update start positions for the next move
     dragStartX.value = event.clientX;
     dragStartY.value = event.clientY;
   }
@@ -476,9 +496,8 @@ function startSelection(event) {
     y: event.clientY - containerRect.top + pdfContainer.value.scrollTop,
   };
 
-  selectionActive.value = true;
+  selectionActive.value = true; // Listen to mousemove and mouseup events
 
-  // Listen to mousemove and mouseup events
   pdfContainer.value.addEventListener("mousemove", moveSelection);
   pdfContainer.value.addEventListener("mouseup", endSelection);
 }
@@ -492,9 +511,8 @@ function moveSelection(event) {
     y: event.clientY - containerRect.top + pdfContainer.value.scrollTop,
   };
 
-  let height = Math.abs(selectionStart.value.y - selectionEnd.value.y);
+  let height = Math.abs(selectionStart.value.y - selectionEnd.value.y); // Limit the height to a maximum of 7.5rem
 
-  // Limit the height to a maximum of 7.5rem
   const maxHeight =
     parseFloat(getComputedStyle(document.documentElement).fontSize) * 7.5;
   if (height > maxHeight) {
@@ -525,8 +543,8 @@ function endSelection(event) {
   };
 
   console.log("Selected Area:", selectedArea.value); // Debugging line
-
   // Open the comment dialog
+
   dialogVisible.value = true;
 
   selectionActive.value = false;
@@ -544,26 +562,25 @@ async function saveComment() {
     height: Number(selectedArea.value.height),
     author: userStore.user.username,
     timestamp: String(Date.now()),
-  };
-
-  // comments.value.push(commentData);
+  }; // comments.value.push(commentData);
   /*
   Well written to include key variables and methodology.
 
-            {
-            "page": null,
-            "title": "Good title.",
-            "text": null,
-            "x": null,
-            "y": null,
-            "width": null,
-            "height": null,
-            "id": "66b5cd267839d79573531daf",
-            "author": null,
-            "timestamp": null
-          }
+      {
+      "page": null,
+      "title": "Good title.",
+      "text": null,
+      "x": null,
+      "y": null,
+      "width": null,
+      "height": null,
+      "id": "66b5cd267839d79573531daf",
+      "author": null,
+      "timestamp": null
+      }
 
   */
+
   const discussionData = JSON.stringify([
     {
       id: paperStore.paper.id,
@@ -574,9 +591,8 @@ async function saveComment() {
   await paperStore.addPaperDiscussion(discussionData);
   title.value = "";
   text.value = "";
-  dialogVisible.value = false;
+  dialogVisible.value = false; // Force update of comments
 
-  // Force update of comments
   updateHighlightPositions();
   window.location.reload;
 }
@@ -817,30 +833,4 @@ const hideCommentsForPage = (page) => {
   position: relative;
   padding-top: 5px; /* Adjust for spacing */
 }
-</style>
-<style>
-  /* Style for unified z-index */
-  .z-index-common {
-    position: absolute; /* Or relative based on layout needs */
-    z-index: 10; /* Common z-index value */
-  }
-
-  /* Additional styles if needed */
- 
-
-  /* Example positioning and overflow styles */
-  .pdf-container {
-    position: relative;
-    overflow: auto;
-  }
-  
-  .comment-marker {
-    position: absolute;
-    /* Adjust styles as needed for comments */
-  }
-  
-  .selection-overlay {
-    position: absolute;
-    /* Adjust styles as needed for overlay */
-  }
 </style>
