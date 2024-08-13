@@ -9,12 +9,11 @@
           </v-alert>
         </h3>
 
-        <div
-          v-if="paperStore.paper.url"
-          style="z-index: 90000 !important; overflow-y: auto"
+        <v-card 
+          v-if="paperStore.paper.url" 
         >
           <Highlighter />
-        </div>
+        </v-card>
       </v-col>
 
       <v-col cols="3">
@@ -154,7 +153,7 @@ import { ref, computed, nextTick, onBeforeMount } from "vue";
 import { usePaperStore } from "../../../stores/papers";
 import axios from "axios";
 // @ts-ignore
-import Highlighter from "../../../components/ArticleTextHighlighter.vue";
+import Highlighter from "../../../pdf/ArticleTextHighlighter.vue";
 
 const paperStore = usePaperStore();
 // @ts-ignore

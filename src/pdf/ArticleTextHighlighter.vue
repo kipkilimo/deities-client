@@ -5,77 +5,76 @@
     <div id="loading-indicator" v-if="loading" class="loading-indicator">
       Loading...
     </div>
-    <div class="header header-wrapper scroller">
-      <!-- PDF Container -->
+    <!-- PDF Container -->
+    <div
+      id="pdf-container"
+      ref="pdfContainer"
+      class="pdf-container z-index-common"
+    >
+      <PDF
+        :src="pdfUrl"
+        ref="pdfImage"
+        @onPageChange="updatePageNumber"
+        @mousedown="startSelection"
+        @page-change="onPageChange"
+        style="width: 100%; height: auto"
+        class="z-index-common"
+      />
+      <!-- Comment Markers -->
       <div
-        id="pdf-container"
-        ref="pdfContainer"
-        class="pdf-container z-index-common"
-        @scroll="handleScroll"
+        v-for="(commentData, index) in filteredComments"
+        :key="index"
+        :style="commentStyle(commentData)"
+        :id="'comment-' + index"
+        class="comment-marker z-index-common"
+        @mouseover="(showTooltip = index), (hoverIndex = index)"
+        @mouseleave="(showTooltip = null), (hoverIndex = null)"
       >
-        <PDF
-          :src="pdfUrl"
-          ref="pdfImage"
-          @onPageChange="updatePageNumber"
-          @mousedown="startSelection"
-          @page-change="onPageChange"
-          style="width: 100%; height: auto"
-          class="z-index-common"
-        />
-        <!-- Comment Markers -->
-        <div
-          v-for="(commentData, index) in filteredComments"
-          :key="index"
-          :style="commentStyle(commentData)"
-          :id="'comment-' + index"
-          ref="commentData"
-          class="comment-marker z-index-common"
-          @mouseover="showTooltip = index"
-          @mouseleave="showTooltip = null"
-        >
-          <br />
-          <br />
-          <br />
-          <br />
-          <div class="tooltip-wrapper">
-            <v-tooltip bottom v-if="showTooltip === index">
-              <template #activator="{ on, attrs }">
-                <div class="triangle"></div>
-
-                <v-card
-                  color="#FFFB95"
-                  v-bind="attrs"
-                  v-on="on"
-                  class="tooltip-card custom-tooltip z-index-common"
-                >
-                  <div class="ma-4 text-h6">{{ commentData.title }}</div>
-                  <div class="ma-4 text-h7">
-                    <i>{{ commentData.text }}</i>
-                  </div>
-                  <v-divider />
-                  <v-card-actions>
-                    <v-card-subtitle class="ml-11" align-right>
-                      Added
-                      {{ reactiveTimeAgo(Number(commentData.timestamp)) }} by
-                      {{ commentData.author }}
-                    </v-card-subtitle>
-                  </v-card-actions>
-                </v-card>
-              </template>
-            </v-tooltip>
-          </div>
+        <br />
+        <br />
+        <br />
+        <br />
+        <div class="tooltip-wrapper">
+          <v-tooltip bottom v-if="showTooltip === index">
+            <template #activator="{ on, attrs }">
+              <div class="triangle"></div>
+              <v-card
+                color="#FFFB95"
+                v-bind="attrs"
+                v-on="on"
+                style="
+                  border-bottom: 1px solid #ccc;
+                  box-shadow: 0 1px 0 #ccc;
+                  z-index: 150;
+                "
+                class="tooltip-card custom-tooltip"
+              >
+                <div class="ma-4 text-h6">{{ commentData.title }}</div>
+                <div class="ma-4 text-h7">
+                  <i>{{ commentData.text }}</i>
+                </div>
+                <v-divider />
+                <v-card-actions>
+                  <v-card-subtitle class="ml-11" align-right>
+                    Added
+                    {{ reactiveTimeAgo(Number(commentData.timestamp)) }} by
+                    {{ commentData.author }}
+                  </v-card-subtitle>
+                </v-card-actions>
+              </v-card>
+            </template>
+          </v-tooltip>
         </div>
-        <!-- Selection Overlay with Secondary Scrollbar -->
-        <div
-          v-if="selectionActive"
-          :style="overlayStyle"
-          class="selection-overlay z-index-common"
-          id="selectionOverlay"
-          ref="selectionOverlay"
-        ></div>
       </div>
+      <!-- Selection Overlay with Secondary Scrollbar -->
+      <div
+        v-if="selectionActive"
+        :style="overlayStyle"
+        class="selection-overlay z-index-common"
+        id="selectionOverlay"
+        ref="selectionOverlay"
+      ></div>
     </div>
-
     <!-- Comment Dialog -->
 
     <v-dialog v-model="dialogVisible" max-width="30rem" persistent>
@@ -129,11 +128,17 @@
         position: fixed;
         z-index: 1000;
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+        min-height: 85vh;
       "
       :style="{ top: dialogTop, left: dialogLeft }"
       @mousedown="onMouseDown"
     >
-      <v-card ref="draggableCard" class="draggable-card">
+      <br />
+      <v-card
+        ref="draggableCard"
+        class="draggable-card mt-10"
+        style="min-height: 85vh !important"
+      >
         <v-card-title @mousedown.stop="onMouseDown">
           <span class="headline"
             >Page {{ currentPage }} Discussion Comments.</span
@@ -151,12 +156,15 @@
                 v-for="(comment, index) in filteredComments"
                 :key="index"
                 :id="'card-' + index"
-                @mouseover="highlightComment(index), toggleHoverColorIn(index)"
-                @mouseleave="
-                  unhighlightComment(index), toggleHoverColorOut(index)
-                "
+                @mouseover="(showTooltip = index), (hoverIndex = index)"
+                @mouseleave="(showTooltip = null), (hoverIndex = null)"
               >
-                <v-card flat :style="cardStyle(index)" style="max-width: 27rem" class="mr-3">
+                <v-card
+                  flat
+                  :style="computedCardStyle(index)"
+                  class="mr-3 hover-card"
+                  style="max-width: 27rem; border: 1px solid #ccc"
+                >
                   <div class="ma-4 text-h6">{{ comment.title }}</div>
                   <div class="ma-4 text-h7">
                     <i>{{ comment.text }}</i>
@@ -218,6 +226,7 @@ const textRules = [
 // Refs for managing state
 const title = ref("");
 const text = ref("");
+const hoverIndex = ref(null); // Tracks the index of the hovered card
 
 const comments = ref([]);
 const selectionStart = ref({ x: null, y: null });
@@ -241,20 +250,11 @@ const isDragging = ref(false);
 const dragStartX = ref(0);
 const dragStartY = ref(0);
 onMounted(() => {
-  console.log({ user: user.value });
   comments.value = paperStore.paper.discussion;
 
-  const scrollers = document.getElementsByClassName("scroller"); // Filter the scrollers to get only the DIV elements
-
-  scrollerDivs.value = Array.from(scrollers).filter((element) => {
-    return element.nodeName === "DIV";
-  }); // Add scroll event listeners to each div
-
-  scrollerDivs.value.forEach((element) => {
-    element.addEventListener("scroll", (e) => {
-      scrollAll(e.target.scrollLeft);
-    });
-  });
+  if (pdfContainer.value) {
+    pdfContainer.value.addEventListener("scroll", handleScroll);
+  }
 });
 // Methods
 /*
@@ -279,8 +279,35 @@ const onMouseDown = (event) => {
   }
 };
 
-const hoverIndex = ref(null); // Tracks the index of the hovered card
+const debounce = (func, wait) => {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+};
 
+const throttle = (func, limit) => {
+  let lastFunc;
+  let lastRan;
+  return function (...args) {
+    if (!lastRan) {
+      func.apply(this, args);
+      lastRan = Date.now();
+    } else {
+      clearTimeout(lastFunc);
+      lastFunc = setTimeout(
+        () => {
+          if (Date.now() - lastRan >= limit) {
+            func.apply(this, args);
+            lastRan = Date.now();
+          }
+        },
+        limit - (Date.now() - lastRan)
+      );
+    }
+  };
+};
 const toggleHoverColorIn = (index) => {
   hoverIndex.value = index;
 };
@@ -288,7 +315,9 @@ const toggleHoverColorIn = (index) => {
 const toggleHoverColorOut = () => {
   hoverIndex.value = null;
 };
-
+// Apply debounce or throttle to the functions
+const debouncedHoverIn = debounce(toggleHoverColorIn, 100);
+const debouncedHoverOut = debounce(toggleHoverColorOut, 100);
 const cardStyle = (index) => {
   return computed(() => {
     if (hoverIndex.value === index) {
@@ -302,29 +331,18 @@ const cardStyle = (index) => {
       backgroundColor: "#FFFFCC", // Default color
       boxShadow: "none", // No shadow by default
       transition: "background-color 0.3s ease, box-shadow 0.3s ease", // Smooth transition
+      cursor: pointer,
     };
   }).value;
 };
+const computedCardStyle = computed(() => {
+  return (index) => ({
+    backgroundColor: hoverIndex.value === index ? "#FFFB95" : "#ffffff",
+    cursor: "pointer", // Added cursor style
+    // Other styles
+  });
+});
 
-function highlightComment(index) {
-  const commentElement = document.getElementById(`comment-${index}`);
-  if (commentElement) {
-    commentElement.style.backgroundColor = "rgba(255, 255, 0, 0.5)"; // Highlight color
-    commentElement.style.border = "2px solid rgba(255, 255, 0, 0.8)"; // Optional border
-    // Check if the element is out of view and scroll to it if necessary
-
-    const containerRect = pdfContainer.value.getBoundingClientRect();
-    const elementRect = commentElement.getBoundingClientRect();
-
-    if (
-      elementRect.top < containerRect.top ||
-      elementRect.bottom > containerRect.bottom
-    ) {
-      pdfContainer.value.scrollTop =
-        commentElement.offsetTop - containerRect.top;
-    }
-  }
-}
 // Function to update the position of the selection overlay on scroll
 function updateOverlayPosition() {
   if (!selectionActive.value) return;
@@ -371,80 +389,42 @@ function commentStyle(commentData) {
     cursor: "pointer",
   };
 }
-
+const pdfScrollTop = ref(0);
 // Update positions of highlights and comments on scroll
-function handleScroll(event) {
-  const container = this.$refs.pdfContainer; // Ensure all elements within the container scroll together
+const handleScroll = (event) => {
+  const scrollTop = event.target.scrollTop;
+  pdfScrollTop.value = scrollTop;
 
-  const scrollTop = container.scrollTop;
-  const scrollLeft = container.scrollLeft; // Propagate the scroll to other elements as necessary
+  // Get all comment markers or any other children in pdf-container
+  const commentMarkers = pdfContainer.value.querySelectorAll(".comment-marker");
 
-  if (this.$refs.pdfImage) {
-    this.$refs.pdfImage.scrollTop = scrollTop;
-    this.$refs.pdfImage.scrollLeft = scrollLeft;
-  } // If there are other elements that need synchronized scrolling:
-  // (You can add similar lines for other elements, such as comment markers)
+  commentMarkers.forEach((marker) => {
+    marker.scrollTop = scrollTop;
+  });
 
-  this.$refs.selectionOverlay.style.top = `${scrollTop}px`;
-  this.$refs.selectionOverlay.style.left = `${scrollLeft}px`;
-
-  const pdfImage = this.$refs.pdfImage.$el || this.$refs.pdfImage; // Reference to PDF element
-  const selectionOverlay = this.$refs.selectionOverlay; // Reference to overlay element
-  // Sync overlay scroll position with PDF scroll position
-
-  if (event.target === this.$refs.parentContainer) {
-    const scrollTop = this.$refs.parentContainer.scrollTop;
-    const scrollLeft = this.$refs.parentContainer.scrollLeft;
-
-    pdfImage.scrollTop = scrollTop;
-    pdfImage.scrollLeft = scrollLeft;
-
-    if (selectionOverlay) {
-      selectionOverlay.scrollTop = scrollTop;
-      selectionOverlay.scrollLeft = scrollLeft;
-    }
-  } // Get the scroll position of the PDF component
-  // Apply the scroll position to each commentData div
-  const commentDivs = this.$refs.commentData;
-
-  if (Array.isArray(commentDivs)) {
-    commentDivs.forEach((commentDiv) => {
-      commentDiv.style.transform = `translateY(${scrollTop}px)`;
-    });
-  } else {
-    commentDivs.style.transform = `translateY(${scrollTop}px)`;
-  }
-  this.updateHighlightPositions(); // Update the comment markers
-  this.updateOverlayPosition(); // Update the selection overlay
-
-  const pdfImageElement = pdfImage;
-  const containerRect = this.$refs.parentContainer.getBoundingClientRect();
-  const pdfRect = pdfImageElement.getBoundingClientRect(); // Calculate visible area
-
-  const visibleHeight =
-    Math.min(containerRect.bottom, pdfRect.bottom) -
-    Math.max(containerRect.top, pdfRect.top);
-  const totalHeight = pdfRect.height;
-  const visibilityPercentage = (visibleHeight / totalHeight) * 100; // Show comments when 60% of the page is visible
-
-  if (visibilityPercentage >= 60) {
-    this.showCommentsForPage(this.currentPage);
-  } else {
-    this.hideCommentsForPage(this.currentPage);
-  }
-
-  lastScrollTop = this.$refs.parentContainer.scrollTop;
-}
+  // If there are other scrollable elements you need to sync
+  // repeat the above for those elements.
+};
 
 // Update positions of comments when scroll occurs
-function updateHighlightPositions() {
-  filteredComments.value.forEach((commentData, index) => {
-    const commentElement = document.querySelectorAll(`.comment-marker`)[index];
-    if (commentElement) {
-      const newStyle = commentStyle(commentData);
-      Object.assign(commentElement.style, newStyle);
+function highlightComment(index) {
+  const commentElement = document.getElementById(`comment-${index}`);
+  if (commentElement) {
+    commentElement.style.backgroundColor = "rgba(255, 255, 0, 0.5)"; // Highlight color
+    commentElement.style.border = "2px solid rgba(255, 255, 0, 0.8)"; // Optional border
+
+    // Ensure the element is visible within the scrollable container
+    const containerRect = pdfContainer.value.getBoundingClientRect();
+    const elementRect = commentElement.getBoundingClientRect();
+
+    if (
+      elementRect.top < containerRect.top ||
+      elementRect.bottom > containerRect.bottom
+    ) {
+      pdfContainer.value.scrollTop =
+        commentElement.offsetTop - containerRect.top;
     }
-  });
+  }
 }
 
 function unhighlightComment(index) {
@@ -500,6 +480,11 @@ function startSelection(event) {
 
   pdfContainer.value.addEventListener("mousemove", moveSelection);
   pdfContainer.value.addEventListener("mouseup", endSelection);
+  if (selectedArea.value.width * selectedArea.value.height < 20) {
+    cancelComment();
+    // Invalidate the selection and do not open the dialog
+    return;
+  }
 }
 
 // Calculate the mouse coordinates on mousemove event
@@ -526,7 +511,6 @@ function moveSelection(event) {
   updateOverlayPosition();
 }
 
-// End the selection
 function endSelection(event) {
   // Remove event listeners
   pdfContainer.value.removeEventListener("mousemove", moveSelection);
@@ -535,18 +519,29 @@ function endSelection(event) {
   const width = Math.abs(selectionStart.value.x - selectionEnd.value.x);
   const height = Math.abs(selectionStart.value.y - selectionEnd.value.y);
 
+  // Check if the selection is too small to be considered valid
+
+  // Set the selected area since the selection is valid
   selectedArea.value = {
     x: Math.min(selectionStart.value.x, selectionEnd.value.x),
     y: Math.min(selectionStart.value.y, selectionEnd.value.y),
     width: width,
     height: height,
   };
-
-  console.log("Selected Area:", selectedArea.value); // Debugging line
+  if (selectedArea.value.width * selectedArea.value.height < 2) {
+    title.value = "";
+    text.value = "";
+    selectedArea.value.x = null;
+    selectedArea.value.y = null;
+    selectedArea.value.width = null;
+    selectedArea.value.height = null;
+    dialogVisible.value = false;
+    cancelComment();
+    // Invalidate the selection and do not open the dialog
+    return;
+  }
   // Open the comment dialog
-
   dialogVisible.value = true;
-
   selectionActive.value = false;
 }
 
@@ -587,10 +582,10 @@ async function saveComment() {
       data: commentData,
     },
   ]);
-  console.log({ discussionData });
   await paperStore.addPaperDiscussion(discussionData);
   title.value = "";
   text.value = "";
+  selectedArea.value = null;
   dialogVisible.value = false; // Force update of comments
 
   updateHighlightPositions();
@@ -601,6 +596,7 @@ async function saveComment() {
 function cancelComment() {
   title.value = "";
   text.value = "";
+  selectedArea.value = null;
   dialogVisible.value = false;
 }
 
@@ -637,23 +633,11 @@ const filteredComments = computed(() => {
   return comments.value.filter((comment) => comment.page === currentPage.value);
 });
 
-const showCommentsForPage = (page) => {
-  filteredComments.value.forEach((commentData, index) => {
-    const commentElement = document.getElementById(`card-${index}`);
-    if (commentElement) {
-      commentElement.style.display = "block";
-    }
-  });
-};
-
-const hideCommentsForPage = (page) => {
-  filteredComments.value.forEach((commentData, index) => {
-    const commentElement = document.getElementById(`card-${index}`);
-    if (commentElement) {
-      commentElement.style.display = "none";
-    }
-  });
-};
+onBeforeUnmount(() => {
+  if (pdfContainer.value) {
+    pdfContainer.value.removeEventListener("scroll", handleScroll);
+  }
+});
 </script>
 
 <style scoped>
@@ -701,7 +685,6 @@ const hideCommentsForPage = (page) => {
 /* Draggable Card */
 .draggable-card-wrapper {
   position: fixed;
-  z-index: 1000;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -711,7 +694,6 @@ const hideCommentsForPage = (page) => {
 
 /* Scrollable List Container */
 .scrollable-list-container {
-  max-height: 300px;
   overflow-y: auto;
 }
 
@@ -725,7 +707,6 @@ const hideCommentsForPage = (page) => {
 /* Example styles for pdf-container */
 .pdf-container {
   width: 100%;
-  height: 100vh; /* Full viewport height for scrolling */
   overflow: auto; /* Scrollbar on the container */
   position: relative;
 }
@@ -834,3 +815,4 @@ const hideCommentsForPage = (page) => {
   padding-top: 5px; /* Adjust for spacing */
 }
 </style>
+ 

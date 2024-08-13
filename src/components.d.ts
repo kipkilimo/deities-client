@@ -7,7 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    ArticleTextHighlighter: typeof import('./components/ArticleTextHighlighter.vue')['default']
+    ArticleTextHighlighter: (typeof import("./pdf/ArticleTextHighlighter.vue"))["default"]
     BarChart: typeof import('./components/charts/BarChart.vue')['default']
     CarsInfo: typeof import('./pages/dashboard/overview/components/CarsInfo.vue')['default']
     Deities: typeof import('./components/deities.vue')['default']
@@ -21,6 +21,7 @@ declare module 'vue' {
     Open: typeof import('./components/polls/open.vue')['default']
     PieChart: typeof import('./components/charts/PieChart.vue')['default']
     Ranked: typeof import('./components/polls/ranked.vue')['default']
+    RankedPriority: typeof import('./components/survey-1/RankedPriority.vue')['default']
     Ratings: typeof import('./components/polls/ratings.vue')['default']
     RentalByType: typeof import('./pages/dashboard/overview/components/RentalByType.vue')['default']
     RentalFrequency: typeof import('./pages/dashboard/overview/components/RentalFrequency.vue')['default']
@@ -28,6 +29,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     Settings: typeof import('./components/blocks/Settings.vue')['default']
     StatCardOverview: typeof import('./pages/dashboard/overview/components/StatCardOverview.vue')['default']
+    SurveyQuestions: typeof import('./components/survey-1/SurveyQuestions.vue')['default']
     Tf: typeof import('./components/polls/tf.vue')['default']
     ThemeToggler: typeof import('./components/blocks/ThemeToggler.vue')['default']
     ToggleDirection: typeof import('./components/blocks/ToggleDirection.vue')['default']

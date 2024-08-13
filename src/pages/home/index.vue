@@ -24,7 +24,7 @@
                   }"
                   class="headline mb-4"
                 >
-                  Advancing Research through collaboration
+                  Advancing Health Research through collaboration
                 </h1>
 
                 <br />
@@ -69,11 +69,11 @@
       <v-col cols="12" md="12" class="text-center">
         <v-card class="pa-5">
           <v-card-title>
-            <h2 class="title">Join the NEMBi Student Research Network</h2>
+            <h2 class="title">Join the NEMBi Health Sciences Research Network</h2>
           </v-card-title>
           <v-card-subtitle class="subheading"
-            >Be a part of NEMBi Journal Club and Schorlaly
-            activities.</v-card-subtitle
+            >Participate in schorlaly
+            activities and NEMBi Students' Journal Club.  </v-card-subtitle
           >
         </v-card>
       </v-col>

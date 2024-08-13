@@ -10,7 +10,6 @@ import generatedRoutes from "~pages";
 import i18n from "./plugins/i18n";
 import { setupLayouts } from "virtual:generated-layouts";
 import vuetify from "./plugins/vuetify";
-import VueSmoothScroll from "vue3-smooth-scroll";
 
 const routes = setupLayouts(generatedRoutes);
 
@@ -19,8 +18,7 @@ const app = createApp({
   setup() {
     onInitApp();
   },
-});
-app.use(VueSmoothScroll);
+}); 
 
 app
   .use(createPinia())
