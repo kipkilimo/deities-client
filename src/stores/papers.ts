@@ -19,7 +19,13 @@ interface Discussion {
   height: number;
   id: string;
   username: string;
-  addedDate: string;
+  timestamp: string;
+}
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
 }
 interface Paper {
   id: string;
@@ -29,7 +35,7 @@ interface Paper {
   sessionId: string;
   discussion: [Discussion];
   createdDate: string;
-  createdBy: string;
+  createdBy: User;
 }
 
 export const usePaperStore = defineStore("paper", {
@@ -82,6 +88,7 @@ export const usePaperStore = defineStore("paper", {
               id
               username
               email
+              role
             }
           }
         }

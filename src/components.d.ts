@@ -7,7 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    ArticleTextHighlighter: (typeof import("./pdf/ArticleTextHighlighter.vue"))["default"]
+    ArticleTextHighlighter: typeof import('./components/pdf/ArticleTextHighlighter.vue')['default']
     BarChart: typeof import('./components/charts/BarChart.vue')['default']
     CarsInfo: typeof import('./pages/dashboard/overview/components/CarsInfo.vue')['default']
     Deities: typeof import('./components/deities.vue')['default']

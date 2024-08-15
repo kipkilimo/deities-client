@@ -16,7 +16,7 @@
         ref="pdfImage"
         @onPageChange="updatePageNumber"
         @mousedown="startSelection"
-        @page-change="onPageChange"
+        @page-change="updatePageNumber"
         style="width: 100%; height: auto"
         class="z-index-common"
       />
@@ -44,8 +44,7 @@
                 v-on="on"
                 style="
                   border-bottom: 1px solid #ccc;
-                  box-shadow: 0 1px 0 #ccc;
-                  z-index: 150;
+                  box-shadow: 0 1px 0 #ccc; 
                 "
                 class="tooltip-card custom-tooltip"
               >
@@ -226,7 +225,6 @@ const textRules = [
 // Refs for managing state
 const title = ref("");
 const text = ref("");
-const hoverIndex = ref(null); // Tracks the index of the hovered card
 
 const comments = ref([]);
 const selectionStart = ref({ x: null, y: null });
@@ -238,6 +236,8 @@ const index = ref(null);
 const selectionActive = ref(false);
 const dialogVisible = ref(false);
 const showTooltip = ref(null);
+const hoverIndex = ref(null); // Tracks the index of the hovered card
+
 const pdfContainer = ref(null);
 const pdfImage = ref(null);
 const loading = ref(false);
@@ -628,7 +628,14 @@ const reactiveTimeAgo = (timestamp) => {
 const updatePageNumber = (pageNumber) => {
   currentPage.value = pageNumber;
 };
-
+watch(currentPage, (newPage) => {
+  if (pdfApp.value) {
+    currentPage.value = newPage;
+  }
+});
+const onPageChange = (newPage) => {
+  currentPage.value = newPage;
+};
 // Filter comments for the current page
 const filteredComments = computed(() => {
   return comments.value.filter((comment) => comment.page === currentPage.value);

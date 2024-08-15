@@ -9,14 +9,81 @@
           </v-alert>
         </h3>
 
-        <v-card 
-          v-if="paperStore.paper.url" 
-        >
+        <v-card v-if="paperStore.paper.url">
           <Highlighter />
         </v-card>
       </v-col>
+      <v-col cols="3" v-if="paperStore.paper" style="position:relative;">
+        <!-- Display message if no paper URL exists -->
+        <div class="text-center pa-4">
+          <v-btn
+            @click="journalTask = true"
+            variant="outlined"
+            class="ml-2"
+            rounded="xs"
+            width="99%"
+          >
+            <v-icon>mdi-dots-vertical</v-icon> View Paper Discussion Details.
+          </v-btn>
 
-      <v-col cols="3">
+          <v-dialog v-model="journalTask" width="auto">
+            <v-card
+              class="mx-auto"
+              prepend-icon="mdi-checkbox-marked-circle-auto-outline"
+              width="540"
+            >
+              <v-card-subtitle class="mb-1" color="green darken-2"
+                ><v-icon class="mr-1">mdi-clipboard-text-clock</v-icon>
+
+                <span
+                  v-html="
+                    `Discussion open till <strong>${evalClosingDate(paperStore.paper.createdDate)}</strong>.`
+                  "
+                ></span>
+              </v-card-subtitle>
+              <template
+                v-slot:title
+                prepend-icon="mdi-checkbox-marked-circle-auto-outline"
+              >
+                <span class="font-weight-black ml-0">{{
+                  paperStore.paper.title
+                }}</span>
+              </template>
+
+              <v-card-text class="bg-surface-light pt-4">
+                <strong>Objective(s):</strong> {{ paperStore.paper.objective }}
+              </v-card-text>
+              <p class="ml-sm">
+                📚 INSTRUCTIONS <br />
+                <i>
+                  <span
+                    >1. Discussion closes after 30 submitted comments (
+                    {{ paperStore.paper.discussion.length }} submitted )</span
+                  >
+                  <br />
+                  <span
+                    >2. Upto three (3) contributions per person per paper.</span
+                  ><br />
+                  <span
+                    >3. Be brief and stay within the journal club paper
+                    objectives.</span
+                  ></i
+                >
+              </p>
+              <v-divider />
+              <v-card-actions>
+                <v-btn
+                  text="Close dialog"
+                  variant="text"
+                  color="orange"
+                  @click="journalTask = false"
+                ></v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </div>
+      </v-col>
+      <v-col cols="3" v-if="user.role !== 'STUDENT'">
         <v-row>
           <v-col cols="9">
             <v-btn
@@ -75,8 +142,8 @@
               class="mt-2 ml-sm"
               v-model="title"
               :rules="titleRules"
-              label="Journal article title"
-              hint="Journal article title"
+              label="Key discussion topic"
+              hint="Key discussion topic"
             ></v-text-field>
 
             <v-textarea
@@ -85,8 +152,8 @@
               variant="outlined"
               v-model="paperSummary"
               :rules="paperSummaryRules"
-              hint="Key task / objectives for the journal club article:"
-              label="Key task / objectives for the journal club article:"
+              hint="Key objectives for the journal club paper discussion:"
+              label="Key objectives for the journal club paper discussion:"
             ></v-textarea>
 
             <v-btn
@@ -153,13 +220,15 @@ import { ref, computed, nextTick, onBeforeMount } from "vue";
 import { usePaperStore } from "../../../stores/papers";
 import axios from "axios";
 // @ts-ignore
-import Highlighter from "../../../pdf/ArticleTextHighlighter.vue";
+import Highlighter from "../../../components/pdf/ArticleTextHighlighter.vue";
+import { useUserStore } from "../../../stores/users";
 
+const userStore = useUserStore();
+const user = computed(() => userStore.user);
 const paperStore = usePaperStore();
 // @ts-ignore
 const apiUrl = import.meta.env.VITE_BASE_URL;
-
-const user = ref<any>(null);
+const journalTask = ref(false);
 const loading = ref(false);
 const title = ref("");
 const paperSummary = ref("");
@@ -175,12 +244,12 @@ const pdfImage = ref(null);
 const titleRules = [
   (v: string) => !!v || "Title is required",
   (v: string) => v.length >= 2 || "Title must be at least 2 characters",
-  (v: string) => v.length <= 255 || "Title must be at most 250 characters",
+  (v: string) => v.length <= 40 || "Title must be at most 40 characters",
 ];
 const paperSummaryRules = [
   (v: string) => !!v || "Summary is required",
   (v: string) => v.length >= 2 || "Summary must be at least 2 characters",
-  (v: string) => v.length <= 755 || "Summary must be at most 750 characters",
+  (v: string) => v.length <= 555 || "Summary must be at most 550 characters",
 ];
 const maxFileSize = 10 * 1024 * 1024; // 10MB
 
@@ -199,6 +268,31 @@ const pdfRules = [
     return fileName.endsWith(".pdf") || "The file must have a .pdf extension.";
   },
 ];
+function evalClosingDate(timestamp: string): string {
+  // Convert the timestamp to an integer
+  const originalDate = new Date(parseInt(timestamp, 10));
+
+  // Add 30 days (30 days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds)
+  const futureDate = new Date(
+    originalDate.getTime() + 28 * 24 * 60 * 60 * 1000
+  );
+
+  // Format the date and time with full weekday and custom date-time style
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  };
+
+  // Use toLocaleString to format the date and time
+  const formattedDateTime = futureDate.toLocaleString("en-US", options);
+
+  return formattedDateTime;
+}
 
 const isFormValid = computed(() => {
   return (
@@ -216,14 +310,14 @@ const isButtonDisabled = computed(() => {
   const oneDayInMs = 24 * 60 * 60 * 1000;
   const twoWeeksInMs = 14 * 24 * 60 * 60 * 1000;
 
-  const createdDateMs = Number(paperStore.paper.createdDate);
+  const createdDateMs = Number(paperStore.paper.timestamp);
   const timeDiff = now - createdDateMs;
 
   return timeDiff > oneDayInMs || timeDiff < twoWeeksInMs;
 });
 
 const isAddArticleEnabled = computed(() => {
-  const lastPublishedDate = paperStore.paper.createdDate;
+  const lastPublishedDate = paperStore.paper.timestamp;
   if (!lastPublishedDate) return true;
   const fourteenDaysAgo = new Date();
   fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);

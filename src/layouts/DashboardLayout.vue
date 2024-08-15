@@ -97,6 +97,8 @@ import { ref, computed, onBeforeMount } from "vue";
 // @ts-ignore
 const { t, locale } = useI18n();
 import { useUserStore } from "../stores/users";
+import { useRouter } from "vue-router";
+const router = useRouter();
 
 onBeforeMount(async () => {
   if (typeof localStorage !== "undefined") {
@@ -105,7 +107,7 @@ onBeforeMount(async () => {
       try {
         await userStore.getCurrentUser(storedUser);
       } catch (error) {
-        console.error("Error parsing user data from localStorage:", error);
+       router.push('/auth/login');
       }
     }
   }

@@ -12,6 +12,7 @@ interface UserState {
     username: string;
     email: string;
     activatedAccount: boolean;
+    role: string;
   };
   // Other user data
 }
@@ -26,6 +27,7 @@ export const useUserStore = defineStore("login", {
       username: "",
       email: "",
       activatedAccount: false,
+      role: "",
     },
   }),
   actions: {
@@ -195,6 +197,7 @@ export const useUserStore = defineStore("login", {
             username
             email
             activatedAccount
+            role
           }
         }
       `;
