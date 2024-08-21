@@ -5,9 +5,9 @@
     <v-toolbar
       style="
         border-radius: 5px 5px 0 0;
-        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.9);
+        box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.9);
         z-index: 1500;
-        color: #cccfcf;
+        color: #e7f2fb;
       "
     >
       <v-app-bar-nav-icon></v-app-bar-nav-icon>
@@ -19,8 +19,11 @@
         variant="text"
         color="grey"
         flat
-        class="mr-2"
-        @click="decrementPageNumber"
+        class="mr-2" 
+        @mousedown="startLongPress('decrement')"
+        @mouseup="stopLongPress"
+        @mouseleave="stopLongPress"
+        @click="handleDecrementClick"
       >
         <v-icon>mdi-menu-left</v-icon> Previous Page
       </v-btn>
@@ -32,7 +35,14 @@
         icon="mdi-file-rotate-right"
         @click="rotatePage"
       ></v-btn>
-      <v-btn color="grey" flat class="mr-2" @click="incrementPageNumber">
+      <v-btn
+        color="grey" 
+        flat
+        @mousedown="startLongPress('increment')"
+        @mouseup="stopLongPress"
+        @mouseleave="stopLongPress"
+        @click="handleIncrementClick"
+      >
         <v-icon>mdi-menu-right</v-icon>Next Page
       </v-btn>
     </v-toolbar>
@@ -78,36 +88,37 @@
             <template #activator="{ on, attrs }">
               <v-row>
                 <v-col>
-                  <div style="align-items: center; justify-content: center">
-                    <v-icon class="ml-44" size="x-large">mdi-menu-up</v-icon>
-                    <v-card
-                      color="#e7f2fb"
-                      v-bind="attrs"
-                      v-on="on"
-                      :style="computedCardStyle(index)"
-                      style="
-                        width: 24rem;
-                        border: 1px solid #ccc;
-                        border-bottom: 1px solid #ccc;
-                        box-shadow: 0 1px 0 #ccc;
-                        z-index: 10;
-                      "
-                      class="tooltip-card custom-tooltip"
-                    >
-                      <div class="ma-4 text-h6">{{ commentData.title }}</div>
-                      <div class="ma-4 text-h7">
-                        <i>{{ commentData.text }}</i>
-                      </div>
-                      <v-divider />
-                      <v-card-actions>
-                        <v-card-subtitle class="ml-11" align-right>
-                          Added
-                          {{ reactiveTimeAgo(Number(commentData.timestamp)) }}
-                          by {{ commentData.author }}
-                        </v-card-subtitle>
-                      </v-card-actions>
-                    </v-card>
-                  </div>
+                  <div
+                    style="align-items: center; justify-content: center"
+                  ></div>
+                  <v-icon class="ml-44" size="50">mdi-menu-up</v-icon>
+                  <v-card
+                    color="#e7f2fb"
+                    v-bind="attrs"
+                    v-on="on"
+                    :style="computedCardStyle(index)"
+                    style="
+                      width: 24rem;
+                      border: 1px solid #ccc;
+                      border-bottom: 1px solid #ccc;
+                      box-shadow: 0 1px 0 #ccc;
+                      z-index: 10;
+                    "
+                    class="tooltip-card custom-tooltip"
+                  >
+                    <div class="ma-4 text-h6">{{ commentData.title }}</div>
+                    <div class="ma-4 text-h7">
+                      <i>{{ commentData.text }}</i>
+                    </div>
+                    <v-divider />
+                    <v-card-actions>
+                      <v-card-subtitle class="ml-11" align-right>
+                        Added
+                        {{ reactiveTimeAgo(Number(commentData.timestamp)) }}
+                        by {{ commentData.author }}
+                      </v-card-subtitle>
+                    </v-card-actions>
+                  </v-card>
                 </v-col>
               </v-row>
             </template>
@@ -122,20 +133,103 @@
         id="selectionOverlay"
         ref="selectionOverlay"
       ></div>
+      <v-toolbar
+        id="toolBar2"
+        style="
+          border-radius: 0px 0px 5px 5px;
+          box-shadow: 0 0px 0px rgba(0, 0, 0, 0.9);
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          width: 74.4%;
+          right: 0;
+          color: #cccfcf;
+          background-color: transparent; /* Make the background transparent */
+        "
+      >
+        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+        <v-spacer></v-spacer>
+
+        <v-btn size="x-small"
+          color="grey"
+          flat
+          class="mr-2"
+          style="
+            background-color: rgba(
+              255,
+              255,
+              255,
+              0
+            ); /* Transparent background */
+          "
+        >
+          <v-icon>mdi-star-box-multiple-outline</v-icon>
+          Page {{ currentPage }} of {{ totalPages }}
+        </v-btn>
+
+        <v-btn size="x-small"
+          variant="text"
+          color="grey"
+          flat
+          class="mr-2"
+          @click="handleDecrementClick"
+          style="
+            background-color: rgba(
+              255,
+              255,
+              255,
+              0
+            ); /* Transparent background */
+          "
+        >
+          <v-icon>mdi-menu-left</v-icon> Previous Page
+        </v-btn>
+
+        <v-btn size="x-small"
+          density="default"
+          icon="mdi-file-rotate-right"
+          @click="rotatePage"
+          style="
+            background-color: rgba(
+              255,
+              255,
+              255,
+              0
+            ); /* Transparent background */
+          "
+        ></v-btn>
+
+        <v-btn size="x-small"
+          color="grey"
+          flat
+          class="mr-2"
+          @click="handleIncrementClick"
+          style="
+            background-color: rgba(
+              255,
+              255,
+              255,
+              0
+            ); /* Transparent background */
+          "
+        >
+          <v-icon>mdi-menu-right</v-icon>Next Page
+        </v-btn>
+      </v-toolbar>
     </div>
 
     <!-- draggable comments iterator  -->
     <div
-      max-width="350px"
       style="
         position: fixed;
         z-index: 1000;
+        max-width: 27rem;
         box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
         max-height: 81vh;
       "
       :style="{ top: dialogTop, left: dialogLeft }"
     >
-      <v-card class="mt-12" style="max-height: 81vh">
+      <v-card class="mt-12" style="max-width: 27rem;z-index:2500; max-height: 81vh;">
         <v-card-title @mousedown.stop="onMouseDown">
           <span class="headline"
             >Page {{ currentPage }} Discussion Comments.</span
@@ -144,21 +238,26 @@
         <v-divider></v-divider>
         <v-card-text>
           <div class="" v-if="filteredSideComments.length === 0">
-            <h5>No discussion comments added yet.</h5>
+            <h5>No discussion comments.</h5>
           </div>
 
-          <div class="scrollable-list-container" id="draggableComments">
-            <v-list>
-              <v-list-item-group
+          <div  id="draggableComments">
+            <v-list style="">
+              <v-list-item-group 
                 v-for="(comment, index) in reorderedComments"
                 :key="index"
                 :id="'card-' + index"
               >
                 <v-card
-                  flat  
+                  flat
+                  elevation="1"
                   :style="computedSideCardStyle(comment.id)"
                   class="mr-3 hover-card"
-                  style="width: 27rem; border: 1px solid #ccc"
+                  style="
+                    min-width: 24rem;
+                    max-width: 24rem;
+                    border: 1px solid #ccc;
+                  "
                 >
                   <div class="ma-4 text-h6">{{ comment.title }}</div>
                   <div class="ma-4 text-h7">
@@ -180,42 +279,6 @@
         </v-card-text>
       </v-card>
     </div>
-
-    <v-toolbar
-      style="
-        border-radius: 5px 5px 0 0;
-        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.9);
-        z-index: 1500;
-        color: #cccfcf;
-      "
-    >
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
-      <v-toolbar-title color="grey">{{
-        paperStore.paper.title
-      }}</v-toolbar-title>
-      <v-spacer></v-spacer>
-
-      <v-btn color="grey" flat class="mr-2">
-        <v-icon>mdi-star-box-multiple-outline</v-icon>Page {{ currentPage }} of
-        {{ totalPages }}
-      </v-btn>
-      <v-btn
-        variant="text"
-        color="grey"
-        flat
-        class="mr-2"
-        @click="decrementPageNumber"
-      >
-        <v-icon>mdi-menu-left</v-icon> Previous Page </v-btn
-      ><v-btn
-        density="default"
-        icon="mdi-file-rotate-right"
-        @click="rotatePage"
-      ></v-btn>
-      <v-btn color="grey" flat class="mr-2" @click="incrementPageNumber">
-        <v-icon>mdi-menu-right</v-icon>Next Page
-      </v-btn>
-    </v-toolbar>
     <!-- Comment Dialog -->
 
     <v-dialog v-model="dialogVisible" max-width="30rem" persistent>
@@ -224,7 +287,7 @@
           <span class="headline ml-2">{{
             paperStore.paper.discussion.length >= 30
               ? "Article discussion closed."
-              : "Add a comment"
+              : "Contribute to the discussion"
           }}</span>
         </v-card-title>
         <v-divider></v-divider>
@@ -254,7 +317,8 @@
             color="primary"
             @click="saveComment"
             :disabled="!isButtonEnabled"
-            >Save Comment</v-btn
+            ><v-icon class="mr-1">mdi-content-save-check</v-icon> Save
+            Comment</v-btn
           >
 
           <v-btn text color="orange" @click="cancelComment">Cancel</v-btn>
@@ -328,21 +392,50 @@ function handleDocumentRender() {
   isLoading.value = false;
 }
 
-function incrementPageNumber() {
-  if (currentPage.value === totalPages.value) {
-    return;
-  }
-  pageRotation.value = 0;
-  currentPage.value = currentPage.value + 1;
-}
+let longPressTimer = null;
+let longPressInterval = null;
+const longPressDelay = 500; // Delay before long press is considered
+const longPressAction = ref(null);
 
-function decrementPageNumber() {
+const incrementPageNumber = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value += 1;
+  }
+};
+
+const decrementPageNumber = () => {
   if (currentPage.value === 1) {
     return;
   }
-  pageRotation.value = 0;
-  currentPage.value = currentPage.value - 1;
-}
+  currentPage.value -= 1;
+};
+
+const handleIncrementClick = () => {
+  incrementPageNumber();
+};
+
+const handleDecrementClick = () => {
+  decrementPageNumber();
+};
+
+const startLongPress = (action) => {
+  longPressAction.value = action;
+  longPressTimer = setTimeout(() => {
+    longPressInterval = setInterval(() => {
+      if (longPressAction.value === "increment") {
+        incrementPageNumber();
+      } else if (longPressAction.value === "decrement") {
+        decrementPageNumber();
+      }
+    }, 100);
+  }, longPressDelay);
+};
+
+const stopLongPress = () => {
+  clearTimeout(longPressTimer);
+  clearInterval(longPressInterval);
+  longPressAction.value = null;
+};
 
 function rotatePage() {
   if (pageRotation.value === 360) {
@@ -351,7 +444,21 @@ function rotatePage() {
   }
   pageRotation.value = pageRotation.value + 90;
 }
+const handleKeydown = (event) => {
+  if (event.key === "ArrowLeft") {
+    decrementPageNumber();
+  } else if (event.key === "ArrowRight") {
+    incrementPageNumber();
+  }
+};
 
+onMounted(() => {
+  window.addEventListener("keydown", handleKeydown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", handleKeydown);
+});
 const onMouseMove = (event) => {
   if (isDragging.value) {
     const dx = event.clientX - dragStartX.value;
@@ -570,9 +677,9 @@ async function saveComment() {
       data: commentData,
     },
   ]);
-  await paperStore.addPaperDiscussion(discussionData); 
+  await paperStore.addPaperDiscussion(discussionData);
 
-  window.location.reload; 
+  window.location.reload;
 }
 
 // Handle comment cancel
@@ -600,8 +707,7 @@ const commentStyle = (comment) => ({
   top: `${comment.y}px`,
   width: `${comment.width}px`,
   height: `${comment.height}px`,
-  backgroundColor: "rgba(231, 242, 251, 0.5)",
-  border: "1px solid #ccc",
+  backgroundColor: "rgba(231, 242, 251, 0.7)",
 });
 
 const timeAgo = (timestamp) => {
@@ -634,13 +740,12 @@ const moveActiveCardToSecondPosition = (activeCardId) => {
 
 // Watch the activeCardId and run the method whenever it changes
 const reorderedComments = computed(() => {
+  const comments = filteredSideComments.value;
+
   if (activeComment.value === null) {
-    const comments = filteredSideComments.value;
-    // Place the active comment at the second position
+    // If activeComment is null, return the entire comments array as is
     return comments;
   }
-  // Clone the comments array to avoid mutating the original array
-  const comments = filteredSideComments.value;
 
   // Find the index of the comment matching activeId
   const activeIndex = comments.findIndex(
@@ -648,20 +753,19 @@ const reorderedComments = computed(() => {
   );
 
   if (activeIndex > -1) {
-    // Remove the comment with activeId from its current position
-    const [activeComment] = comments.splice(activeIndex, 1);
+    // Determine the start and end indices to include four elements
+    const start = Math.max(0, activeIndex - 2); // Start 2 elements before the active one
+    const end = Math.min(comments.length, activeIndex + 4); // End 2 elements after the active one
 
-    if (comments.length > 1) {
-      // Place the active comment at the second position
-      comments.splice(1, 0, activeComment);
-    } else {
-      // If there's only one comment, it remains at the beginning
-      comments.unshift(activeComment);
-    }
+    // Return the subarray containing the active comment and its neighbors
+    return comments.slice(start, end);
   }
 
+  // If activeComment not found, return the original comments array
   return comments;
 });
+
+
 // Optional: Wrap in a computed to make it reactive (Vue-specific)
 </script>
 
@@ -677,7 +781,6 @@ const reorderedComments = computed(() => {
 .comment-marker {
   position: absolute;
   background-color: rgba(192, 235, 238, 0.5);
-  border: 1px solid #ccc;
   cursor: pointer;
 }
 

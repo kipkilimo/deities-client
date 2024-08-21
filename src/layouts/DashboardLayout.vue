@@ -3,7 +3,11 @@
     <v-layout full-height>
       <v-app-bar class="!fixed">
         <router-link to="/home" class="px-8 flex items-center w-64">
-          <Logo :width="50" :height="40" />
+          <v-img
+            src="https://www.hda-institute.com/wp-content/uploads/2021/05/hdai_logo_FINAL_horz-2lines_full-color_wo-tag.png"
+            :width="100"
+            :height="40"
+          />
         </router-link>
 
         <v-btn icon @click="drawer = !drawer">
@@ -11,6 +15,17 @@
         </v-btn>
 
         <v-spacer></v-spacer>
+        <v-col cols="auto">
+          <v-btn
+            icon
+            rounded
+            density="comfortable"
+            @click="resourceStore.showCreateResourceDialog = true"
+          >
+            <v-icon>mdi-note-plus-outline</v-icon>
+          </v-btn>
+        </v-col>
+
         <v-btn icon variant="text" color="inherit">
           <span class="i-iconoir-bell text-2xl"></span>
         </v-btn>
@@ -36,11 +51,11 @@
         </template>
 
         <v-list density="compact" nav>
-          <v-list-item 
+          <v-list-item
             height="100"
-            :prepend-avatar="`https://ui-avatars.com/api/?name=${user.username}&background=0D8ABC&color=fff`"
-            :title="user.username"
-            :subtitle="user.email"
+            :prepend-avatar="`https://ui-avatars.com/api/?name=${user.personalInfo.username}&background=0D8ABC&color=fff`"
+            :title="user.personalInfo.username"
+            :subtitle="user.personalInfo.email"
             class="me-4"
           ></v-list-item>
 
@@ -90,6 +105,26 @@
         </v-container>
       </v-main>
     </v-layout>
+    <v-dialog v-model="resourceStore.showCreateResourceDialog" width="85%" min-height="84vh" persistent>
+      <v-card min-height="84vh" title="Add a new resource">
+        <ResourceBaseForm />
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="resourceStore.showAddResourceCoverAndContentDialog" width="85%" height="84vh" persistent>
+      <v-card height="84vh" title="Add resource content">
+        <ResourceContentsHandler />
+        <v-card-actions><v-spacer/>
+        <v-btn variant="text" color="red" @click="resourceStore.showAddResourceCoverAndContentDialog = false">CLOSE</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+<!-- 
+        <v-dialog v-model="showAddResourceContentDialog" width="85%" height="84vh">
+      <v-card height="84vh" title="Add a new resource">
+        <ResourceBaseForm />
+      </v-card>
+    </v-dialog> -->
   </v-app>
 </template>
 <script setup lang="ts">
@@ -99,7 +134,9 @@ const { t, locale } = useI18n();
 import { useUserStore } from "../stores/users";
 import { useRouter } from "vue-router";
 const router = useRouter();
-
+import { useResourceStore } from "../stores/resources"; // Replace with actual path
+ 
+const resourceStore = useResourceStore();
 onBeforeMount(async () => {
   if (typeof localStorage !== "undefined") {
     const storedUser = localStorage.getItem("sessionId");
@@ -107,7 +144,7 @@ onBeforeMount(async () => {
       try {
         await userStore.getCurrentUser(storedUser);
       } catch (error) {
-       router.push('/auth/login');
+        router.push("/auth/login");
       }
     }
   }
@@ -119,11 +156,12 @@ const user = computed(() => userStore.user);
 function logout() {
   userStore.logout();
 }
-// papers: Papers
+// papers: Papers https://api.jsonserve.com/CHZMhR
 // poster: Posters
 // poll: Poll
 // news: News
-const drawer = ref(true);
+const drawer = ref(true); 
+
 const rail = ref(true);
 const isRTL = computed(() => locale.value === "ar");
 const sidebarItems = computed(() => [
@@ -177,12 +215,3 @@ const sidebarItems = computed(() => [
   },
 ]);
 </script>
-<style scoped>
-.custom-tooltip .v-tooltip__content {
-  background-color: #f0f0f0 !important; /* Very light grey background */
-  border: 1px solid #858383 !important; /* Light grey border */
-  padding: 8px 12px; /* Add padding as needed */
-  border-radius: 4px; /* Optional: rounded corners */
-  box-shadow: none; /* Remove default shadow if needed */
-}
-</style>

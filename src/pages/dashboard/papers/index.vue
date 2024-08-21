@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-card style="max-height: 90vh" color="transparent">
     <v-row>
       <v-col cols="9">
         <!-- Display message if no paper URL exists -->
@@ -13,17 +13,18 @@
           <Highlighter />
         </v-card>
       </v-col>
-      <v-col cols="3" v-if="paperStore.paper" style="position:relative;">
+      <v-col cols="3" v-if="paperStore.paper" style="position: relative">
         <!-- Display message if no paper URL exists -->
         <div class="text-center pa-4">
           <v-btn
             @click="journalTask = true"
             variant="outlined"
-            class="ml-2"
             rounded="xs"
-            width="99%"
+            class="mr-5"
+            width="100%"
           >
-            <v-icon>mdi-dots-vertical</v-icon> View Paper Discussion Details.
+            <v-icon class="mr-2">mdi-dots-vertical</v-icon> View Paper
+            Discussion Details.
           </v-btn>
 
           <v-dialog v-model="journalTask" width="auto">
@@ -32,14 +33,19 @@
               prepend-icon="mdi-checkbox-marked-circle-auto-outline"
               width="540"
             >
-              <v-card-subtitle class="mb-1" color="green darken-2"
+              <v-card-subtitle
+                class="mb-1"
+                color="green darken-2"
+                :class="{ 'past-due': isPastDue, 'on-time': !isPastDue }"
                 ><v-icon class="mr-1">mdi-clipboard-text-clock</v-icon>
 
                 <span
-                  v-html="
-                    `Discussion open till <strong>${evalClosingDate(paperStore.paper.createdDate)}</strong>.`
-                  "
-                ></span>
+                  >Discussion open till
+                  <strong>{{
+                    evalClosingDate(paperStore.paper.createdDate)
+                  }}</strong
+                  >.</span
+                >
               </v-card-subtitle>
               <template
                 v-slot:title
@@ -83,7 +89,7 @@
           </v-dialog>
         </div>
       </v-col>
-      <v-col cols="3" v-if="user.role !== 'STUDENT'">
+      <v-col cols="3" v-if="user.role == 'STUDENT'">
         <v-row>
           <v-col cols="9">
             <v-btn
@@ -155,7 +161,8 @@
               hint="Key objectives for the journal club paper discussion:"
               label="Key objectives for the journal club paper discussion:"
             ></v-textarea>
-
+            <v-card-text>Add journal club date and time</v-card-text>
+            <DateTime />
             <v-btn
               style="width: 90%"
               class="mt-1 nb-2 ml-sm"
@@ -213,16 +220,16 @@
         </v-sheet>
       </v-col>
     </v-row>
-  </v-container>
+  </v-card>
 </template>
 <script setup lang="ts">
 import { ref, computed, nextTick, onBeforeMount } from "vue";
 import { usePaperStore } from "../../../stores/papers";
 import axios from "axios";
 // @ts-ignore
-import Highlighter from "../../../components/pdf/ArticleTextHighlighter.vue";
+import Highlighter from "../../../components/pdf/PaperTextHighlighter.vue";
 import { useUserStore } from "../../../stores/users";
-
+import DateTime from "../../../components/commonResourceCreateItems/formItems/DateTimePicker.vue";
 const userStore = useUserStore();
 const user = computed(() => userStore.user);
 const paperStore = usePaperStore();
@@ -304,20 +311,22 @@ const isFormValid = computed(() => {
     )
   );
 });
-
+const isPastDue = computed(() => {
+  return new Date(paperStore.paper.createdDate) < new Date();
+});
 const isButtonDisabled = computed(() => {
   const now = Date.now();
   const oneDayInMs = 24 * 60 * 60 * 1000;
   const twoWeeksInMs = 14 * 24 * 60 * 60 * 1000;
 
-  const createdDateMs = Number(paperStore.paper.timestamp);
+  const createdDateMs = Number(paperStore.paper.createdDate);
   const timeDiff = now - createdDateMs;
 
   return timeDiff > oneDayInMs || timeDiff < twoWeeksInMs;
 });
 
 const isAddArticleEnabled = computed(() => {
-  const lastPublishedDate = paperStore.paper.timestamp;
+  const lastPublishedDate = paperStore.paper.createdDate;
   if (!lastPublishedDate) return true;
   const fourteenDaysAgo = new Date();
   fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
@@ -417,6 +426,15 @@ onBeforeMount(async () => {
   flex-direction: column; /* Change to 'row' if horizontal scrolling is desired */
   overflow-y: auto; /* Change to 'overflow-x' for horizontal scrolling */
   height: 1000vh; /* Set your desired maximum height */
+}
+.past-due {
+  background-color: rgb(243, 39, 39);
+  color: white;
+}
+
+.on-time {
+  background-color: rgb(20, 155, 20);
+  color: white;
 }
 </style>
 <route lang="yaml">

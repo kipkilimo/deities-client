@@ -6,9 +6,9 @@
       <v-row>
         <v-col>
           <v-card>
-            <v-card-title>Baseline Survey for NEMBi</v-card-title>
+            <v-card-title>Baseline Survey for   NEMBi</v-card-title>
             <v-card-subtitle>
-              We are gathering feedback on the introduction of NEMBi, a students
+              We are gathering feedback on the introduction of   NEMBi, a students
               research platform focusing on research methods in the health
               sciences. Your input will help shape the development of this
               platform.

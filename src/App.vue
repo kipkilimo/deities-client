@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useHead({
-    title: 'OpalLearning',
-    meta: [{ name: 'description', content: 'Opal Learning' }],
+    title: ' NEMBiLearning',
+    meta: [{ name: 'description', content: ' NEMBi Learning' }],
 })
 
 // onInitApp()

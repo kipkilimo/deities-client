@@ -69,11 +69,11 @@
       <v-col cols="12" md="12" class="text-center">
         <v-card class="pa-5">
           <v-card-title>
-            <h2 class="title">Join the NEMBi Health Sciences Research Network</h2>
+            <h2 class="title">Join the   NEMBi Health Sciences Research Network</h2>
           </v-card-title>
           <v-card-subtitle class="subheading"
             >Participate in schorlaly
-            activities and NEMBi Students' Journal Club.  </v-card-subtitle
+            activities and   NEMBi Students' Journal Club.  </v-card-subtitle
           >
         </v-card>
       </v-col>
@@ -146,9 +146,7 @@
             >Expand your knowledge in research methods.</v-card-subtitle
           >
           <v-card-text>
-            The best method for your project largely depends on your topic, the
-            type of data you will need, and the people or items from which you
-            will be collecting data.
+           The best method for your project largely depends on your topic, the type of data you will need, and the people or items from which you will be collecting data, including considerations for data accuracy and relevance.
           </v-card-text>
 
           <v-card-actions>
@@ -164,7 +162,7 @@
         <v-col cols="12">
           <p>
             &copy; {{ currentYear }} Nairobi Epidemiology and Biostatistical
-            Methods Colloquium, NEMBi. All rights reserved.
+            Methods Colloquium,   NEMBi. All rights reserved.
           </p>
           <br />
           <v-divider />

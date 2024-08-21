@@ -1,37 +1,44 @@
 import { defineStore } from "pinia";
 import { client } from "@/graphql/apolloClient"; // Replace with your Apollo Client instance
 import gql from "graphql-tag";
-// import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
+const router = useRouter();
+import Cookies from "js-cookie";
 
 interface UserState {
   isLoggedIn: boolean;
   token?: string;
   username: string;
+  userStrObj: string;
   user: {
     id: string;
-    username: string;
-    email: string;
-    activatedAccount: boolean;
+    personalInfo: {
+      username: string;
+      email: string;
+      activatedAccount: boolean;
+    };
     role: string;
   };
-  // Other user data
 }
 
 export const useUserStore = defineStore("login", {
   state: (): UserState => ({
     isLoggedIn: false,
-    token: undefined,
     username: "",
+    token: undefined,
+    userStrObj: "",
     user: {
       id: "",
-      username: "",
-      email: "",
-      activatedAccount: false,
+      personalInfo: {
+        username: "",
+        email: "",
+        activatedAccount: false,
+      },
       role: "",
     },
   }),
+
   actions: {
-    // activationToken
     async resetPassword(activationToken: string, password: string) {
       const RESET_PASSWORD = gql`
         mutation resetPassword($activationToken: String!, $password: String!) {
@@ -42,8 +49,11 @@ export const useUserStore = defineStore("login", {
             accessToken
             user {
               id
-              username
-              email
+              personalInfo {
+                username
+                email
+                activatedAccount
+              }
             }
           }
         }
@@ -55,27 +65,42 @@ export const useUserStore = defineStore("login", {
           variables: { activationToken, password },
         });
 
-        // Handle response
-        this.user = response.data?.resetPassword?.user;
+        const user = response.data?.resetPassword?.user;
         const accessToken = response.data?.resetPassword?.accessToken;
-        if (accessToken) {
+
+        if (user && accessToken) {
           this.isLoggedIn = true;
           this.token = accessToken;
-          //  Store token in secure storage (optional)
+          this.user = {
+            id: user.id,
+            personalInfo: {
+              username: user.personalInfo.username,
+              email: user.personalInfo.email,
+              activatedAccount: user.personalInfo.activatedAccount,
+            },
+            role: user.personalInfo.role,
+          };
         } else {
-          throw new Error("Invalid username or password");
+          throw new Error("Reset failed");
         }
       } catch (error) {
-        throw new Error("Reset failed"); // Optionally re-throw the error after logging it
+        console.error("Reset password error:", error);
+        throw new Error("Reset failed");
       }
     },
+
     async requestPasswordReset(email: string) {
       const REQUEST_RESET_PASSWORD = gql`
         mutation requestPasswordReset($email: String!) {
           requestPasswordReset(email: $email) {
-            id
-            username
-            email
+            user {
+              id
+              personalInfo {
+                username
+                email
+                activatedAccount
+              }
+            }
           }
         }
       `;
@@ -86,23 +111,25 @@ export const useUserStore = defineStore("login", {
           variables: { email },
         });
 
-        // Handle response
-
-        return response.data?.requestPasswordReset; // Return the registered user data if needed
+        return response.data?.requestPasswordReset?.user;
       } catch (error) {
-        console.error("Activation error:", error);
-        throw new Error("Activation failed"); // Optionally re-throw the error after logging it
+        console.error("Request password reset error:", error);
+        throw new Error("Request failed");
       }
     },
-    async activate(token: string) {
+
+    async activate(activationToken: string) {
       const ACTIVATE_ACCOUNT = gql`
-        mutation activateUser($token: String!) {
-          activate(token: $token) {
+        mutation activateUser($activationToken: String!) {
+          activate(activationToken: $activationToken) {
             accessToken
             user {
               id
-              username
-              email
+              personalInfo {
+                username
+                email
+                activatedAccount
+              }
             }
           }
         }
@@ -111,60 +138,54 @@ export const useUserStore = defineStore("login", {
       try {
         const response = await client.mutate({
           mutation: ACTIVATE_ACCOUNT,
-          variables: { token },
+          variables: { activationToken },
         });
 
-        // Handle response
-        this.user = response.data?.activate?.user;
+        const user = response.data?.activate?.user;
         const accessToken = response.data?.activate?.accessToken;
-        if (accessToken) {
+
+        if (user && accessToken) {
           this.isLoggedIn = true;
           this.token = accessToken;
-          //  Store token in secure storage (optional)
+          this.user = {
+            id: user.id,
+            personalInfo: {
+              username: user.personalInfo.username,
+              email: user.personalInfo.email,
+              activatedAccount: user.personalInfo.activatedAccount,
+            },
+            role: user.personalInfo.role,
+          };
         } else {
-          throw new Error("Invalid username or password");
+          throw new Error("Activation failed");
         }
       } catch (error) {
         console.error("Activation error:", error);
-        throw new Error("Activation failed"); // Optionally re-throw the error after logging it
+        throw new Error("Activation failed");
       }
     },
-    async register(username: string, email: string, password: string) {
+
+    async register(
+      username: string,
+      fullName: string,
+      email: string,
+      password: string
+    ) {
       const REGISTER_USER = gql`
-        mutation registerUser(
+        mutation createUser(
           $username: String!
+          $fullName: String!
           $email: String!
           $password: String!
         ) {
-          register(username: $username, email: $email, password: $password) {
+          createUser(
+            username: $username
+            fullName: $fullName
+            email: $email
+            password: $password
+          ) {
             id
-            username
-            email
-          }
-        }
-      `;
-
-      try {
-        const response = await client.mutate({
-          mutation: REGISTER_USER,
-          variables: { username, email, password },
-        });
-
-        // Handle response
-
-        return response.data?.register; // Return the registered user data if needed
-      } catch (error) {
-        console.error("Registration error:", error);
-        throw new Error("Registration failed"); // Optionally re-throw the error after logging it
-      }
-    },
-    async login(email: string, password: string) {
-      const loginMutation = gql`
-        mutation Login($email: String!, $password: String!) {
-          login(email: $email, password: $password) {
-            accessToken
-            user {
-              id
+            personalInfo {
               username
               email
               activatedAccount
@@ -173,56 +194,250 @@ export const useUserStore = defineStore("login", {
         }
       `;
 
-      const response = await client.mutate({
-        mutation: loginMutation,
-        variables: { email, password },
-      });
-      this.user = response.data?.login?.user;
+      try {
+        const response = await client.mutate({
+          mutation: REGISTER_USER,
+          variables: { username, fullName, email, password },
+        });
+        const user = response.data?.createUser;
 
-      localStorage.setItem("sessionId", this.user.id);
-      const token = response.data?.login?.accessToken;
-      if (token) {
-        this.isLoggedIn = true;
-        this.token = token;
-        //  Store token in secure storage (optional)
-      } else {
-        throw new Error("Invalid username or password");
+        if (user) {
+          this.user = {
+            id: user.id,
+            personalInfo: {
+              username: user.personalInfo.username,
+              email: user.personalInfo.email,
+              activatedAccount: user.personalInfo.activatedAccount,
+            },
+            role: user.personalInfo.role,
+          };
+        }
+        return response.data?.createUser;
+      } catch (error) {
+        console.error("Registration error:", error);
+        throw new Error("Registration failed");
       }
     },
+    // ,
+    async singleSignInRequest(email: string) {
+      const REQUEST_ACCESS_KEY = gql`
+        mutation singleSignInRequest($email: String!) {
+          singleSignInRequest(email: $email) {
+            id
+            personalInfo {
+              username
+              email
+              activatedAccount
+            }
+          }
+        }
+      `;
+
+      try {
+        const response = await client.mutate({
+          mutation: REQUEST_ACCESS_KEY,
+          variables: { email },
+        });
+        const user = response.data?.singleSignInRequest;
+
+        this.user = {
+          id: user.id,
+          personalInfo: {
+            username: user.personalInfo.username,
+            email: user.personalInfo.email,
+            activatedAccount: user.personalInfo.activatedAccount,
+          },
+          role: user.personalInfo.role,
+        };
+        return response.data?.singleSignInRequest;
+      } catch (error) {
+        console.error("Request password reset error:", error);
+        throw new Error("Request failed");
+      }
+    },
+    async singleSigninLogin(accessKey: string) {
+      const LOGIN_USER = gql`
+        mutation singleSigninLogin($accessKey: String!) {
+          singleSigninLogin(accessKey: $accessKey) {
+            accessToken
+            user {
+              id
+              personalInfo {
+                username
+                email
+                activatedAccount
+              }
+              role
+            }
+          }
+        }
+      `;
+
+      try {
+        const response = await client.mutate({
+          mutation: LOGIN_USER,
+          variables: { accessKey },
+        });
+
+        const user = response.data?.singleSigninLogin?.user;
+        const accessToken = response.data?.singleSigninLogin?.accessToken;
+
+        if (user && accessToken == null) {
+          this.isLoggedIn = false;
+          this.token = "";
+          this.user = {
+            id: user.id,
+            personalInfo: {
+              username: user.personalInfo.username,
+              email: user.personalInfo.email,
+              activatedAccount: user.personalInfo.activatedAccount,
+            },
+            role: user.personalInfo.role,
+          };
+        }
+
+        if (user && accessToken) {
+          this.isLoggedIn = true;
+          this.token = accessToken;
+          this.user = {
+            id: user.id,
+            personalInfo: {
+              username: user.personalInfo.username,
+              email: user.personalInfo.email,
+              activatedAccount: user.personalInfo.activatedAccount,
+            },
+            role: user.personalInfo.role,
+          };
+          localStorage.setItem("sessionId", this.user.id);
+        } else {
+          throw new Error("Invalid email or password");
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+        throw new Error("Login failed");
+      }
+    },
+    async login(email: string, password: string) {
+      const LOGIN_USER = gql`
+        mutation Login($email: String!, $password: String!) {
+          login(email: $email, password: $password) {
+            accessToken
+            user {
+              id
+              personalInfo {
+                username
+                email
+                activatedAccount
+              }
+              role
+            }
+          }
+        }
+      `;
+
+      try {
+        const response = await client.mutate({
+          mutation: LOGIN_USER,
+          variables: { email, password },
+        });
+
+        const user = response.data?.login?.user;
+        const accessToken = response.data?.login?.accessToken;
+
+        if (user && accessToken == null) {
+          this.isLoggedIn = false;
+          this.token = "";
+          this.user = {
+            id: user.id,
+            personalInfo: {
+              username: user.personalInfo.username,
+              email: user.personalInfo.email,
+              activatedAccount: user.personalInfo.activatedAccount,
+            },
+            role: user.personalInfo.role,
+          };
+        }
+
+        if (user && accessToken) {
+          this.isLoggedIn = true;
+          this.token = accessToken;
+          this.user = {
+            id: user.id,
+            personalInfo: {
+              username: user.personalInfo.username,
+              email: user.personalInfo.email,
+              activatedAccount: user.personalInfo.activatedAccount,
+            },
+            role: user.personalInfo.role,
+          };
+          localStorage.setItem("sessionId", this.user.id);
+        } else {
+          throw new Error("Invalid email or password");
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+        throw new Error("Login failed");
+      }
+    },
+
     async getCurrentUser(sessionId: string) {
-      const getCurrentUser = gql`
-        mutation getCurrentUser($sessionId: String!) {
+      const GET_CURRENT_USER = gql`
+        query getCurrentUser($sessionId: String!) {
           getCurrentUser(sessionId: $sessionId) {
             id
-            username
-            email
-            activatedAccount
+            personalInfo {
+              username
+              email
+              activatedAccount
+            }
             role
           }
         }
       `;
 
-      const response = await client.mutate({
-        mutation: getCurrentUser,
-        variables: { sessionId },
-      });
-      this.user = response.data?.getCurrentUser;
+      try {
+        const response = await client.query({
+          query: GET_CURRENT_USER,
+          variables: { sessionId },
+        });
+
+        const user = response.data?.getCurrentUser;
+        const userArrObj = [user];
+        const userStrObj = JSON.stringify(userArrObj);
+
+        if (user) {
+          this.user = {
+            id: user.id,
+            personalInfo: {
+              username: user.personalInfo.username,
+              email: user.personalInfo.email,
+              activatedAccount: user.personalInfo.activatedAccount,
+            },
+            role: user.personalInfo.role,
+          };
+          this.userStrObj = userStrObj;
+        }
+      } catch (error) {
+        console.error("Fetch current user error:", error);
+        throw new Error("Failed to fetch current user");
+      }
     },
+
     logout() {
-      // Set logged-in state to false
       this.isLoggedIn = false;
-
-      // Clear the token
-      this.token = "";
-      this.user = {} as UserState["user"]; // Ensure user is an empty object of the correct type
-
-      // Clear all items from localStorage
+      this.token = undefined;
+      this.user = {
+        id: "",
+        personalInfo: {
+          username: "",
+          email: "",
+          activatedAccount: false,
+        },
+        role: "",
+      };
       localStorage.clear();
-
-      // Redirect to the login page
-      window.location.href = "/auth/login";
-
-      // Optionally, clear token from secure storage if applicable
+      Cookies.remove("authToken");
+      window.location.href = "/";
     },
   },
 });

@@ -51,9 +51,12 @@
       </v-form>
     </v-card-text>
     <v-progress-linear v-if="activateLoading" color="cyan" indeterminate></v-progress-linear>
-    <div v-if="activateSuccess">
-      <v-alert :text="activateSuccess" title="Activation success" type="success"></v-alert>
+        <div v-if="activateSuccess" class="custom-alert">
+      <v-alert :text="activateSuccess" title="Reset request sent!" type="success" class="custom-alert">
+
+      </v-alert>
     </div>
+ 
     <div v-if="activateError">
       <v-alert :text="activateError" title="Activation error" type="error"></v-alert>
     </div>
@@ -79,11 +82,10 @@ const activationToken = ref(''); // Replace with your token capturing logic
 
 onMounted(() => {
   const token = route.query.token;
+  console.log({token})
   activationToken.value = String(token);
    setTimeout(() => {
-    if (userStore.user.email.length < 5) {
-      return;
-    }
+ 
     accountActivate();
   }, 3600);
 });
@@ -100,12 +102,11 @@ const accountActivate = async () => {
   } catch (error) {
      activateError.value = "Failed to activate account."; // Set error message
     setTimeout(() => {
-      router.push("/auth/register");
-    }, 4200);
+      router.push("/auth/login");
+    }, 12000);
   }
 };
 </script>
-
 <style scoped>
 .reset-card {
   max-width: 98%;
@@ -113,7 +114,17 @@ const accountActivate = async () => {
   padding: 24px;
 }
 </style>
+<style scoped>
+.custom-alert {
+  background-color: #ffffff; /* Dark background */
+  padding: 20px;
+  border-radius: 5px;
+}
 
+.custom-alert * {
+  color: white !important;
+}
+</style>
 <route lang="yaml">
 meta:
   layout: AuthLayout
