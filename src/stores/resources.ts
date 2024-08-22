@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { client } from "@/graphql/apolloClient"; // Replace with your Apollo Client instance
 import gql from "graphql-tag";
+
 // Define the ResourceType enum
 export enum ResourceType {
   AUDIO = "AUDIO",
@@ -20,6 +21,7 @@ export enum ResourceType {
   JOB = "JOB",
   TASK = "TASK",
 }
+
 type ID = string; // or type ID = number; based on your use case
 
 interface Resource {
@@ -52,7 +54,33 @@ interface Resource {
 
 export const useResourceStore = defineStore("resource", {
   state: () => ({
-    resource: {} as Resource,
+    resource: {
+      id: "",
+      title: "",
+      description: "",
+      content: "",
+      targetRegion: "",
+      targetCountry: "",
+      slug: "",
+      language: "",
+      contentType: "",
+      viewsNumber: 0,
+      likesNumber: 0,
+      sharesNumber: 0,
+      subject: "",
+      topic: "",
+      rating: "",
+      sessionId: "",
+      accessKey: "",
+      keywords: "",
+      coverImage: "",
+      isPublished: false,
+      averageRating: 0,
+      reviews: "",
+      createdBy: "",
+      createdAt: "",
+      updatedAt: "",
+    } as Resource,
     resources: [] as Resource[],
     filteredResources: [] as Resource[],
     sortBy: "title" as keyof Resource,
@@ -250,8 +278,7 @@ export const useResourceStore = defineStore("resource", {
             createdBy: $createdBy
           ) {
             id
-            title
-            description  
+            contentType
           }
         }
       `;
@@ -265,7 +292,8 @@ export const useResourceStore = defineStore("resource", {
         const newResource = response.data?.createResource;
         if (newResource) {
           this.resources.push(newResource);
-          this.setResources(this.resources);
+          this.resources = this.resources;
+          this.resource = newResource;
         } else {
           throw new Error("Failed to create resource");
         }
@@ -373,75 +401,16 @@ export const useResourceStore = defineStore("resource", {
 
         const updatedResource = response.data?.updateResource;
         if (updatedResource) {
-          const index = this.resources.findIndex((r) => r.id === id);
+          const index = this.resources.findIndex((res) => res.id === id);
           if (index !== -1) {
             this.resources[index] = updatedResource;
-            this.setResources(this.resources);
           }
+          this.resource = updatedResource;
         } else {
           throw new Error("Failed to update resource");
         }
       } catch (error) {
         console.error("Error updating resource:", error);
-      }
-    },
-
-    // RESOURCE CONTENT ADDITIONS
-    async submitEvent(id: string) {
-      const submitResourceEvent = gql`
-        mutation ($id: ID!) {
-          submitResourceEvent(id: $id) {
-            id
-          }
-        }
-      `;
-
-      try {
-        const response = await client.mutate({
-          mutation: submitResourceEvent,
-          variables: { id },
-        });
-
-        const submittedResourceId = response.data?.submitResourceEvent?.id;
-        if (submittedResourceId) {
-          this.resources = this.resources.filter(
-            (r) => r.id !== submittedResourceId
-          );
-          this.setResources(this.resources);
-        } else {
-          throw new Error("Failed to delete resource");
-        }
-      } catch (error) {
-        console.error("Error deleting resource:", error);
-      }
-    },
-
-    async deleteResource(id: string) {
-      const deleteResourceMutation = gql`
-        mutation ($id: ID!) {
-          deleteResource(id: $id) {
-            id
-          }
-        }
-      `;
-
-      try {
-        const response = await client.mutate({
-          mutation: deleteResourceMutation,
-          variables: { id },
-        });
-
-        const deletedResourceId = response.data?.deleteResource?.id;
-        if (deletedResourceId) {
-          this.resources = this.resources.filter(
-            (r) => r.id !== deletedResourceId
-          );
-          this.setResources(this.resources);
-        } else {
-          throw new Error("Failed to delete resource");
-        }
-      } catch (error) {
-        console.error("Error deleting resource:", error);
       }
     },
   },

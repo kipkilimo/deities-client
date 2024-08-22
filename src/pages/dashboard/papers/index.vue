@@ -106,7 +106,7 @@
               border
               @click="showSubmit"
             >
-              Add Journal Club Paper
+              Add Paper Dive Paper
             </v-btn>
           </v-col>
           <v-col cols="3">
@@ -392,17 +392,6 @@ const uploadJournalPaper = async () => {
 };
 
 onBeforeMount(async () => {
-  if (typeof localStorage !== "undefined") {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        user.value = parsedUser && parsedUser[0] ? parsedUser[0] : {};
-      } catch (error) {
-        console.error("Error parsing user data from localStorage:", error);
-      }
-    }
-  }
   await paperStore.getMostRecentPaper();
 });
 </script>

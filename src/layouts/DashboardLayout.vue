@@ -16,14 +16,20 @@
 
         <v-spacer></v-spacer>
         <v-col cols="auto">
-          <v-btn
-            icon
-            rounded
-            density="comfortable"
-            @click="resourceStore.showCreateResourceDialog = true"
-          >
-            <v-icon>mdi-note-plus-outline</v-icon>
-          </v-btn>
+          <v-tooltip location="top">
+            <template v-slot:activator="{ props }">
+              <v-btn
+                v-bind="props"
+                icon
+                rounded
+                density="comfortable"
+                @click="resourceStore.showCreateResourceDialog = true"
+              >
+                <v-icon>mdi-note-plus-outline</v-icon>
+              </v-btn></template
+            >
+            <span> Add a resource</span>
+          </v-tooltip>
         </v-col>
 
         <v-btn icon variant="text" color="inherit">
@@ -55,7 +61,7 @@
             height="100"
             :prepend-avatar="`https://ui-avatars.com/api/?name=${user.personalInfo.username}&background=0D8ABC&color=fff`"
             :title="user.personalInfo.username"
-            :subtitle="user.personalInfo.email"
+            :subtitle="obfuscateEmail(user.personalInfo.email)"
             class="me-4"
           ></v-list-item>
 
@@ -69,10 +75,10 @@
             >
               <v-tooltip
                 activator="parent"
-                location="right"
+                location="top"
                 class="custom-tooltip"
               >
-                <template v-slot:activator="{ props }">
+                <template v-slot:activator="{ props }" v-show="rail">
                   <div v-bind="props" class="d-flex align-center">
                     <v-icon class="me-2">{{ item.iconClass }}</v-icon>
                     <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -105,21 +111,42 @@
         </v-container>
       </v-main>
     </v-layout>
-    <v-dialog v-model="resourceStore.showCreateResourceDialog" width="85%" min-height="84vh" persistent>
+    <v-dialog
+      v-model="resourceStore.showCreateResourceDialog"
+      width="85%"
+      min-height="84vh"
+      persistent
+    >
       <v-card min-height="84vh" title="Add a new resource">
         <ResourceBaseForm />
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="resourceStore.showAddResourceCoverAndContentDialog" width="85%" height="84vh" persistent>
+    <v-dialog
+      v-model="resourceStore.showAddResourceCoverAndContentDialog"
+      width="85%"
+      height="84vh"
+      persistent
+    >
       <v-card height="84vh" title="Add resource content">
         <ResourceContentsHandler />
-        <v-card-actions><v-spacer/>
-        <v-btn variant="text" color="red" @click="resourceStore.showAddResourceCoverAndContentDialog = false">CLOSE</v-btn>
+        <v-card-actions
+          style="position: relative; padding: 0; margin: 0;"
+        >
+          <v-spacer />
+          <v-btn
+            variant="text"
+            color="red"
+            @click="resourceStore.showAddResourceCoverAndContentDialog = false"
+            style="position: absolute; bottom: 0; right: 0; margin: 16px"
+          >
+            CLOSE
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-<!-- 
+
+    <!-- 
         <v-dialog v-model="showAddResourceContentDialog" width="85%" height="84vh">
       <v-card height="84vh" title="Add a new resource">
         <ResourceBaseForm />
@@ -135,7 +162,7 @@ import { useUserStore } from "../stores/users";
 import { useRouter } from "vue-router";
 const router = useRouter();
 import { useResourceStore } from "../stores/resources"; // Replace with actual path
- 
+
 const resourceStore = useResourceStore();
 onBeforeMount(async () => {
   if (typeof localStorage !== "undefined") {
@@ -149,6 +176,30 @@ onBeforeMount(async () => {
     }
   }
 });
+function obfuscateEmail(email: { split: (arg0: string) => [any, any]; }) {
+  const [localPart, domainPart] = email.split("@");
+
+  if (!localPart || !domainPart) {
+    return email; // Return the original email if the format is incorrect
+  }
+
+  const obfuscatedLocal =
+    localPart.slice(0, 4) + "*".repeat(Math.max(0, localPart.length - 2));
+
+  const domainParts = domainPart.split(".");
+
+  if (domainParts.length < 2) {
+    return email; // Return the original email if the domain format is incorrect
+  }
+
+  const obfuscatedDomain =
+    domainParts[0].slice(0, 1) +
+    "*".repeat(Math.max(0, domainParts[0].length - 1)) +
+    "." +
+    domainParts.slice(1).join(".");
+
+  return `${obfuscatedLocal}@${obfuscatedDomain}`;
+}
 
 const userStore = useUserStore();
 const user = computed(() => userStore.user);
@@ -160,9 +211,9 @@ function logout() {
 // poster: Posters
 // poll: Poll
 // news: News
-const drawer = ref(true); 
+const drawer = ref(true);
 
-const rail = ref(true);
+const rail = ref(false);
 const isRTL = computed(() => locale.value === "ar");
 const sidebarItems = computed(() => [
   {

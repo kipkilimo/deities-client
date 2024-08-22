@@ -12,22 +12,39 @@
       @change="validateFiles"
       show-size
     ></v-file-input>
-    <v-btn @click="uploadFiles"  :disabled="uploading"><v-icon class="mr-2">mdi-cloud-upload</v-icon>Upload</v-btn>
-    <v-alert v-if="error" type="error">
+
+    <v-row justify="center" class="mt-4">
+      <v-col cols="auto">
+        <v-btn @click="uploadFiles" :disabled="files.length === 0 || uploading">
+          <v-icon class="mr-2">mdi-cloud-upload</v-icon>Upload
+        </v-btn>
+      </v-col>
+    </v-row>
+
+    <v-alert v-if="error" type="error" class="mt-4">
       {{ error }}
     </v-alert>
-    <v-alert v-if="isUploadSuccessful" type="success">
-      Files uploaded successfully!
-    </v-alert>
+
+        <div v-if="isUploadSuccessful" class="custom-alert">
+      <v-alert :text="isUploadSuccessful" title="Files uploaded successfully!" type="success" class="custom-alert">
+
+      </v-alert>
+    </div>
+    
   </v-container>
 </template>
-
 <script setup>
 import { ref, computed } from "vue";
 import axios from "axios";
+import { useResourceStore } from "../../../stores/resources";
 
+import { useRouter } from "vue-router";
+
+const resourceStore = useResourceStore();
 // @ts-ignore
 const apiUrl = import.meta.env.VITE_BASE_URL;
+
+const router = useRouter(); // Use Vue Router to handle navigation
 
 const files = ref([]);
 const uploading = ref(false);
@@ -64,25 +81,26 @@ const validateFiles = () => {
 };
 
 const uploadFiles = async () => {
-  loading.value = true;
+  uploading.value = true;
 
   if (files.value.length === 0) {
     console.error("No files selected");
     error.value = "Please select files to upload.";
-    loading.value = false;
+    uploading.value = false;
     return;
   }
 
-  const resourceId = resourceStore.resource.id; // Example value
-  const resourceType = resourceStore.resource.contentType; // Example value
-  const fileCreationStage = "CONTENT"; // Example value
+  // Example values, replace with actual logic if necessary
+  const resourceId = resourceStore.resource.id;
+  const resourceType = resourceStore.resource.contentType;
+  const fileCreationStage = "CONTENT";
 
   const formData = new FormData();
   files.value.forEach((file) => {
     formData.append("files", file);
   });
 
-  const url = `${apiUrl}/resource-uploads/?resourceId=${encodeURIComponent(resourceId)}&resourceType=${encodeURIComponent(resourceType)}&fileCreationStage=${encodeURIComponent(fileCreationStage)}`;
+  const url = `${apiUrl}/resources/uploads?resourceId=${encodeURIComponent(resourceId)}&resourceType=${encodeURIComponent(resourceType)}&fileCreationStage=${encodeURIComponent(fileCreationStage)}`;
 
   try {
     const response = await axios.post(url, formData, {
@@ -90,16 +108,24 @@ const uploadFiles = async () => {
     });
 
     if (response.status === 200) {
-      const { message, updatedResource } = response.data;
-      resourceStore.setResource(updatedResource);
-      successMessage.value = message;
+      const { message } = response.data; 
       isUploadSuccessful.value = true;
+      window.location.href = 'dashboard/overview';
     }
   } catch (err) {
     console.error("Failed to upload files:", err);
     error.value = "Failed to upload files. Please try again.";
-  } finally {
-    loading.value = false;
   }
 };
 </script>
+<style scoped>
+.custom-alert {
+  background-color: #ffffff; /* Dark background */
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.custom-alert * {
+  color: white !important;
+}
+</style>

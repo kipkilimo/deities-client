@@ -80,11 +80,11 @@
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
+                v-bind="props"
                 color="primary"
                 icon
                 height="30"
                 variant="outlined"
-                v-bind="props"
                 to="/auth/register"
               >
                 <v-icon>mdi-account-plus</v-icon>

@@ -73,7 +73,7 @@
           </v-card-title>
           <v-card-subtitle class="subheading"
             >Participate in schorlaly
-            activities and   NEMBi Students' Journal Club.  </v-card-subtitle
+            activities and   NEMBi Students' Paper Dive.  </v-card-subtitle
           >
         </v-card>
       </v-col>

@@ -16,6 +16,7 @@
         <v-textarea
           v-model="formData.description"
           label="Description"
+          counter="350"
           :rules="[rules.required]"
         />
       </v-col>
@@ -209,8 +210,8 @@ const resourceTypes = Object.values(ResourceType);
 
 // Define the form data
 const formData = ref({
-  title: "",
-  description: "",
+  title: "Poisson distribution",
+  description: "In probability theory and statistics, the Poisson distribution is a discrete probability distribution that expresses the probability of a given number of events occurring in a fixed interval of time if these events occur with a known constant mean rate and independently of the time since the last event.",
   subject: "",
   topic: "",
   targetRegion: "",
@@ -218,7 +219,7 @@ const formData = ref({
   targetCountry: "",
   language: "",
   resourceType: "",
-  keywords: [] as string[],
+  keywords: [   'poisson','model','distributions','probability'] as string[],
   createdBy: "user-id", // Replace with dynamic user ID
 });
 
