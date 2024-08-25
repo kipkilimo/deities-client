@@ -22,6 +22,10 @@ export enum ResourceType {
   TASK = "TASK",
 }
 
+interface Option {
+  label: string;
+}
+
 type ID = string; // or type ID = number; based on your use case
 
 interface Resource {
@@ -54,6 +58,18 @@ interface Resource {
 
 export const useResourceStore = defineStore("resource", {
   state: () => ({
+    surveyLikertQuestion:
+      "What is your take on NEMBi, 'The Hub for Interactive Life Sciences Research Tools.', after the introduction given?",
+    surveyLikertOptions: [
+      { label: "Waste of time" },
+      { label: "Neutral" },
+      { label: "Needs radical surgery" },
+      {
+        label:
+          "Just minor modifications and it is good to go - These are my suggestions (write on provided paper).",
+      },
+      { label: "Excellent proposition. Can't wait to try it!" },
+    ],
     resource: {
       id: "",
       title: "",
@@ -89,6 +105,14 @@ export const useResourceStore = defineStore("resource", {
     showCreateResourceDialog: false,
   }),
   actions: {
+    setQuestion(newQuestion: string) {
+      this.surveyLikertQuestion = newQuestion;
+    },
+
+    setOptions(newOptions: Option[]) {
+      this.surveyLikertOptions = newOptions;
+    },
+
     setResources(resources: Resource[]) {
       this.resources = resources;
       this.filteredResources = resources;
@@ -112,6 +136,60 @@ export const useResourceStore = defineStore("resource", {
         this.filteredResources = this.resources;
       }
       this.sortResources();
+    },
+    async getAllResources() {
+      const RESOURCE_SUMMARY_QUERY = gql`
+        query {
+          getAllResources {
+            id
+            contentType
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({ query: RESOURCE_SUMMARY_QUERY });
+
+        const resources = response.data?.getAllResources;
+        if (resources) {
+          this.setResources(resources);
+        } else {
+          throw new Error("Failed to fetch resources");
+        }
+      } catch (error) {
+        console.error("Error fetching resources:", error);
+      }
+    },
+    async getAllSpecificTypeResources(resourceType: string) {
+      const SPECIFIC_RESOURCE_TYPE = gql`
+        query ($resourceType: String!) {
+          getAllSpecificTypeResources(resourceType: $resourceType) {
+            id
+            contentType
+            viewsNumber
+            likesNumber
+            sharesNumber
+            subject
+            topic
+            averageRating
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: SPECIFIC_RESOURCE_TYPE,
+          variables: { resourceType },
+        });
+        const resources = response.data?.getAllSpecificTypeResources;
+        if (resources) {
+          this.setResources(resources);
+        } else {
+          throw new Error("Failed to fetch resources");
+        }
+      } catch (error) {
+        console.error("Error fetching resources:", error);
+      }
     },
     async fetchResource(id: string) {
       const resourceQuery = gql`

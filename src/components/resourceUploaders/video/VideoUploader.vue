@@ -25,29 +25,39 @@
       {{ error }}
     </v-alert>
 
-        <div v-if="isUploadSuccessful" class="custom-alert">
-      <v-alert :text="isUploadSuccessful" title="Files uploaded successfully!" type="success" class="custom-alert">
+    <v-progress-linear
+      v-if="uploading"
+      :value="uploadProgress"
+      height="6"
+      color="blue darken-2"
+      class="mt-4"
+    ></v-progress-linear>
 
-      </v-alert>
+    <div v-if="isUploadSuccessful" class="custom-alert">
+      <v-alert
+        :text="isUploadSuccessful"
+        title="Files uploaded successfully!"
+        type="success"
+        class="custom-alert"
+      ></v-alert>
     </div>
-    
   </v-container>
 </template>
+
 <script setup>
 import { ref, computed } from "vue";
 import axios from "axios";
 import { useResourceStore } from "../../../stores/resources";
-
 import { useRouter } from "vue-router";
 
 const resourceStore = useResourceStore();
-// @ts-ignore
 const apiUrl = import.meta.env.VITE_BASE_URL;
 
-const router = useRouter(); // Use Vue Router to handle navigation
+const router = useRouter();
 
 const files = ref([]);
 const uploading = ref(false);
+const uploadProgress = ref(0);
 const isUploadSuccessful = ref(false);
 const error = ref(null);
 
@@ -82,6 +92,7 @@ const validateFiles = () => {
 
 const uploadFiles = async () => {
   uploading.value = true;
+  uploadProgress.value = 0;
 
   if (files.value.length === 0) {
     console.error("No files selected");
@@ -90,7 +101,6 @@ const uploadFiles = async () => {
     return;
   }
 
-  // Example values, replace with actual logic if necessary
   const resourceId = resourceStore.resource.id;
   const resourceType = resourceStore.resource.contentType;
   const fileCreationStage = "CONTENT";
@@ -100,24 +110,45 @@ const uploadFiles = async () => {
     formData.append("files", file);
   });
 
-  const url = `${apiUrl}/resources/uploads?resourceId=${encodeURIComponent(resourceId)}&resourceType=${encodeURIComponent(resourceType)}&fileCreationStage=${encodeURIComponent(fileCreationStage)}`;
+  const url = `${apiUrl}/resources/uploads?resourceId=${encodeURIComponent(
+    resourceId
+  )}&resourceType=${encodeURIComponent(
+    resourceType
+  )}&fileCreationStage=${encodeURIComponent(fileCreationStage)}`;
 
   try {
     const response = await axios.post(url, formData, {
       headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.lengthComputable) {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          uploadProgress.value = percentCompleted;
+
+          // Log progress for debugging
+          console.log(`Upload progress: ${percentCompleted}%`);
+        }
+      },
     });
 
     if (response.status === 200) {
-      const { message } = response.data; 
       isUploadSuccessful.value = true;
-      window.location.href = 'dashboard/overview';
+      // Delay the reload to ensure progress is visible
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000); // 1-second delay
     }
   } catch (err) {
     console.error("Failed to upload files:", err);
     error.value = "Failed to upload files. Please try again.";
+  } finally {
+    uploading.value = false;
   }
 };
+
 </script>
+
 <style scoped>
 .custom-alert {
   background-color: #ffffff; /* Dark background */

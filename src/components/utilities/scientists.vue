@@ -53,7 +53,7 @@
           >
             <v-card-title>
               <v-icon>{{ figure.mdi_icon }}</v-icon>
-              <span class="ml-2">{{ figure.name }}</span>
+              <span class="ml-2">{{ figure.name }} ({{ figure.country_of_origin }})</span>
             </v-card-title>
             <v-card-subtitle>{{ figure.field }}</v-card-subtitle>
             <v-card-text>

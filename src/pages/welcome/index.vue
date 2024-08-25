@@ -4,7 +4,7 @@
     <v-row class="hero-section align-center" justify="center">
       <v-col class="text-center" cols="12">
         <v-img
-          src="https://epidemiologist.io/_next/image/?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fc3zbgow3%2Fproduction%2Ff849d9459d9b1f2770d4642f3969913488f8baba-1792x1024.webp%3Fw%3D1792%26q%3D100%26auto%3Dformat&w=3840&q=100"
+          src="https://static.vecteezy.com/system/resources/previews/023/639/135/non_2x/molecular-structure-with-dna-strand-for-medical-chemistry-and-science-concept-background-illustration-vector.jpg"
           style="height: 70vh"
           class="hero-image"
           cover
@@ -24,7 +24,7 @@
                   }"
                   class="headline mb-4"
                 >
-                  Advancing Health Research through collaboration
+                  Advancing Life Sciences Research through Collaboration
                 </h1>
 
                 <br />
@@ -43,7 +43,7 @@
                     @click="scrollToCallToAction"
                   >
                     <v-icon>mdi-login</v-icon>
-                    Continue to Platform
+                    Continue to Application
                   </v-btn>
 
                   <!-- <v-btn
@@ -67,14 +67,48 @@
     <!-- Call to Action -->
     <v-row ref="callToAction" class="call-to-action">
       <v-col cols="12" md="12" class="text-center">
-        <v-card class="pa-5">
-          <v-card-title>
-            <h2 class="title">Join the   NEMBi Health Sciences Research Network</h2>
-          </v-card-title>
-          <v-card-subtitle class="subheading"
-            >Participate in schorlaly
-            activities and   NEMBi Students' Paper Dive.  </v-card-subtitle
-          >
+        <v-card max-height="22.5rem">
+          <v-row>
+            <v-col cols="4">
+              <v-img
+                src="https://img.freepik.com/premium-vector/green-medical-seamless-pattern_74102-633.jpg"
+              ></v-img>
+            </v-col>
+
+            <v-col cols="8">
+              <v-card-title>
+                <h2 class="title">
+                  About NEMBi <br />
+                  The Hub for Interactive Life Sciences Research Tools.
+                </h2>
+              </v-card-title>
+              <v-card-subtitle class="subheading">
+                Epidemiology | Biostatistics | Research Methods | Seminar Series
+                | Colloquia and Talks | Test Yourself | Fun Activities
+              </v-card-subtitle>
+
+              <p class="pa-2">
+                Welcome to the NEMBi Life Sciences, a web application hub for
+                Epidemiology , Biostatistics and Research Methods learning. It
+                is a dynamic web application dedicated to empowering higher
+                level of learning students and members of the faculty in the
+                fields of health and life sciences research. Our objective is to
+                foster a fun , interactive and collaborative environment where
+                life sciences researchers can find help,discuss papers and
+                exchange ideas as well best practices, and the the process
+                advance groundbreaking research together.
+                <br />
+                <br />
+                Become part of NEMBi's vibrant community and engage in
+                collaborative research that explores the complex interplay
+                between disease patterns, exposures, and health outcomes.
+                Develop advanced biostatistical techniques and benefit from our
+                comprehensive web application, designed to support your academic
+                and professional growth. Join us and be at the forefront of the
+                next generation of health sciences scholars.
+              </p>
+            </v-col>
+          </v-row>
         </v-card>
       </v-col>
     </v-row>
@@ -146,7 +180,10 @@
             >Expand your knowledge in research methods.</v-card-subtitle
           >
           <v-card-text>
-           The best method for your project largely depends on your topic, the type of data you will need, and the people or items from which you will be collecting data, including considerations for data accuracy and relevance.
+            The best method for your project largely depends on your topic, the
+            type of data you will need, and the people or items from which you
+            will be collecting data, including considerations for data accuracy
+            and relevance.
           </v-card-text>
 
           <v-card-actions>
@@ -162,7 +199,7 @@
         <v-col cols="12">
           <p>
             &copy; {{ currentYear }} Nairobi Epidemiology and Biostatistical
-            Methods Colloquium,   NEMBi. All rights reserved.
+            Methods Colloquium, NEMBi. All rights reserved.
           </p>
           <br />
           <v-divider />

@@ -2,7 +2,7 @@
   <v-app full-height>
     <v-layout full-height>
       <v-app-bar class="!fixed">
-        <router-link to="/home" class="px-8 flex items-center w-64">
+        <router-link to="/welcome" class="px-8 flex items-center w-64">
           <v-img
             src="https://www.hda-institute.com/wp-content/uploads/2021/05/hdai_logo_FINAL_horz-2lines_full-color_wo-tag.png"
             :width="100"
@@ -241,10 +241,10 @@ const sidebarItems = computed(() => [
     path: "/dashboard/poll",
   },
   {
-    title: t("dashboard.sidebar.news"),
-    value: "news",
+    title: t("dashboard.sidebar.tasks"),
+    value: "tasks",
     iconClass: "i-iconoir-doc-star me-4 text-xl",
-    path: "/dashboard/news",
+    path: "/dashboard/tasks",
   },
   {
     title: t("dashboard.sidebar.events"),

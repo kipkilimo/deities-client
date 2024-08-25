@@ -1,15 +1,17 @@
 import { createRouter, createWebHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
+import playerRoutes from "./player"; // Assuming auth.ts is in the same directory todoAppRoutes
 
-import authRoutes from "./auth"; // Assuming auth.ts is in the same directory todoAppRoutes 
+import authRoutes from "./auth"; // Assuming auth.ts is in the same directory todoAppRoutes
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    redirect: "/home",
+    redirect: "/welcome",
   },
-  ...authRoutes, 
+  ...authRoutes,
+  ...playerRoutes,
   // Add any additional routes that are not part of auth or todoApp (optional)
 ];
 // Create the router instance

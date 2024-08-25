@@ -1,19 +1,18 @@
 <template>
   <v-card style="max-height: 90vh" color="transparent">
     <v-row>
-      <v-col cols="9">
+      <v-col cols="9"> 
         <!-- Display message if no paper URL exists -->
         <h3 v-if="!paperStore.paper.url">
           <v-alert border="top" type="info" variant="outlined" prominent>
             There is no paper to show at the moment. Check back later.
           </v-alert>
         </h3>
-
         <v-card v-if="paperStore.paper.url">
           <Highlighter />
         </v-card>
       </v-col>
-      <v-col cols="3" v-if="paperStore.paper" style="position: relative">
+      <v-col cols="3">
         <!-- Display message if no paper URL exists -->
         <div class="text-center pa-4">
           <v-btn

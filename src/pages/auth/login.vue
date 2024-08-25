@@ -61,14 +61,21 @@
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
-                color="cyan"
+              :disabled="!usingPassword || password.length >= 6"
+                :color="isEmailValid ? 'green' : 'primary'"
                 icon
                 height="30"
                 variant="outlined"
                 v-bind="props"
                 @click="sendOneTimeSignInKey"
               >
-                <v-icon>mdi-cloud-key-outline</v-icon>
+                <v-icon
+                  >{{
+                    isEmailValid
+                      ? "mdi-send-variant-clock-outline"
+                      : "mdi-cloud-key-outline"
+                  }}
+                </v-icon>
               </v-btn>
             </template>
             <span>{{
@@ -143,7 +150,9 @@ const isEmailValid = computed(() => {
 });
 
 // Computed property to check if the password is at least 6 characters long
-const isPasswordValid = computed(() => password.value.length >= 6 || accessKey.value.length >= 6 );
+const isPasswordValid = computed(
+  () => password.value.length >= 6 || accessKey.value.length >= 6
+);
 
 // Computed property to enable or disable the login button
 const canLogin = computed(() => isEmailValid.value && isPasswordValid.value);
@@ -276,7 +285,7 @@ const submitLogin = async () => {
     loginError.value = errorMessage;
     setTimeout(() => {
       window.location.reload();
-    }, 42000);
+    }, 4200);
   }
 };
 </script>
