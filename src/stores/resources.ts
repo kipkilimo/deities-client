@@ -165,12 +165,14 @@ export const useResourceStore = defineStore("resource", {
         query ($resourceType: String!) {
           getAllSpecificTypeResources(resourceType: $resourceType) {
             id
+            title
             contentType
             viewsNumber
             likesNumber
             sharesNumber
             subject
             topic
+            coverImage
             averageRating
           }
         }
@@ -183,7 +185,7 @@ export const useResourceStore = defineStore("resource", {
         });
         const resources = response.data?.getAllSpecificTypeResources;
         if (resources) {
-          this.setResources(resources);
+          this.resources = resources;
         } else {
           throw new Error("Failed to fetch resources");
         }

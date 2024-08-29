@@ -1,7 +1,7 @@
 <template>
-  <v-container fluid>
+  <v-container>
     <!-- Top Row: Sort, Filter, Search Strip -->
-    <v-row class="mb-4">
+    <v-row>
       <v-col cols="12">
         <v-row align="center">
           <!-- Sort Dropdown -->
@@ -11,6 +11,7 @@
               :items="sortOptions"
               label="Sort by"
               dense
+              style="max-height: 67%"
             ></v-select>
           </v-col>
 
@@ -21,6 +22,7 @@
               :items="filterOptions"
               label="Filter by"
               dense
+              style="max-height: 67%"
             ></v-select>
           </v-col>
 
@@ -31,91 +33,82 @@
               label="Search"
               clearable
               dense
+              prepend-inner-icon="mdi-file-search"
+              style="max-height: 67%"
             ></v-text-field>
           </v-col>
         </v-row>
       </v-col>
     </v-row>
 
+    <v-divider class="mb-2" />
+
     <!-- Bottom Row: Two Column Layout -->
     <v-row>
       <!-- Left Column: Resource Iterator Cards -->
       <v-col cols="3" class="pr-2">
-        <v-sheet height="400" class="overflow-y-auto">
-          <v-card
-            v-for="resource in filteredResources"
+        <!-- Container for vertical scrolling -->
+        <v-row
+          class="overflow-y-auto mt-1"
+          style="height: 400px; max-height: 400px; overflow-y: auto"
+        >
+          <v-col
+            v-for="(resource, index) in sortedAndFilteredResources"
             :key="resource.id"
-            class="mb-2"
-            @click="selectResource(resource)"
+            class="pa-0"
           >
-            <v-row>
-              <!-- Left Column: Image -->
-              <v-col cols="3">
-                <v-img :src="resource.coverImage" class="cover-image"></v-img>
-              </v-col>
+            <v-card
+              class="mb-2"
+              height="4.5rem"
+              @click="selectResource(resource)"
+            >
+              <v-row no-gutters>
+                <!-- Left Column: Image -->
+                <v-col cols="4">
+                  <v-img height="4.5rem" :src="resource.coverImage"></v-img>
+                </v-col>
 
-              <!-- Right Column: Details -->
-              <v-col cols="9">
-                <v-card-title>{{ resource.title }}</v-card-title>
-                <v-card-subtitle>
-                  {{ resource.subject }} - {{ resource.topic }}
-                </v-card-subtitle>
-                <v-card-text>
-                  {{ truncateText(resource.description, 50) }}
-                </v-card-text>
-              </v-col>
-            </v-row>
-          </v-card>
-        </v-sheet>
+                <!-- Right Column: Details -->
+                <v-col cols="8">
+                  <v-card-title>{{ resource.title }}</v-card-title>
+                  <v-card-subtitle>
+                    {{ resource.subject }} - {{ resource.topic }}
+                  </v-card-subtitle>
+                  <v-card-text>
+                    {{ truncateText(resource.description, 50) }}
+                  </v-card-text>
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-col>
 
       <!-- Right Column: Selected Resource -->
       <v-col cols="9">
-        <v-card v-if="selectedResource">
+        <v-card
+          v-if="!resourceComponent"
+          @click="selectResource(resourceStore.resources[0])"
+          height="63vh"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 5px 5px 0px 0px !important;
+          "
+        >
+          <v-img
+            height="21vh"
+            class="mt-24 ma-4"
+            style="cursor: pointer"
+            src="https://cdn-icons-png.flaticon.com/512/907/907805.png"
+          ></v-img>
+        </v-card>
+
+        <v-card v-if="selectedResource && showMedia">
           <!-- Dynamic Resource Renderer -->
           <component :is="resourceComponent" :resource="selectedResource" />
-
-          <!-- Lower Strip with Action Buttons -->
-          <v-divider></v-divider>
-          <v-card-actions>
-            <!-- Left Button Group -->
-            <v-row no-gutters>
-              <v-col cols="auto">
-                <v-btn icon @click="skipPrev">
-                  <v-icon>mdi-skip-previous</v-icon>
-                </v-btn>
-              </v-col>
-              <v-col cols="auto">
-                <v-btn icon @click="prev">
-                  <v-icon>mdi-chevron-left</v-icon>
-                </v-btn>
-              </v-col>
-              <v-col cols="auto">
-                <v-btn icon @click="next">
-                  <v-icon>mdi-chevron-right</v-icon>
-                </v-btn>
-              </v-col>
-              <v-col cols="auto">
-                <v-btn icon @click="skipNext">
-                  <v-icon>mdi-skip-next</v-icon>
-                </v-btn>
-              </v-col>
-            </v-row>
-
-            <!-- Right Button Group -->
-            <v-row>
-              <v-col cols="6">
-                <v-btn icon @click="fullWidth">
-                  <v-icon>mdi-rectangle-outline</v-icon>
-                </v-btn>
-              </v-col>
-              <v-col cols="6">
-                <v-btn icon @click="fullScreen">
-                  <v-icon>mdi-fullscreen</v-icon>
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
@@ -123,7 +116,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onBeforeMount } from "vue";
 import VideoPlayer from "../resourcePlayers/video/VideoPlayer.vue";
 import AudioPlayer from "../resourcePlayers/audio/AudioPlayer.vue";
 import ImagePlayer from "../resourcePlayers/images/ImagePlayer.vue";
@@ -142,6 +135,7 @@ import ModelPlayer from "../resourcePlayers/models/ModelPlayer.vue";
 import { useResourceStore } from "../../stores/resources"; // Replace with actual path
 
 const resourceStore = useResourceStore();
+
 // Define ResourceType as a constant object with keys
 const ResourceType = {
   AUDIO: "AUDIO",
@@ -161,56 +155,52 @@ const ResourceType = {
   MODEL: "MODEL",
 } as const;
 
-const getResources = ref([
-  {
-    id: "66c768cc0a18b25cc8c357f2",
-    title: "Poisson distribution",
-    coverImage:
-      "https://a2z-v0.s3.eu-central-1.amazonaws.com/290ef771-5d29-49bd-866e-318fe1a621ea-Poisson-Distribution.webp",
-    description:
-      "In probability theory and statistics, the Poisson distribution is a discrete probability distribution that expresses the probability of a given number of events occurring in a fixed interval of time if these events occur with a known constant mean rate and independently of the time since the last event.",
-    contentType: ResourceType.VIDEO, // Using the key from ResourceType
-    content: [
-      "https://a2z-v0.s3.eu-central-1.amazonaws.com/0ff292c6-6fdb-4878-bfea-d6701012176e-An Introduction to the Poisson Distribution.mp4",
-    ],
-    subject: "Biostatistics",
-    topic: "Probability Theory",
-    keywords: '["poisson","model","distributions","probability"]',
-    createdBy: {
-      personalInfo: {
-        username: "kipkilimo-snow",
-      },
-    },
-  },
-  // More resource objects can go here...
-]);
-
 const sortOptions = ref(["Title", "Date Created", "Subject"]);
 const filterOptions = ref(["Biostatistics", "Probability Theory"]);
 const searchQuery = ref("");
 const sortOption = ref("");
 const filterOption = ref("");
-const selectedResource = ref(null);
+const selectedResource = ref({});
+const showMedia = ref(false);
 
-const truncateText = (text: string, length: number) => {
+const truncateText = (text: string | undefined, length: number) => {
+  if (!text) {
+    return ""; // or return a default value or an empty string
+  }
   return text.length > length ? text.substring(0, length) + "..." : text;
 };
 
-const filteredResources = computed(() => {
-  return getResources.value.filter((resource) => {
+// Computed property to filter and sort resources
+const sortedAndFilteredResources = computed(() => {
+  let filtered = resourceStore.resources.filter((resource) => {
     const matchesSearch = resource.title
-      .toLowerCase()
-      .includes(searchQuery.value.toLowerCase());
-    const matchesFilter = filterOption.value
-      ? resource.subject === filterOption.value
-      : true;
+      ? resource.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+      : false;
+
+    const matchesFilter =
+      !filterOption.value || resource.subject === filterOption.value;
+
     return matchesSearch && matchesFilter;
   });
+
+  if (sortOption.value === "Title") {
+    filtered = filtered.sort((a, b) => a.title.localeCompare(b.title));
+  } else if (sortOption.value === "Date Created") {
+    filtered = filtered.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  } else if (sortOption.value === "Subject") {
+    filtered = filtered.sort((a, b) => a.subject.localeCompare(b.subject));
+  }
+
+  return filtered;
 });
 
-const selectResource = (resource: any) => {
-  selectedResource.value = resource;
-  resourceStore.resource = resource;
+const selectResource = async (resource: any) => {
+  showMedia.value = false;
+  await resourceStore.fetchResource(resource.id);
+  selectedResource.value = resourceStore.resource;
+  showMedia.value = true;
 };
 
 const resourceComponent = computed(() => {
@@ -237,34 +227,10 @@ const resourceComponent = computed(() => {
   return componentMap[selectedResource.value.contentType];
 });
 
-// Button click handler methods
-const skipPrev = () => {
-  // Handle skip previous action
-  console.log("Skip Previous clicked");
-};
-
-const prev = () => {
-  // Handle previous action
-  console.log("Previous clicked");
-};
-
-const next = () => {
-  // Handle next action
-  console.log("Next clicked");
-};
-
-const skipNext = () => {
-  // Handle skip next action
-  console.log("Skip Next clicked");
-};
-
-const fullWidth = () => {
-  // Handle full width action
-  console.log("Full Width clicked");
-};
-
-const fullScreen = () => {
-  // Handle full screen action
-  console.log("Full Screen clicked");
-};
+// Fetch resources before mounting the component
+onBeforeMount(async () => {
+  const queryParams = localStorage.getItem("queryParams") || "";
+  await resourceStore.getAllSpecificTypeResources(queryParams);
+  selectResource(resourceStore.resources[0]);
+});
 </script>

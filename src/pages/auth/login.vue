@@ -61,7 +61,7 @@
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
-              :disabled="!usingPassword || password.length >= 6"
+                :disabled="!usingPassword || password.length >= 6"
                 :color="isEmailValid ? 'green' : 'primary'"
                 icon
                 height="30"
@@ -117,6 +117,13 @@
         </div>
       </v-form>
     </v-card-text>
+    <v-divider class="mt-2" />
+    <h3 color="#777777" class="ml-2 mt-2 mb-2">Sponsors</h3>
+    <v-img
+      class="mt-3 "
+      style="border-radius: 0px 0px 5px 5px"
+      src="https://assets.bizclikmedia.net/580/d07c504f4f85d8f6a3c308c34edb7b93:b4ee3e25d34286c263ca95017d7fb60d/bro-3186903594-boehringeringelheim-dec2022.jpg"
+    ></v-img>
   </v-card>
 </template>
 
@@ -213,7 +220,14 @@ const submitSingleSigninLogin = async () => {
     }
     const token = userStore.token;
     // @ts-ignore
-    Cookies.set("authToken", token, { expires: 7 }); // Expires in 7 days
+    // @ts-ignore
+
+    // @ts-ignore
+    const expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + 7);
+
+    // @ts-ignore
+    Cookies.set("authToken", token, { expires: expirationDate });
 
     router.push("/dashboard/overview");
   } catch (error) {

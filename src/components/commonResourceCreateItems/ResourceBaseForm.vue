@@ -297,8 +297,7 @@ const createResource = async () => {
     // Handle success (e.g., notify user, reset form, etc.)
     resourceStore.showAddResourceCoverAndContentDialog = true;
     resourceStore.showCreateResourceDialog = false;
-  } catch (error) {
-    console.error("Failed to create resource:", error);
+  } catch (error) { 
     // Handle error (e.g., notify user)
   }
 };

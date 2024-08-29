@@ -105,7 +105,7 @@
                   height="30"
                   variant="outlined"
                   v-bind="props"
-                  to="/home"
+                  to="/welcome"
                 >
                   <v-icon>mdi-home-account</v-icon>
                 </v-btn>
@@ -235,7 +235,7 @@ function leavePage() {
   // Check if the window object is available
   if (typeof window !== "undefined") {
     // Redirect to the home page
-    window.location.href = "/home";
+    window.location.href = "/welcome";
   }
 }
 </script>

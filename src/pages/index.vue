@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const router = useRouter();
-router.push("/home");
+router.push("/welcome");
 </script>
 <template>
   <div>

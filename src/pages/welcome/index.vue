@@ -37,13 +37,13 @@
                 <br />
                 <div class="button-container">
                   <v-btn
-                    :style="{ backgroundColor: buttonBgColor, width: '21rem' }"
+                    :style="{ backgroundColor: buttonBgColor, width: '24rem' }"
                     size="x-large"
                     class="mr-xl"
                     @click="scrollToCallToAction"
                   >
                     <v-icon>mdi-login</v-icon>
-                    Continue to Application
+                    Continue to the Application
                   </v-btn>
 
                   <!-- <v-btn
@@ -79,7 +79,8 @@
               <v-card-title>
                 <h2 class="title">
                   About NEMBi <br />
-                  The Hub for Interactive Life Sciences Research Tools.
+                  The Hub for Interactive Life Sciences Learning and Research
+                  Tools.
                 </h2>
               </v-card-title>
               <v-card-subtitle class="subheading">
@@ -88,24 +89,26 @@
               </v-card-subtitle>
 
               <p class="pa-2">
-                Welcome to the NEMBi Life Sciences, a web application hub for
-                Epidemiology , Biostatistics and Research Methods learning. It
-                is a dynamic web application dedicated to empowering higher
+                Welcome to the Nairobi Epidemiology and Biostatistical Methods
+                Colloquium, NEMBi, a Life Sciences focused a web application hub
+                for learning Epidemiology , Biostatistics and Research Methods .
+                It is a dynamic web environment dedicated to empowering higher
                 level of learning students and members of the faculty in the
                 fields of health and life sciences research. Our objective is to
                 foster a fun , interactive and collaborative environment where
-                life sciences researchers can find help,discuss papers and
-                exchange ideas as well best practices, and the the process
-                advance groundbreaking research together.
+                life sciences researchers can find help,discuss scientific
+                papers and exchange ideas as well best practices, and in the
+                process advance groundbreaking research together.
                 <br />
                 <br />
                 Become part of NEMBi's vibrant community and engage in
                 collaborative research that explores the complex interplay
                 between disease patterns, exposures, and health outcomes.
                 Develop advanced biostatistical techniques and benefit from our
-                comprehensive web application, designed to support your academic
-                and professional growth. Join us and be at the forefront of the
-                next generation of health sciences scholars.
+                comprehensive cloud based utilities, designed to support your
+                academic and professional growth. Join us and be at the
+                forefront of the next generation of health sciences scholaly
+                work.
               </p>
             </v-col>
           </v-row>
@@ -209,6 +212,13 @@
         </v-col>
       </v-row>
     </v-footer>
+    <div class="text-caption" style="text-align: center">
+      Concept, design & crafting with ♡ by
+      <a href="https://vuetifyjs.com/" target="_blank" rel="noopener noreferrer"
+        >NVSMS</a
+      >
+      Creations.
+    </div>
   </v-container>
 </template>
 

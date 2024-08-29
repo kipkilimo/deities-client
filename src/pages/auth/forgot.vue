@@ -20,7 +20,7 @@
 
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
-              <v-btn class="ml-xs" color="primary" icon height="30" variant="outlined" v-bind="props" to="/home">
+              <v-btn class="ml-xs" color="primary" icon height="30" variant="outlined" v-bind="props" to="/welcome">
                 <v-icon>mdi-home-account</v-icon>
               </v-btn>
             </template>

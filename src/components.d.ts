@@ -19,6 +19,7 @@ declare module 'vue' {
     Audio: (typeof import("./components/resourceUploaders/audio/index.vue"))["default"]
     AudioPlayer: typeof import('./components/resourcePlayers/audio/AudioPlayer.vue')['default']
     AudioUploader: typeof import('./components/resourceUploaders/audio/AudioUploader.vue')['default']
+    AwsS3Deleter: typeof import('./components/utilities/AwsS3Deleter.vue')['default']
     BarChart: typeof import('./components/charts/BarChart.vue')['default']
     CarsInfo: typeof import('./pages/dashboard/overview/components/CarsInfo.vue')['default']
     ClinicalPredictionModel: typeof import('./components/commonResourceCreateItems/formItems/clinicalPredictionModel.vue')['default']
@@ -100,5 +101,6 @@ declare module 'vue' {
     Video: (typeof import("./components/resourceUploaders/video/VideoUploader.vue"))["default"]
     VideoPlayer: typeof import('./components/resourcePlayers/video/VideoPlayer.vue')['default']
     VideoUploader: typeof import('./components/resourceUploaders/video/VideoUploader.vue')['default']
+    VoucherGenerator: typeof import('./components/voucherGenerator/VoucherGenerator.vue')['default']
   }
 }

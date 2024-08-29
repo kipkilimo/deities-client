@@ -20,7 +20,7 @@ dashboard:
 
     events: Events
     library: Resource Center
-    help: Help
+    consults: Research Counsel
     logout: Logout
   main:
     dashboard-overview: Overview

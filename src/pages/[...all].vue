@@ -11,7 +11,7 @@
                     {{ $t('error.pageNotFoundDescription') }}
                 </p>
                 <div class="flex space-x-2 space-x-reverse">
-                    <v-btn color="primary" to="/home" class="px-12 mx-1">
+                    <v-btn color="primary" to="/welcome" class="px-12 mx-1">
                         {{ $t('error.backToHome') }}
                     </v-btn>
                     <v-btn color="secondary" to="/dashboard/overview" class="px-12">

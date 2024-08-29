@@ -79,14 +79,28 @@
                 class="custom-tooltip"
               >
                 <template v-slot:activator="{ props }" v-show="rail">
-                  <div v-bind="props" class="d-flex align-center">
+                  <div
+                    v-bind="props"
+                    class="d-flex align-center"
+                    @mouseover="() => onHover(item.path)"
+                    @mouseleave="onLeave"
+                  >
                     <v-icon class="me-2">{{ item.iconClass }}</v-icon>
                     <v-list-item-title>{{ item.title }}</v-list-item-title>
                   </div>
                 </template>
-                <span class="custom-tooltip_content">{{ item.title }}</span>
+                <span class="custom-tooltip_content">{{
+                  getTooltipHighlight(item.title)
+                }}</span>
               </v-tooltip>
             </v-list-item>
+            <v-divider class="mt-2"/>
+            <h3 color="#55565a" class="text-h10 mb-4">Sponsors</h3>
+            <v-img
+              class="mt-3"
+              style="border-radius: 0px 0px 5px 5px"
+              src="https://assets.bizclikmedia.net/580/d07c504f4f85d8f6a3c308c34edb7b93:b4ee3e25d34286c263ca95017d7fb60d/bro-3186903594-boehringeringelheim-dec2022.jpg"
+            ></v-img>
           </v-list-item-group>
         </v-list>
         <template v-slot:append>
@@ -130,9 +144,7 @@
     >
       <v-card height="84vh" title="Add resource content">
         <ResourceContentsHandler />
-        <v-card-actions
-          style="position: relative; padding: 0; margin: 0;"
-        >
+        <v-card-actions style="position: relative; padding: 0; margin: 0">
           <v-spacer />
           <v-btn
             variant="text"
@@ -176,7 +188,7 @@ onBeforeMount(async () => {
     }
   }
 });
-function obfuscateEmail(email: { split: (arg0: string) => [any, any]; }) {
+function obfuscateEmail(email: { split: (arg0: string) => [any, any] }) {
   const [localPart, domainPart] = email.split("@");
 
   if (!localPart || !domainPart) {
@@ -259,10 +271,49 @@ const sidebarItems = computed(() => [
     path: "/dashboard/library",
   },
   {
-    title: t("dashboard.sidebar.help"),
-    value: "help",
-    iconClass: "i-iconoir-help-circle me-4 text-xl",
-    path: "/dashboard/help",
+    title: t("dashboard.sidebar.consults"),
+    value: "consults",
+    iconClass: "mdi-timeline-question-outline me-4 text-xl",
+    path: "/dashboard/consults",
   },
 ]);
+function getTooltipHighlight(key: string): string {
+  const tooltips: { [key: string]: string } = {
+    Dashboard: "Get an overview of our milestones",
+    "Paper Dive": "Contribute in a paper discussion!",
+    Posters: "Share your abstract poster on NEMBi",
+    "Live Poll": "Submit your opinion via NEMBi Live Polls",
+    "Assignment Tasks": "View and attempt Assignment Tasks",
+    Events: "See upcoming NEMBi and external Events",
+    "Resource Center":
+      "Browse a wide range of resources at NEMBi Resource Center",
+    "Research Counsel":
+      "Request for a Professional Research Counselling session with NEMBi Mentor Scholars for all stages of your project!",
+    Logout: "Logout",
+  };
+
+  return tooltips[key] || "Unknown";
+}
+
+// Example usage:
+const hoverTimeout = ref(1);
+
+const onHover = (title: any) => {
+  // Start a timer to call a method after 2.1 seconds and pass the title as a parameter
+  // @ts-ignore
+  hoverTimeout.value = setTimeout(() => {
+    handleHover(title);
+  }, 1800); // 2100ms = 2.1 seconds
+};
+
+const onLeave = () => {
+  // Clear the timeout if the user leaves the element before 2.1 seconds
+  clearTimeout(hoverTimeout.value);
+};
+
+const handleHover = (title: any) => {
+  // Your logic that runs after 2.1 seconds, using the title passed from onHover
+  router.push(title); 
+  // Replace with any other method you want to call, using the passed parameter
+};
 </script>
