@@ -369,14 +369,10 @@ export const useResourceStore = defineStore("resource", {
           variables: resourceData,
         });
 
-        const newResource = response.data?.createResource;
-        if (newResource) {
-          this.resources.push(newResource);
-          this.resources = this.resources;
-          this.resource = newResource;
-        } else {
-          throw new Error("Failed to create resource");
-        }
+        const newResource = response.data.createResource;
+        this.resource = newResource;
+        this.resources.push(newResource);
+        this.resources = this.resources;
       } catch (error) {
         console.error("Error creating resource:", error);
       }

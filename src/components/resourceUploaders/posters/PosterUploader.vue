@@ -4,7 +4,7 @@
   v-model="files"
   accept=".jpg, .jpeg, .png,.avif, .webp"
   label="Upload an Image File"
-  prepend-icon="mdi-image"
+  prepend-icon="mdi-image-frame"
   :multiple="true"
   :counter="true"
   :rules="fileRules"

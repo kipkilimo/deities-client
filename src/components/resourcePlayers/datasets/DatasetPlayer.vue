@@ -1,115 +1,310 @@
 <template>
-  <v-container fluid>
-    <v-card>
-      <v-card-title>
-        <v-spacer></v-spacer>
-        <v-btn @click="toggleFullscreen" icon>
-          <v-icon>{{
-            isFullscreen ? "mdiFullscreenExit" : "mdiFullscreen"
-          }}</v-icon>
-        </v-btn>
-      </v-card-title>
-      <v-carousel
-        v-model:currentIndex="currentIndex"
-        :items="preloadedSlides"
-        hide-delimiters
-        hide-gutter
-        show-arrows
-        :cycle="true"
-        :interval="5000"
-        class="v-carousel--fullscreen"
-      >
-        <v-carousel-item v-for="(slide, index) in slides" :key="index">
-          <v-img :src="slide" class="slide-img" contain></v-img>
-        </v-carousel-item>
-      </v-carousel>
-    </v-card>
+  <v-container>
+    <v-alert
+      v-if="copyAlert.length > 1"
+      max-height="4.5rem"
+      :text="copyAlert"
+      title="URL Copied!"
+      color="#34e0a2"
+      class="custom-alert"
+    >
+    </v-alert>
+    <v-overlay :value="isFullscreen" absolute>
+      <v-img :src="dataset[currentIndex]" class="fullscreen-image"></v-img>
+      <v-btn @click="toggleFullscreen" class="fullscreen-close" icon>
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-overlay>
+
+    <div
+      class="carousel-wrapper"
+      ref="carouselWrapper"
+      :class="{ fullscreen: isFullscreen }"
+      @click="handleClick"
+    >
+      <img
+        class="nav-btn left-btn"
+        @click.stop="prev"
+        style="height: 1.2rem; cursor: pointer"
+        src="@/assets/resources/Chevron-Left.512.png"
+        alt="Previous"
+      />
+
+      <v-card class="dataset-card" flat prepend-icon="mdi-database-outline">
+        <template v-slot:title>
+          <span class="font-weight-black">{{
+            resourceStore.resource.title
+          }} - {{
+            resourceStore.resource.contentType
+          }}</span>
+        </template>
+        <v-card-subtitle>{{ resourceStore.resource.subject }}</v-card-subtitle>
+
+        <v-card-text class="pt-4">
+          {{ resourceStore.resource.description }}
+        </v-card-text>
+        <v-divider/>
+        <v-container
+          :src="dataset[currentIndex]"
+          style="max-height: 45vh; object-fit: cover"
+        />
+        <v-container
+          class="summary-container"
+          style="color: #050505; max-height: 45vh; overflow-y: auto"
+        >
+          <pre>{{ summary }}</pre>
+        </v-container>
+        <v-chip
+          @click="copyToClipboard(dataset[currentIndex])"
+          color="success"
+          class="mt-2" width="95%"
+        >
+          Copy Dataset URL
+        </v-chip>
+      </v-card>
+
+      <img
+        class="nav-btn right-btn"
+        @click.stop="next"
+        style="height: 1.2rem; cursor: pointer"
+        src="@/assets/resources/Chevron-Right.512.png"
+        alt="Next"
+      />
+    </div>
+
+    <p :style="pStyle">{{ currentIndex + 1 }} / {{ dataset.length }}</p>
+    <v-divider></v-divider>
+
+    <v-row class="mt-3 thumbnails-row">
+      <v-col v-for="(image, index) in dataset" :key="index" cols="1">
+        <v-img
+          :src="image"
+          class="thumbnail"
+          @click="setActiveImage(index)"
+          :class="{ 'active-thumbnail': index === currentIndex }"
+        />
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { useResourceStore } from "@/stores/resources";
+import Papa from "papaparse";
+import * as XLSX from "xlsx";
+import axios from "axios";
 
-// Slide URLs
-const urls = [
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/978f2423-fa6a-4084-a1ad-145d1d38c013-page-000.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/3599d01f-fb8a-45a0-88ec-4bc5f87f768c-page-001.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/01543dda-d758-4d1a-85b9-56c27df9d2a0-page-002.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/1c56b055-c3d3-499a-aac8-09a299de6bee-page-003.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/ac932133-2cba-46c1-b302-8e102f9bef7f-page-004.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/ebaec5ad-5723-424e-a959-b38ee21bc0a0-page-005.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/b06941cc-5b30-49ce-a0f4-36c395bb51db-page-006.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/d3d0f008-8457-4446-a4a3-ff609ebe64c6-page-007.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/fae99192-c846-4391-881b-b2bad60c6641-page-008.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/b78aba32-fb56-43f3-aa44-de390165764b-page-009.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/8229ee9f-79e0-4156-a5dc-db2d7a290f8a-page-010.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/fb257b8a-e4cf-4255-86d2-9c6cd5683536-page-011.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/02bf02a1-7442-4896-a3c9-8001bb783808-page-012.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/3c59c106-93da-4b16-be0e-15ba70912ad8-page-013.jpg",
-];
-
-// Sort the URLs
-const sortedUrls = urls.sort((a, b) => {
-  const matchA = a.match(/page-(\d+)\.jpg/);
-  const matchB = b.match(/page-(\d+)\.jpg/);
-
-  // Ensure matches are found and valid before accessing groups
-  if (matchA && matchB) {
-    const pageA = parseInt(matchA[1], 10);
-    const pageB = parseInt(matchB[1], 10);
-    return pageA - pageB;
-  }
-
-  // Handle cases where matches are not found
-  // For example, if one or both of the matches are null, consider them equal or put null values at the end
-  return 0; // or you can choose to return a default value based on your sorting requirements
-});
-
+const resourceStore = useResourceStore();
+const dataset = ref(JSON.parse(resourceStore.resource.content));
 const currentIndex = ref(0);
 const isFullscreen = ref(false);
-
-// Preload next 4 slides
-const preloadCount = 4;
-const preloadedSlides = ref(sortedUrls.slice(0, preloadCount + 1));
-
-// Update preloaded slides based on current index
-watch(currentIndex, (newIndex) => {
-  const start = Math.max(newIndex, 0);
-  const end = Math.min(newIndex + preloadCount, sortedUrls.length - 1);
-  preloadedSlides.value = sortedUrls.slice(start, end + 1);
-});
-
-// Toggle fullscreen mode
-const toggleFullscreen = () => {
-  if (document.fullscreenElement) {
-    document.exitFullscreen();
-  } else {
-    document.documentElement.requestFullscreen();
-  }
-  isFullscreen.value = !isFullscreen.value;
+const carouselWrapper = ref<HTMLElement | null>(null);
+const summary = ref("");
+const copyAlert = ref("");
+const setActiveImage = (index: number) => {
+  currentIndex.value = index;
+  generateSummary(dataset.value[currentIndex.value]);
 };
 
-// Slides data
-const slides = ref(sortedUrls);
+const fetchDataAndGenerateSummary = async (url: string) => {
+  try {
+    const { data } = await axios.get(url);
+    generateSummary(data);
+  } catch (error) {
+    summary.value = `Error fetching data: ${error.message}`;
+  }
+};
+
+const generateSummary = (data: any) => {
+  if (Array.isArray(data)) {
+    summary.value = `Number of records: ${data.length}\nFields: ${Object.keys(data[0] || {}).join(", ")}`;
+  } else if (typeof data === "object") {
+    summary.value = `Fields: ${Object.keys(data).join(", ")}`;
+  } else {
+    summary.value = `Data: ${data}`;
+  }
+};
+watch(currentIndex, () => {
+  fetchDataAndGenerateSummary(dataset.value[currentIndex.value]);
+});
+const parseData = (fileContent: string | ArrayBuffer, fileType: string) => {
+  if (fileType === "csv") {
+    return Papa.parse(fileContent as string, {
+      header: true,
+      dynamicTyping: true,
+    }).data;
+  } else if (fileType === "json") {
+    return JSON.parse(fileContent as string);
+  } else if (fileType === "xlsx") {
+    const workbook = XLSX.read(fileContent, { type: "array" });
+    return XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+  }
+};
+
+const copyToClipboard = (data) => {
+  navigator.clipboard.writeText(data).then(() => {
+    copyAlert.value = "Dataset URL copied to clipboard!";
+    setTimeout(() => {
+      copyAlert.value = "";
+    }, 2700);
+  });
+};
+
+const prev = () => {
+  if (currentIndex.value > 0) {
+    currentIndex.value--;
+    generateSummary(dataset.value[currentIndex.value]);
+  }
+};
+
+const next = () => {
+  if (currentIndex.value < dataset.value.length - 1) {
+    currentIndex.value++;
+    generateSummary(dataset.value[currentIndex.value]);
+  }
+};
+
+const toggleFullscreen = () => {
+  if (document.fullscreenElement) {
+    document.exitFullscreen().then(() => (isFullscreen.value = false));
+  } else if (carouselWrapper.value) {
+    carouselWrapper.value
+      .requestFullscreen()
+      .then(() => (isFullscreen.value = true));
+  }
+};
+
+const handleFullscreenChange = () => {
+  if (!document.fullscreenElement) {
+    window.location.reload();
+  }
+};
+
+const handleKeyboardNavigation = (event: KeyboardEvent) => {
+  if (event.key === "ArrowLeft") prev();
+  if (event.key === "ArrowRight") next();
+};
+
+const handleClick = (event: MouseEvent) => {
+  if (isFullscreen.value || !carouselWrapper.value) return;
+  const { clientX, offsetWidth } = event;
+  if (clientX <= offsetWidth * 0.1) prev();
+  if (clientX >= offsetWidth * 0.9) next();
+};
+
+onMounted(() => {
+  fetchDataAndGenerateSummary(dataset.value[currentIndex.value]);
+  window.addEventListener("keydown", handleKeyboardNavigation);
+  document.addEventListener("fullscreenchange", handleFullscreenChange);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", handleKeyboardNavigation);
+  document.removeEventListener("fullscreenchange", handleFullscreenChange);
+});
+
+const pStyle = {
+  position: "relative",
+  left: "50%",
+  transform: "translateX(-50%)",
+  margin: "0",
+  backgroundColor: "#bfbfbf",
+  color: "#ffffff",
+  fontSize: "9px",
+  textAlign: "center",
+};
 </script>
 
 <style scoped>
-.v-carousel--fullscreen {
-  height: 100vh;
+.thumbnail {
+  cursor: pointer;
+  border: 2px solid transparent;
 }
 
-.slide-img {
-  max-height: 100vh;
-  max-width: 100vw;
+.thumbnail.active-thumbnail {
+  border: 2px solid rgb(187, 207, 201);
 }
 
-.v-carousel-item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.fullscreen-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
-.v-btn {
+.fullscreen-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.5);
   color: white;
+}
+
+.carousel-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 67vh;
+  transition:
+    width 0.3s,
+    height 0.3s;
+}
+
+.carousel-wrapper.fullscreen {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 500;
+}
+
+.dataset-card {
+  position: relative;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+.summary-container {
+  color: #efefef;
+  background-color: transparent;
+}
+
+.thumbnails-row {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.thumbnails-row::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+</style>
+<style scoped>
+.custom-alert {
+  background-color: #ffffff; /* Dark background */
+  padding: 20px;
+  z-index: 9000;
+  border-radius: 5px;
+}
+
+.custom-alert * {
+  color: white !important;
+}
+</style>
+<style>
+.dataset-card {
+  display: inline-block; /* Inline display for card */
+  width: auto; /* Adjust width as needed */
+}
+
+.summary-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 </style>

@@ -2,9 +2,9 @@
   <v-container>
     <v-file-input
       v-model="files"
-      accept=".mp4"
-      label="Upload MP4 Files"
-      prepend-icon="mdi-video"
+      accept=".pdf, .jpg, .jpeg, .png, .webp"
+      label="Upload PDF orr image Files"
+      prepend-icon="mdi-lock-clock"
       :multiple="true"
       :counter="true"
       :rules="fileRules"
@@ -34,8 +34,8 @@ const uploading = ref(false);
 const isUploadSuccessful = ref(false);
 const error = ref(null);
 
-const maxItems = 12;
-const maxTotalSizeMB = 960;
+const maxItems = 1;
+const maxTotalSizeMB = 12;
 
 const fileRules = computed(() => [
   () =>

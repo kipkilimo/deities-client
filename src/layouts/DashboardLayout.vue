@@ -94,12 +94,12 @@
                 }}</span>
               </v-tooltip>
             </v-list-item>
-            <v-divider class="mt-2"/>
+            <v-divider class="mt-2" />
             <h3 color="#55565a" class="text-h10 mb-4">Sponsors</h3>
             <v-img
               class="mt-3"
               style="border-radius: 0px 0px 5px 5px"
-              src="https://assets.bizclikmedia.net/580/d07c504f4f85d8f6a3c308c34edb7b93:b4ee3e25d34286c263ca95017d7fb60d/bro-3186903594-boehringeringelheim-dec2022.jpg"
+              src="https://www.boehringer-ingelheim.com/sites/default/files/Innovation/open_innovation/open_innovation_at_boehringer_ingelheim.jpg"
             ></v-img>
           </v-list-item-group>
         </v-list>
@@ -269,6 +269,11 @@ const sidebarItems = computed(() => [
     value: "library",
     iconClass: "mdi-bookshelf me-4 text-xl",
     path: "/dashboard/library",
+  },  {
+    title: t("dashboard.sidebar.programming"),
+    value: "programming",
+    iconClass: "mdi-code-block-braces me-4 text-xl",
+    path: "/dashboard/programming",
   },
   {
     title: t("dashboard.sidebar.consults"),
@@ -284,6 +289,8 @@ function getTooltipHighlight(key: string): string {
     Posters: "Share your abstract poster on NEMBi",
     "Live Poll": "Submit your opinion via NEMBi Live Polls",
     "Assignment Tasks": "View and attempt Assignment Tasks",
+    "Computational Methods": "Learn programming methods for analyzing research data in the life sciences",
+    "Research Consultation": "Personalized guidance and support to researchers at all stages",
     Events: "See upcoming NEMBi and external Events",
     "Resource Center":
       "Browse a wide range of resources at NEMBi Resource Center",
@@ -313,7 +320,7 @@ const onLeave = () => {
 
 const handleHover = (title: any) => {
   // Your logic that runs after 2.1 seconds, using the title passed from onHover
-  router.push(title); 
+  router.push(title);
   // Replace with any other method you want to call, using the passed parameter
 };
 </script>

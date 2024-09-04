@@ -47,6 +47,7 @@
           @click:append="togglePassword"
           required
         />
+
         <div class="d-flex justify-space-between mt-4">
           <v-btn
             :disabled="!canLogin"
@@ -61,7 +62,7 @@
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
-                :disabled="!usingPassword || password.length >= 6"
+                :disabled="!isEmailValid || !usingPassword || password.length >= 6"
                 :color="isEmailValid ? 'green' : 'primary'"
                 icon
                 height="30"
@@ -115,12 +116,32 @@
             <span>Forgot Password?</span>
           </v-tooltip>
         </div>
+        <v-card class="mt-4" disabled
+          style="
+            width: 100%;
+            cursor: pointer;
+            border-radius: 5px;
+            border: 1px solid #bfbfbf;
+          "
+        >
+          <v-tooltip location="bottom">
+            <template v-slot:activator="{ props }">
+              <v-img 
+                v-bind="props"
+                @click="orcIDAuthenticate"
+                src="https://blog.noyam.org/wp-content/uploads/2021/02/noyamblog17.jpg"
+                style="height: 4.5rem; cursor: pointer"
+              />
+            </template>
+            <span>Signin with your ORCID</span>
+          </v-tooltip>
+        </v-card>
       </v-form>
     </v-card-text>
     <v-divider class="mt-2" />
     <h3 color="#777777" class="ml-2 mt-2 mb-2">Sponsors</h3>
     <v-img
-      class="mt-3 "
+      class="mt-3"
       style="border-radius: 0px 0px 5px 5px"
       src="https://assets.bizclikmedia.net/580/d07c504f4f85d8f6a3c308c34edb7b93:b4ee3e25d34286c263ca95017d7fb60d/bro-3186903594-boehringeringelheim-dec2022.jpg"
     ></v-img>
@@ -259,7 +280,48 @@ const submitSingleSigninLogin = async () => {
     }, 42000);
   }
 };
+const orcIDAuthenticate = async () => {
+  loginLoading.value = true; // Indicate login in progress
+  try {
+    await userStore.login(email.value, password.value);
+    if (userStore.user.personalInfo.activatedAccount === false) {
+      router.push("/auth/activate");
+      return;
+    }
+    const token = userStore.token;
+    // @ts-ignore
+    Cookies.set("authToken", token, { expires: 7 }); // Expires in 7 days
 
+    router.push("/dashboard/overview");
+  } catch (error) {
+    loginError.value = "Check your credentials."; // Set error message
+    let errorMessage = loginError.value;
+
+    function isGraphQLError(
+      err: unknown
+    ): err is { graphQLErrors: Array<{ message: string }> } {
+      return (
+        typeof err === "object" &&
+        err !== null &&
+        "graphQLErrors" in err &&
+        Array.isArray((err as any).graphQLErrors)
+      );
+    }
+
+    if (isGraphQLError(error)) {
+      if (error.graphQLErrors.length > 0) {
+        errorMessage = error.graphQLErrors[0].message;
+      }
+    } else if (error instanceof Error && error.message) {
+      errorMessage = error.message;
+    }
+
+    loginError.value = errorMessage;
+    setTimeout(() => {
+      window.location.reload();
+    }, 4200);
+  }
+};
 const submitLogin = async () => {
   loginLoading.value = true; // Indicate login in progress
   try {

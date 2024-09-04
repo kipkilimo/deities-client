@@ -3,7 +3,7 @@
     <v-row>
       <!-- Image upload and cropping section -->
       <v-col cols="4" v-if="coverUploaded === false">
-        <v-card>{{ coverUploaded }}
+        <v-card>{{ resourceStore.resource.content }}
           <v-row>
             <!-- File input for selecting the image -->
             <v-col cols="12">
@@ -43,6 +43,7 @@
               >
             </v-col>
           </v-row>
+          
         </v-card>
       </v-col>
       <!-- Other content -->
@@ -150,7 +151,7 @@ const uploadCroppedImage = async () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      const { message } = response.data;
+      const { message } = response.data; 
       console.log("Upload successful:", message);
       coverUploaded.value = true;
       loading.value = false;

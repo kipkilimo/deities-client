@@ -20,7 +20,9 @@ dashboard:
 
     events: Events
     library: Resource Center
-    consults: Research Counsel
+
+    programming: Computational Methods
+    consults: Research Consultation
     logout: Logout
   main:
     dashboard-overview: Overview

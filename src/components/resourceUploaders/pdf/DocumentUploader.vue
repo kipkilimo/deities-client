@@ -4,7 +4,7 @@
   v-model="files"
   accept=".pdf"
   label="Upload PDF Files"
-  prepend-icon="mdi-image"
+  prepend-icon="mdi-file-document-multiple-outline"
   :multiple="true"
   :counter="true"
   :rules="fileRules"

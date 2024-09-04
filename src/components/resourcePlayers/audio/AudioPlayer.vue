@@ -1,115 +1,305 @@
 <template>
-  <v-container fluid>
-    <v-card>
-      <v-card-title>
-        <v-spacer></v-spacer>
-        <v-btn @click="toggleFullscreen" icon>
-          <v-icon>{{
-            isFullscreen ? "mdiFullscreenExit" : "mdiFullscreen"
-          }}</v-icon>
-        </v-btn>
-      </v-card-title>
-      <v-carousel
-        v-model:currentIndex="currentIndex"
-        :items="preloadedSlides"
-        hide-delimiters
-        hide-gutter
-        show-arrows
-        :cycle="true"
-        :interval="5000"
-        class="v-carousel--fullscreen"
+  <v-card color="#f4f6f7"
+    fluid
+    v-if="resourceStore.resource.content"
+    :style="{  
+      position: 'relative',
+      paddingBottom: '20px'
+    }"
+  >
+    <!-- Inner carousel wrapper -->
+    <div
+      class="carousel-wrapper"
+      ref="carouselWrapper"
+      :class="{ fullscreen: isFullScreen }"
+    >
+      <!-- Inner card with audio player -->
+      <v-card
+        color="transparent"
+        flat
+        style="border-radius:2px 2px 0px 0px;"
+        class="carousel-slide"
+        :class="{ 'fullscreen-slide': isFullScreen }"
+        :style="{
+          backgroundImage: `url(${podcastBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          position: 'relative',
+          borderRadius:'2px 2px 0px 0px !important'
+        }"
       >
-        <v-carousel-item v-for="(slide, index) in slides" :key="index">
-          <v-img :src="slide" class="slide-img" contain></v-img>
-        </v-carousel-item>
-      </v-carousel>
-    </v-card>
-  </v-container>
+        <vuetify-audio
+          :file="currentSlide"
+          color="#16539c"
+          autoPlay
+          :ended="audioFinish"
+          class="audio-player"
+        ></vuetify-audio>
+      </v-card>
+    </div>
+
+    <!-- Silvery Bottom Strip on the outer card -->
+    <div
+      :style="{
+        position: 'absolute',
+        bottom: '0',
+        left: '0',
+        width: '100%',
+        height: '5px',
+        backgroundColor: 'silver',
+        borderRadius: '0 0 1px 1px',
+      }"
+    ></div>
+
+    <v-divider></v-divider>
+
+    <v-card-actions>
+      <v-row no-gutters align="center" justify="space-between" class="w-100">
+        <v-col cols="5"></v-col>
+        <v-col cols="5">
+          <v-row no-gutters>
+            <v-col cols="auto">
+              <v-btn icon @click="skipPrev">
+                <v-icon>mdi-skip-previous</v-icon>
+              </v-btn>
+            </v-col>
+            <v-col cols="auto">
+              <v-btn icon @click="prev">
+                <v-icon>mdi-chevron-left</v-icon>
+              </v-btn>
+            </v-col>
+            <v-col cols="auto">
+              <v-btn icon @click="next">
+                <v-icon>mdi-chevron-right</v-icon>
+              </v-btn>
+            </v-col>
+            <v-col cols="auto">
+              <v-btn icon @click="skipNext">
+                <v-icon>mdi-skip-next</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-col>
+
+        <v-col cols="2">
+          <v-row no-gutters>
+            <v-col cols="auto">
+              <v-btn disabled icon @click="fullScreen">
+                <v-icon>mdi-fullscreen</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, onMounted, onUnmounted, watch } from "vue";
+import { useResourceStore } from "../../../stores/resources"; // Replace with actual path
+import VuetifyAudio from "vuetify3-audio-player";
 
-// Slide URLs
-const urls = [
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/978f2423-fa6a-4084-a1ad-145d1d38c013-page-000.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/3599d01f-fb8a-45a0-88ec-4bc5f87f768c-page-001.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/01543dda-d758-4d1a-85b9-56c27df9d2a0-page-002.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/1c56b055-c3d3-499a-aac8-09a299de6bee-page-003.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/ac932133-2cba-46c1-b302-8e102f9bef7f-page-004.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/ebaec5ad-5723-424e-a959-b38ee21bc0a0-page-005.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/b06941cc-5b30-49ce-a0f4-36c395bb51db-page-006.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/d3d0f008-8457-4446-a4a3-ff609ebe64c6-page-007.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/fae99192-c846-4391-881b-b2bad60c6641-page-008.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/b78aba32-fb56-43f3-aa44-de390165764b-page-009.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/8229ee9f-79e0-4156-a5dc-db2d7a290f8a-page-010.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/fb257b8a-e4cf-4255-86d2-9c6cd5683536-page-011.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/02bf02a1-7442-4896-a3c9-8001bb783808-page-012.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/3c59c106-93da-4b16-be0e-15ba70912ad8-page-013.jpg",
-];
+const resourceStore = useResourceStore();
+const urls = ref<string[]>(JSON.parse(resourceStore.resource.content));
 
-// Sort the URLs
-const sortedUrls = urls.sort((a, b) => {
-  const matchA = a.match(/page-(\d+)\.jpg/);
-  const matchB = b.match(/page-(\d+)\.jpg/);
+const sortedUrls = ref<string[]>(
+  urls.value.sort((a, b) => {
+    const getPageNumber = (url: string) => {
+      const match = url.match(/page-(\d+)\.jpg/);
+      return match ? parseInt(match[1], 10) : 0;
+    };
+    return getPageNumber(a) - getPageNumber(b);
+  })
+);
 
-  // Ensure matches are found and valid before accessing groups
-  if (matchA && matchB) {
-    const pageA = parseInt(matchA[1], 10);
-    const pageB = parseInt(matchB[1], 10);
-    return pageA - pageB;
-  }
-
-  // Handle cases where matches are not found
-  // For example, if one or both of the matches are null, consider them equal or put null values at the end
-  return 0; // or you can choose to return a default value based on your sorting requirements
-});
-
-const currentIndex = ref(0);
-const isFullscreen = ref(false);
-
-// Preload next 4 slides
-const preloadCount = 4;
-const preloadedSlides = ref(sortedUrls.slice(0, preloadCount + 1));
-
-// Update preloaded slides based on current index
-watch(currentIndex, (newIndex) => {
-  const start = Math.max(newIndex, 0);
-  const end = Math.min(newIndex + preloadCount, sortedUrls.length - 1);
-  preloadedSlides.value = sortedUrls.slice(start, end + 1);
-});
-
-// Toggle fullscreen mode
-const toggleFullscreen = () => {
-  if (document.fullscreenElement) {
-    document.exitFullscreen();
-  } else {
-    document.documentElement.requestFullscreen();
-  }
-  isFullscreen.value = !isFullscreen.value;
+const currentIndex = ref<number>(0);
+const currentSlide = ref<string>(sortedUrls.value[0]);
+const isFullScreen = ref<boolean>(false);
+const carouselWrapper = ref<HTMLElement | null>(null);
+const podcastBg = ref(
+  "https://www.yourwealth.com/wp-content/uploads/2023/06/Podcast-Retire-Sooner-iStock.jpg"
+);
+const updateSlide = () => {
+  currentSlide.value = sortedUrls.value[currentIndex.value];
 };
 
-// Slides data
-const slides = ref(sortedUrls);
+const prev = () => {
+  if (currentIndex.value > 0) {
+    currentIndex.value -= 1;
+  }
+};
+
+const audioFinish = () => {
+  if (currentIndex.value < sortedUrls.value.length - 1) {
+    currentIndex.value += 1;
+  }
+};
+const next = () => {
+  if (currentIndex.value < sortedUrls.value.length - 1) {
+    currentIndex.value += 1;
+  }
+};
+
+const skipPrev = () => {
+  currentIndex.value = 0;
+};
+
+const skipNext = () => {
+  currentIndex.value = sortedUrls.value.length - 1;
+};
+
+// Fullscreen functionality
+const fullScreen = () => {
+  if (carouselWrapper.value) {
+    if (document.fullscreenElement) {
+      document
+        .exitFullscreen()
+        .then(() => {
+          isFullScreen.value = false;
+          resetHeight(); // Reset height when exiting fullscreen
+        })
+        .catch((err) => {
+          console.error("Failed to exit full screen mode:", err);
+        });
+    } else {
+      carouselWrapper.value
+        .requestFullscreen()
+        .then(() => {
+          isFullScreen.value = true;
+        })
+        .catch((err) => {
+          console.error("Failed to enter full screen mode:", err);
+        });
+    }
+  }
+};
+
+const resetHeight = () => {
+  if (carouselWrapper.value) {
+    carouselWrapper.value.style.height = "72vh"; // Reset to default height
+  }
+};
+
+// Handle fullscreen change event
+const handleFullscreenChange = () => {
+  if (!document.fullscreenElement) {
+    window.location.reload();
+  }
+};
+
+const handleKeyboardNavigation = (event: KeyboardEvent) => {
+  if (event.key === "ArrowLeft") {
+    prev();
+  } else if (event.key === "ArrowRight") {
+    next();
+  }
+};
+const handleClick = (event: MouseEvent) => {
+  if (isFullScreen.value === true) {
+    return;
+  }
+  if (carouselWrapper.value) {
+    const { clientX } = event;
+    const { offsetWidth } = carouselWrapper.value;
+
+    // Calculate boundaries for the left 10% and right 10% of the width
+    const leftBoundary = offsetWidth * 1;
+    const rightBoundary = offsetWidth * 1;
+
+    // Respond to clicks only if they are within the left 10% or right 10% of the width
+    if (clientX <= leftBoundary) {
+      prev();
+    } else if (clientX >= rightBoundary) {
+      next();
+    }
+
+    // No response if click is in between the left and right 10%
+  }
+};
+
+watch(currentIndex, updateSlide);
+
+onMounted(() => {
+  updateSlide();
+  window.addEventListener("keydown", handleKeyboardNavigation);
+  document.addEventListener("fullscreenchange", handleFullscreenChange);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", handleKeyboardNavigation);
+  document.removeEventListener("fullscreenchange", handleFullscreenChange);
+});
 </script>
 
 <style scoped>
-.v-carousel--fullscreen {
-  height: 100vh;
-}
-
-.slide-img {
-  max-height: 100vh;
-  max-width: 100vw;
-}
-
-.v-carousel-item {
+.carousel-wrapper {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  position: relative;
+  transition:
+    width 0.3s,
+    height 0.3s; /* Smooth transition */
+  height: 67vh; /* Default height */
 }
 
-.v-btn {
-  color: white;
+.carousel-wrapper.fullscreen {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000; /* Ensure it’s on top */
+  background: black; /* Optional: To prevent background issues */
+}
+
+.carousel-slide {
+  flex: 1;
+  text-align: center;
+  overflow: hidden; /* Prevents overflow issues */
+  height: 100%; /* Ensure it takes full height of the container */
+}
+
+.carousel-slide.fullscreen-slide {
+  width: 100%;
+  height: 100%;
+}
+
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.left-btn {
+  left: 0;
+}
+
+.right-btn {
+  right: 0;
+}
+
+.v-img {
+  object-fit: contain; /* Ensures image fits within the container without distortion */
+  width: 100%;
+  height: 100%;
+}
+.carousel-background {
+  background-image: url("your-image-url.jpg");
+  background-size: cover;
+  width: 100%;
+  background-position: center;
+}
+</style>
+<style>
+.audio-player {
+  position: absolute;
+  bottom: 1%;
+  left: 50%;
+  opacity: 0.83;
+  transform: translateX(-50%);
+  width: 95%; /* Adjust width as needed */
 }
 </style>

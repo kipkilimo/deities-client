@@ -46,7 +46,7 @@
     <!-- Bottom Row: Two Column Layout -->
     <v-row>
       <!-- Left Column: Resource Iterator Cards -->
-      <v-col cols="3" class="pr-2">
+      <v-col cols="2" class="pr-2">
         <!-- Container for vertical scrolling -->
         <v-row
           class="overflow-y-auto mt-1"
@@ -58,6 +58,7 @@
             class="pa-0"
           >
             <v-card
+              fluid
               class="mb-2"
               height="4.5rem"
               @click="selectResource(resource)"
@@ -85,8 +86,9 @@
       </v-col>
 
       <!-- Right Column: Selected Resource -->
-      <v-col cols="9">
+      <v-col cols="10">
         <v-card
+          fluid
           v-if="!resourceComponent"
           @click="selectResource(resourceStore.resources[0])"
           height="63vh"
@@ -106,10 +108,10 @@
           ></v-img>
         </v-card>
 
-        <v-card v-if="selectedResource && showMedia">
+        <v-container fluid v-if="selectedResource && showMedia">
           <!-- Dynamic Resource Renderer -->
           <component :is="resourceComponent" :resource="selectedResource" />
-        </v-card>
+        </v-container>
       </v-col>
     </v-row>
   </v-container>
@@ -187,7 +189,8 @@ const sortedAndFilteredResources = computed(() => {
     filtered = filtered.sort((a, b) => a.title.localeCompare(b.title));
   } else if (sortOption.value === "Date Created") {
     filtered = filtered.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   } else if (sortOption.value === "Subject") {
     filtered = filtered.sort((a, b) => a.subject.localeCompare(b.subject));

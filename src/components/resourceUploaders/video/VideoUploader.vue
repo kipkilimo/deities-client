@@ -4,7 +4,7 @@
       v-model="files"
       accept=".mp4"
       label="Upload MP4 Files"
-      prepend-icon="mdi-video"
+      prepend-icon="mdi-file-video"
       :multiple="true"
       :counter="true"
       :rules="fileRules"

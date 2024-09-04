@@ -99,6 +99,9 @@ const isButtonDisabled = computed(() => {
   return !regex.test(email.value); // Disable button if email does not match pattern
 });
 const submitReset = async () => {
+  if(email.value === ''){
+    return
+  }
   resetLoading.value = true; // Indicate reset in progress
   try {
     await userStore.requestPasswordReset(email.value);

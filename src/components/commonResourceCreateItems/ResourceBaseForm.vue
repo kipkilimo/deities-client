@@ -178,7 +178,7 @@ const filteredTopics = computed(() => {
 // Methods to reset child selections when parent is changed
 function resetLevelAndTopics() {
   selectedLevel.value = "";
-  selectedTopic.value = "";
+  selectedTopic.value = ""; 
 }
 
 function resetTopics() {

@@ -1,6 +1,12 @@
 <template>
-  <v-container fluid v-if="resourceStore.resource.content">
-  
+  <v-card  color="transparent"  
+    fluid
+    v-if="resourceStore.resource.content"
+    :style="{  
+      position: 'relative',
+      paddingBottom: '20px'
+    }"
+  >
     <div
       class="carousel-wrapper"
       ref="carouselWrapper"
@@ -74,16 +80,16 @@
         </v-col>
       </v-row>
     </v-card-actions>
-  </v-container>
+  </v-card>
 </template>
-
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { useResourceStore } from "../../../stores/resources"; // Replace with actual path
 
 const resourceStore = useResourceStore();
 const urls = ref<string[]>(JSON.parse(resourceStore.resource.content));
 
+// Sort URLs based on page numbers
 const sortedUrls = ref<string[]>(
   urls.value.sort((a, b) => {
     const getPageNumber = (url: string) => {
@@ -99,8 +105,21 @@ const currentSlide = ref<string>(sortedUrls.value[0]);
 const isFullScreen = ref<boolean>(false);
 const carouselWrapper = ref<HTMLElement | null>(null);
 
+// Preload images based on the current index
+const preloadImages = (index: number) => {
+  const range = 4; // Number of slides to preload
+  for (let i = -range; i <= range; i++) {
+    const preloadIndex = index + i;
+    if (preloadIndex >= 0 && preloadIndex < sortedUrls.value.length) {
+      const img = new Image();
+      img.src = sortedUrls.value[preloadIndex];
+    }
+  }
+};
+
 const updateSlide = () => {
   currentSlide.value = sortedUrls.value[currentIndex.value];
+  nextTick(() => preloadImages(currentIndex.value));
 };
 
 const prev = () => {
@@ -169,17 +188,18 @@ const handleKeyboardNavigation = (event: KeyboardEvent) => {
     next();
   }
 };
+
 const handleClick = (event: MouseEvent) => {
-  if(isFullScreen.value === true){
-    return
+  if (isFullScreen.value === true) {
+    return;
   }
   if (carouselWrapper.value) {
     const { clientX } = event;
     const { offsetWidth } = carouselWrapper.value;
 
     // Calculate boundaries for the left 10% and right 10% of the width
-    const leftBoundary = offsetWidth * 1;
-    const rightBoundary = offsetWidth * 1;
+    const leftBoundary = offsetWidth * 0.1;
+    const rightBoundary = offsetWidth * 0.9;
 
     // Respond to clicks only if they are within the left 10% or right 10% of the width
     if (clientX <= leftBoundary) {
@@ -187,11 +207,8 @@ const handleClick = (event: MouseEvent) => {
     } else if (clientX >= rightBoundary) {
       next();
     }
-
-    // No response if click is in between the left and right 10%
   }
 };
-
 
 watch(currentIndex, updateSlide);
 
@@ -206,6 +223,7 @@ onUnmounted(() => {
   document.removeEventListener("fullscreenchange", handleFullscreenChange);
 });
 </script>
+
 
 <style scoped>
 .carousel-wrapper {

@@ -11,6 +11,8 @@ import i18n from "./plugins/i18n";
 import { setupLayouts } from "virtual:generated-layouts";
 import vuetify from "./plugins/vuetify";
 
+import "viewerjs/dist/viewer.css";
+import VueViewer from "v-viewer";
 const routes = setupLayouts(generatedRoutes);
 
 const app = createApp({
@@ -18,8 +20,9 @@ const app = createApp({
   setup() {
     onInitApp();
   },
-}); 
+});
 
+app.use(VueViewer);
 app
   .use(createPinia())
   .use(vuetify)

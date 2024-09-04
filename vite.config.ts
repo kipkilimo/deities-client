@@ -17,6 +17,9 @@ export default defineConfig({
   esbuild: {
     target: "esnext", // or 'es2015', 'es2018', etc., depending on your requirements
   },
+  server: {
+    host: true,
+  },
 
   plugins: [
     VueRouter({
