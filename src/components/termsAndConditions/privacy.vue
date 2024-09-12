@@ -5,7 +5,7 @@
 
     <h2>What Does This Privacy Policy Cover?</h2>
     <p>
-      This Privacy Policy explains how NEMBi Web app (hereinafter NEMBi)
+      This Privacy Policy explains how NEMBio Web app (hereinafter NEMBio)
       collects and uses personal information in relation to the products and
       services that are linked to this Policy. These products and services shall
       be referred to as our “Services” for the rest of this Policy.
@@ -18,21 +18,21 @@
       referred to as “Individuals” in this Policy).
     </p>
     <p>
-      In this Policy, a “User” is defined as any person making use of NEMBi’s
+      In this Policy, a “User” is defined as any person making use of NEMBio’s
       Services, including employees and students of Organizations that have
-      purchased NEMBi’s Services, as well as Individuals who have purchased
-      NEMBi’s Services themselves. In each case, we may have to collect “User
+      purchased NEMBio’s Services, as well as Individuals who have purchased
+      NEMBio’s Services themselves. In each case, we may have to collect “User
       Data” (here defined as any personal information or data pertaining to any
-      User that is collected by, or on behalf of, NEMBi) in order to provide our
+      User that is collected by, or on behalf of, NEMBio) in order to provide our
       Services.
     </p>
     <p>
-      This Policy covers how NEMBi handles User Data as a data processor when
-      providing Services to Organizations. It also covers how NEMBi handles User
+      This Policy covers how NEMBio handles User Data as a data processor when
+      providing Services to Organizations. It also covers how NEMBio handles User
       Data as a data controller when providing Services to Individuals.
     </p>
 
-    <h2>NEMBi’s Commitment</h2>
+    <h2>NEMBio’s Commitment</h2>
     <p>
       Under the Regulations, civil registration registries cannot transfer
       personal data collected for civil registration purposes outside Kenya
@@ -44,14 +44,14 @@
       <li>Creating a safe and secure digital learning environment for you,</li>
       <li>
         Not sharing or selling your personal information to third parties that
-        are not directly involved in delivering NEMBi Services (unless we are
+        are not directly involved in delivering NEMBio Services (unless we are
         required to by law),
       </li>
       <li>
         Providing you with access to and control over the information you give
         us,
       </li>
-      <li>Not showing any external advertisements on NEMBi Services.</li>
+      <li>Not showing any external advertisements on NEMBio Services.</li>
     </ul>
     <p>
       We consider all User Data that we collect to be strictly confidential. In
@@ -63,20 +63,20 @@
 
     <h2>What If My Account Was Provided for Me by an Organization?</h2>
     <p>
-      If your access to NEMBi’s Services is provided to you by an Organization,
+      If your access to NEMBio’s Services is provided to you by an Organization,
       then the Organization is the data controller for any User Data uploaded or
       accessed by the Services. The Organization is responsible for ensuring it
-      has a legal basis for processing this data. NEMBi may process this data on
+      has a legal basis for processing this data. NEMBio may process this data on
       the Organization’s behalf as a data processor.
     </p>
 
-    <h2>What User Data Does NEMBi Collect and Store?</h2>
+    <h2>What User Data Does NEMBio Collect and Store?</h2>
     <p>
       In order to provide our Services effectively, there are a number of pieces
-      of information (User Data) that NEMBi needs to collect and store.
+      of information (User Data) that NEMBio needs to collect and store.
     </p>
     <p>
-      By subscribing to our Services, you consent to NEMBi storing and
+      By subscribing to our Services, you consent to NEMBio storing and
       processing the following information about you:
     </p>
     <ul>
@@ -85,7 +85,7 @@
       <li>Country of residence,</li>
       <li>Phone number (for authentication and SMS notifications),</li>
       <li>
-        Usage of NEMBi’s Services, such as the pages you visit and the actions
+        Usage of NEMBio’s Services, such as the pages you visit and the actions
         you take,
       </li>
       <li>Education-specific data such as enrollment, grade, and term,</li>
@@ -98,19 +98,19 @@
     <p>
       Organizations are responsible for ensuring that any information they
       upload to the Services is accurate. Administrators, teachers, and tutors
-      that use NEMBi Services may also generate User Data. For example, NEMBi
+      that use NEMBio Services may also generate User Data. For example, NEMBio
       Services may track learner assignment scores, responses to interactive
       exercises, grades, and more. This data can be compiled into reports in
-      some NEMBi Services. NEMBi is not responsible for the disclosure of such
+      some NEMBio Services. NEMBio is not responsible for the disclosure of such
       data by Users.
     </p>
     <p>
-      For more information on what data will be collected by specific NEMBi
+      For more information on what data will be collected by specific NEMBio
       Services, please contact
-      <a href="mailto:info@nembi.com">info@nembi.com</a>.
+      <a href="mailto:info@nem.bio">info@nem.bio</a>.
     </p>
 
-    <h2>How Do NEMBi Services Collect User Data?</h2>
+    <h2>How Do NEMBio Services Collect User Data?</h2>
     <p>We collect the information that forms your User Data when:</p>
     <ul>
       <li>
@@ -146,14 +146,14 @@
       >.
     </p>
 
-    <h2>Who Will NEMBi Share My Data With?</h2>
+    <h2>Who Will NEMBio Share My Data With?</h2>
     <p>
       We do not sell any User Data. We also do not share any User Data with any
-      third parties not directly involved in the delivery of NEMBi Services,
+      third parties not directly involved in the delivery of NEMBio Services,
       unless required to by law.
     </p>
     <p>
-      NEMBi may release User Data if it has a good faith belief that access,
+      NEMBio may release User Data if it has a good faith belief that access,
       use, preservation, or disclosure of such information is reasonably
       necessary to:
     </p>
@@ -172,11 +172,11 @@
       </li>
       <li>
         Protect against imminent harm to the rights, property, or safety of
-        NEMBi, its users, or the public as required or permitted by law.
+        NEMBio, its users, or the public as required or permitted by law.
       </li>
     </ul>
     <p>
-      We may also have to share User Data if NEMBi becomes involved in a merger,
+      We may also have to share User Data if NEMBio becomes involved in a merger,
       acquisition, or any form of sale of some or all of its assets. The legal
       basis for such a transfer would be our legitimate interests. You would be
       given notice of the proposed transfer at the relevant time and the option
@@ -192,16 +192,16 @@
       purposes of data privacy regulations.
     </p>
 
-    <h2>What Laws and Regulations Does NEMBi Follow When Handling My Data?</h2>
+    <h2>What Laws and Regulations Does NEMBio Follow When Handling My Data?</h2>
     <p>
-      When you purchase access to NEMBi’s Services or when we contact you for
+      When you purchase access to NEMBio’s Services or when we contact you for
       marketing purposes, we act as a data controller. Following the European
       General Data Protection Regulation, we are required to inform you of the
       legal basis for handling your User Data. We may use User Data:
     </p>
     <ul>
       <li>
-        To enter into a contract with you (such as when you purchase NEMBi’s
+        To enter into a contract with you (such as when you purchase NEMBio’s
         Services),
       </li>
       <li>
@@ -221,20 +221,20 @@
       When we handle User Data on behalf of an Organization, the Organization is
       the data controller and will establish the legal basis for handling your
       User Data. If you have any questions regarding this, please contact the
-      Organization that has provided you with the use of NEMBi’s Services on
+      Organization that has provided you with the use of NEMBio’s Services on
       your behalf.
     </p>
 
-    <h2>Will NEMBi Send Me Marketing Communications, and How Can I Opt Out?</h2>
+    <h2>Will NEMBio Send Me Marketing Communications, and How Can I Opt Out?</h2>
     <p>
       We may use the contact details provided by Users of our Services to inform
-      Users about other Services on offer from NEMBi unless the User chooses to
+      Users about other Services on offer from NEMBio unless the User chooses to
       opt out.
     </p>
     <p>
       Marketing communications will not be sent to any User that has opted out
       of receiving them. Users may opt out of receiving marketing communications
-      at any time. All marketing communications sent by NEMBi will contain an
+      at any time. All marketing communications sent by NEMBio will contain an
       “Unsubscribe” link at the end of the communication.
     </p>
 
@@ -252,12 +252,12 @@
       up-to-date internet security and virus protection on the devices from
       which you access our Services. Please change your password immediately if
       you suspect there has been a data breach or if you have security concerns,
-      and contact us using <a href="mailto:info@nembi.com">info@nembi.com</a>.
+      and contact us using <a href="mailto:info@nem.bio">info@nem.bio</a>.
     </p>
     <p>
       If User Data is collected improperly or misused, this is considered a
       violation of this Privacy Policy. Please report it to
-      <a href="mailto:info@nembi.com">info@nembi.com</a>.
+      <a href="mailto:info@nem.bio">info@nem.bio</a>.
     </p>
     <p>
       Organizational customers and their Users must not misuse any User Data
@@ -271,9 +271,9 @@
       or Organization’s access to our Services.
     </p>
 
-    <h2>How Long Will NEMBi Keep My Data?</h2>
+    <h2>How Long Will NEMBio Keep My Data?</h2>
     <p>
-      We will keep your User Data for as long as you are a NEMBi customer and
+      We will keep your User Data for as long as you are a NEMBio customer and
       for any duration after this time where your data is required for
       processing in order to fulfill our Services, unless the law requires or
       permits longer.
@@ -291,7 +291,7 @@
       personal data collected for civil registration purposes outside Kenya
       without the written approval of the DPC. The Data Protection (General)
       Regulations, 2021 elaborate in more detail transfer of personal data
-      outside Kenya. requirements and substantially follow NEMBi’s Privacy
+      outside Kenya. requirements and substantially follow NEMBio’s Privacy
       Policy.
     </p>
     <p>
@@ -308,7 +308,7 @@
       registries cannot transfer personal data collected for civil registration
       purposes outside Kenya without the written approval of the DPC. The Data
       Protection (General) Regulations, 2021 elaborate in more detail transfer
-      of personal data outside Kenya. compliance, NEMBi has standard contractual
+      of personal data outside Kenya. compliance, NEMBio has standard contractual
       clauses in place where necessary. For example, companies in the US are
       registered with Privacy Shield.
     </p>
@@ -346,16 +346,16 @@
       may no longer be able to offer you our Services.
     </p>
     <p>
-      If you have access to NEMBi Services through your Organization and you
+      If you have access to NEMBio Services through your Organization and you
       have queries or concerns, then please contact the administrator for the
-      Organization. If you directly purchased access to NEMBi Services as an
+      Organization. If you directly purchased access to NEMBio Services as an
       Individual customer, then you can contact us with your request using the
       contact details given at the end of this Privacy Policy. We will consider
       and act upon any request in accordance with any applicable data protection
       laws.
     </p>
     <p>
-      If your access to NEMBi Services was purchased by yourself, a parent, or a
+      If your access to NEMBio Services was purchased by yourself, a parent, or a
       guardian, and you are unhappy with our privacy practices, you may have the
       right to complain to the Information Commissioner (if you are based in the
       Kenya), or to your local data protection supervisory authority.
@@ -367,13 +367,13 @@
       always clearly display the date on which the latest update was made.
     </p>
 
-    <h2>How Can I Contact NEMBi?</h2>
+    <h2>How Can I Contact NEMBio?</h2>
     <p>
       If you have any queries about our Privacy Policy, please contact us at:
     </p>
     <p>
-      NEMBi Web app<br />
-      Email: <a href="mailto:info@nembi.com">info@nembi.com</a>
+      NEMBio Web app<br />
+      Email: <a href="mailto:info@nem.bio">info@nem.bio</a>
     </p>
   </div>
 </template>

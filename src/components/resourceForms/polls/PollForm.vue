@@ -1,146 +1,230 @@
 <template>
   <v-container>
-    <v-form ref="form" v-model="valid" lazy-validation>
-      <v-text-field
-        v-model="eventData.event_title"
-        label="Event Title"
-        :rules="[rules.required]"
-        required
-      ></v-text-field>
+    <v-row>
+      <v-col cols="12" md="8" offset-md="2">
+        <v-card>
+          <v-card-title>Add Poll Questions</v-card-title>
+          <v-card-text>
+            <v-form ref="formRef" v-model="valid" lazy-validation>
+              <!-- Poll Type Selector -->
+              <v-select
+                v-model="currentlyCreatingPollItem.type"
+                :items="pollTypes"
+                label="Poll Type"
+                :rules="[rules.required]"
+                required
+              ></v-select>
 
-      <v-row>
-        <v-col cols="12" sm="6">
-          <v-text-field
-            v-model="eventData.event_start_date"
-            label="Start Date"
-            type="date"
-            :rules="[rules.required]"
-            required
-          ></v-text-field>
-        </v-col>
+              <!-- Poll Question -->
+              <v-text-field
+                v-model="currentlyCreatingPollItem.question"
+                label="Poll Question"
+                :rules="[rules.required]"
+                required
+              ></v-text-field>
 
-        <v-col cols="12" sm="6">
-          <v-text-field
-            v-model="eventData.event_end_date"
-            label="End Date"
-            type="date"
-            :rules="[rules.required]"
-            required
-          ></v-text-field>
-        </v-col>
-      </v-row>
+              <!-- Add Options (Single Choice, Multiple Choice, Ranking) -->
+              <template
+                v-if="['Single Choice', 'Multiple Choice', 'Ranking'].includes(currentlyCreatingPollItem.type)"
+              >
+                <v-text-field
+                  v-model="newOption"
+                  label="Add Option"
+                  @keyup.enter="addOption"
+                  :rules="[rules.required]"
+                ></v-text-field>
+                <v-btn @click="addOption" color="primary"> Add Option </v-btn>
 
-      <v-row>
-        <v-col cols="12" sm="6">
-          <v-text-field
-            v-model="eventData.event_start_time"
-            label="Start Time"
-            type="time"
-            :rules="[rules.required]"
-            required
-          ></v-text-field>
-        </v-col>
+                <!-- Render Options as v-chips in a horizontal row -->
+                <v-row class="mt-4" dense>
+                  <v-col
+                    v-for="(option, index) in currentlyCreatingPollItem.options"
+                    :key="index"
+                    cols="auto"
+                  >
+                    <v-chip>
+                      {{ option }}
+                      <v-icon
+                        small
+                        class="ml-2"
+                        @click="removeOption(option)"
+                      >mdi-close</v-icon>
+                    </v-chip>
+                  </v-col>
+                </v-row>
 
-        <v-col cols="12" sm="6">
-          <v-text-field
-            v-model="eventData.event_end_time"
-            label="End Time"
-            type="time"
-            :rules="[rules.required]"
-            required
-          ></v-text-field>
-        </v-col>
-      </v-row>
+                <!-- Correct Response Field (if applicable) -->
+                <v-text-field
+                  v-if="['Single Choice', 'Multiple Choice'].includes(currentlyCreatingPollItem.type)"
+                  v-model="currentlyCreatingPollItem.correctResponse"
+                  label="Correct Response"
+                  :rules="[rules.correctResponse]"
+                  required
+                ></v-text-field>
+              </template>
 
-      <v-text-field
-        v-model="eventData.event_online_platform"
-        label="Online Platform"
-        :rules="[rules.required]"
-        required
-      ></v-text-field>
+              <!-- Open-Ended Question Instructions -->
+              <v-textarea
+                v-if="currentlyCreatingPollItem.type === 'Open-Ended'"
+                v-model="currentlyCreatingPollItem.options"
+                label="Instructions for open-ended response"
+              ></v-textarea>
 
-      <v-text-field
-        v-model="eventData.event_online_link"
-        label="Online Link"
-        :rules="[rules.required, rules.url]"
-        required
-      ></v-text-field>
+              <!-- Rating Question Slider -->
+              <v-slider
+                v-if="currentlyCreatingPollItem.type === 'Rating'"
+                v-model="currentlyCreatingPollItem.correctResponse"
+                min="1"
+                max="5"
+                ticks
+                :labels="['1', '', '', '', '5']"
+                thumb-label
+              ></v-slider>
 
-      <v-text-field
-        v-model="eventData.event_activity_schedule_url"
-        label="Activity Schedule URL"
-        :rules="[rules.required, rules.url]"
-        required
-      ></v-text-field>
+              <!-- Add Question Button -->
+              <v-btn :disabled="!valid" color="primary" @click="addQuestion">
+                Add Question
+              </v-btn>
 
-      <v-text-field
-        v-model="eventData.event_cover_image_url"
-        label="Cover Image URL"
-        :rules="[rules.required, rules.url]"
-        required
-      ></v-text-field>
+              <v-divider class="my-4"></v-divider>
 
-      <v-text-field
-        v-model="eventData.event_venue"
-        label="Venue"
-        :rules="[rules.required]"
-        required
-      ></v-text-field>
+              <!-- Poll Questions List -->
+              <v-list>
+                <v-list-item-group
+                  v-for="(question, index) in pollArray"
+                  :key="index"
+                >
+                  <v-list-item>
+                    <v-list-item-content>
+                      <v-list-item-title>{{ question.question }}</v-list-item-title>
+                      <v-list-item-subtitle>Type: {{ question.type }}</v-list-item-subtitle>
+                      <v-list-item-subtitle v-if="question.options.length">
+                        Options: {{ getOptionDisplay(question.type, question.options) }}
+                      </v-list-item-subtitle>
+                      <v-list-item-subtitle v-if="question.correctResponse">
+                        Correct Response: {{ question.correctResponse }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list-item-group>
+              </v-list>
 
-      <v-select
-        v-model="eventData.event_mode"
-        :items="['Online', 'In-Person', 'Hybrid']"
-        label="Event Mode"
-        :rules="[rules.required]"
-        required
-      ></v-select>
-
-      <v-btn :disabled="!valid" color="primary" @click="submit"> Submit </v-btn>
-    </v-form>
+              <!-- Submit All Polls Button -->
+              <v-btn :disabled="!valid" color="primary" @click="submitPolls">
+                Submit All Polls
+              </v-btn>
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
-import { useResourceStore } from "../../../stores/resources"; //
+import { ref, reactive } from "vue";
+import { useResourceStore } from "@/stores/resources";
+import qstnIdGen from "../../../utilities/accessTokenGenerator";
 const resourceStore = useResourceStore();
-
-const valid = ref(false);
-const form = ref(null);
-
-const eventData = ref({
-  event_title: "",
-  event_start_time: "",
-  event_end_time: "",
-  event_start_date: "",
-  event_end_date: "",
-  event_online_platform: "",
-  event_online_link: "",
-  event_activity_schedule_url: "",
-  event_cover_image_url: "",
-  event_venue: "",
-  event_mode: "",
-});
+const pollTypes = [
+  "Single Choice",
+  "Multiple Choice",
+  "Ranking",
+  "Open-Ended",
+  "Rating",
+];
 
 const rules = {
-  required: (value) => !!value || "Required.",
-  url: (value) => {
-    const pattern = new RegExp(
-      "^(https?:\\/\\/)?" + // protocol
-        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-        "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-        "(\\#[-a-z\\d_]*)?$",
-      "i"
-    ); // fragment locator
-    return (!!value && pattern.test(value)) || "Invalid URL.";
-  },
+  required: (value) => !!value || "Required field",
+  correctResponse: (value) =>
+    ["Single Choice", "Multiple Choice"].includes(
+      currentlyCreatingPollItem.type
+    )
+      ? !!value || "Required field"
+      : undefined, // Only required for specific types
+};
+const questionId = ref(qstnIdGen(12));
+const currentlyCreatingPollItem = reactive({
+  question: "",
+  type: "",
+  correctResponse: "",
+  qstId: questionId,
+  options: [],
+  responses: [],
+});
+
+const pollArray = ref([]);
+
+const valid = ref(false);
+const newOption = ref("");
+const formRef = ref(null);
+
+const addOption = () => {
+  if (newOption.value) {
+    currentlyCreatingPollItem.options.push(newOption.value);
+    newOption.value = "";
+  }
 };
 
-const submit = () => {
-  if (form.value.validate()) {
-    resourceStore.submitEvent(eventData.value); // Pass eventData to the store's submitEvent method
+const addQuestion = () => {
+  if (formRef.value.validate()) {
+    pollArray.value.push({ ...currentlyCreatingPollItem }); // Spread to avoid reference issues
+    currentlyCreatingPollItem.question = "";
+    currentlyCreatingPollItem.type = "";
+    questionId.value = qstnIdGen(12);
+    currentlyCreatingPollItem.options = [];
+    currentlyCreatingPollItem.correctResponse = ""; // Reset correct response
+    formRef.value.resetValidation(); // Reset validation
+  }
+};
+
+const submitPolls = async () => {
+  try {
+    const paramsObjRaw = [
+      {
+        resourceId: resourceStore.resource.id,
+        resourceContent: JSON.stringify({
+          pollArray: pollArray.value,
+          activeQuestion: {
+            qstId: pollArray.value[0].qstId,
+            type: pollArray.value.type,
+          },
+        }),
+      },
+    ];
+
+    console.log({ paramsObjRaw });
+
+    const resourceDetails = JSON.stringify(paramsObjRaw);
+    await resourceStore.addResourceFormContent({ resourceDetails });
+    window.location.reload();
+  } catch (error) {
+    console.error("Error submitting polls:", error);
+  }
+};
+
+const getOptionDisplay = (type, options) => {
+  switch (type) {
+    case "Single Choice":
+    case "Multiple Choice":
+      return options.join(", ");
+    case "Ranking":
+      return options
+        .map((option, index) => `${index + 1}. ${option}`)
+        .join(", ");
+    default:
+      return options;
+  }
+};
+
+const updateOption = (index, event) => {
+  currentlyCreatingPollItem.options[index] = event.target.value;
+};
+
+const removeOption = (option) => {
+  const index = currentlyCreatingPollItem.options.indexOf(option);
+  if (index !== -1) {
+    currentlyCreatingPollItem.options.splice(index, 1);
   }
 };
 </script>

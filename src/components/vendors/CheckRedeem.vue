@@ -79,7 +79,7 @@
         <template v-slot:prepend>
           <v-icon color="success"></v-icon>
         </template>
-        Go to NEMBi App
+        Go to NEMBio App
       </v-btn>
     </div>
 

@@ -1,5 +1,5 @@
 <template>
-  <v-card flat>
+  <v-card flat auto-height>
     <!-- Loading Indicator -->
     <!-- PDF Container -->
     <v-toolbar
@@ -19,7 +19,7 @@
         variant="text"
         color="grey"
         flat
-        class="mr-2" 
+        class="mr-2"
         @mousedown="startLongPress('decrement')"
         @mouseup="stopLongPress"
         @mouseleave="stopLongPress"
@@ -36,7 +36,7 @@
         @click="rotatePage"
       ></v-btn>
       <v-btn
-        color="grey" 
+        color="grey"
         flat
         @mousedown="startLongPress('increment')"
         @mouseup="stopLongPress"
@@ -150,7 +150,8 @@
         <v-app-bar-nav-icon></v-app-bar-nav-icon>
         <v-spacer></v-spacer>
 
-        <v-btn size="x-small"
+        <v-btn
+          size="x-small"
           color="grey"
           flat
           class="mr-2"
@@ -167,7 +168,8 @@
           Page {{ currentPage }} of {{ totalPages }}
         </v-btn>
 
-        <v-btn size="x-small"
+        <v-btn
+          size="x-small"
           variant="text"
           color="grey"
           flat
@@ -185,7 +187,8 @@
           <v-icon>mdi-menu-left</v-icon> Previous Page
         </v-btn>
 
-        <v-btn size="x-small"
+        <v-btn
+          size="x-small"
           density="default"
           icon="mdi-file-rotate-right"
           @click="rotatePage"
@@ -199,7 +202,8 @@
           "
         ></v-btn>
 
-        <v-btn size="x-small"
+        <v-btn
+          size="x-small"
           color="grey"
           flat
           class="mr-2"
@@ -219,7 +223,8 @@
     </div>
 
     <!-- draggable comments iterator  -->
-    <div
+    <v-card
+      class="mr-14"
       style="
         position: fixed;
         z-index: 1000;
@@ -229,56 +234,52 @@
       "
       :style="{ top: dialogTop, left: dialogLeft }"
     >
-      <v-card class="mt-12" style="max-width: 27rem;z-index:2500; max-height: 81vh;">
-        <v-card-title @mousedown.stop="onMouseDown">
-          <span class="headline"
-            >Page {{ currentPage }} Discussion Comments.</span
-          >
-        </v-card-title>
-        <v-divider></v-divider>
-        <v-card-text>
-          <div class="" v-if="filteredSideComments.length === 0">
-            <h5>No discussion comments.</h5>
-          </div>
+      <v-card-title @mousedown.stop="onMouseDown">
+        <span class="headline"
+          >Page {{ currentPage }} Discussion Comments.</span
+        >
+      </v-card-title>
+      <v-divider></v-divider>
+      <v-card-text>
+        <div class="" v-if="filteredSideComments.length === 0">
+          <h5>No discussion comments.</h5>
+        </div>
 
-          <div  id="draggableComments">
-            <v-list style="">
-              <v-list-item-group 
-                v-for="(comment, index) in reorderedComments"
-                :key="index"
-                :id="'card-' + index"
+        <div id="draggableComments">
+          <v-list style="">
+            <v-list-item-group
+              v-for="(comment, index) in reorderedComments"
+              :key="index"
+              :id="'card-' + index"
+            >
+              <v-card full-width
+                flat
+                elevation="1"
+                :style="computedSideCardStyle(comment.id)"
+                class="mr-3 hover-card"
+                style="  
+                  border: 1px solid #ccc;
+                "
               >
-                <v-card
-                  flat
-                  elevation="1"
-                  :style="computedSideCardStyle(comment.id)"
-                  class="mr-3 hover-card"
-                  style="
-                    min-width: 24rem;
-                    max-width: 24rem;
-                    border: 1px solid #ccc;
-                  "
-                >
-                  <div class="ma-4 text-h6">{{ comment.title }}</div>
-                  <div class="ma-4 text-h7">
-                    <i>{{ comment.text }}</i>
-                  </div>
-                  <v-divider />
-                  <v-card-actions>
-                    <v-card-subtitle>
-                      Added {{ reactiveTimeAgo(Number(comment.timestamp)) }} by
-                      {{ comment.author }}
-                    </v-card-subtitle>
-                  </v-card-actions>
-                  <v-divider />
-                </v-card>
-                <br />
-              </v-list-item-group>
-            </v-list>
-          </div>
-        </v-card-text>
-      </v-card>
-    </div>
+                <div class="ma-4 text-h6">{{ comment.title }}</div>
+                <div class="ma-4 text-h7">
+                  <i>{{ comment.text }}</i>
+                </div>
+                <v-divider />
+                <v-card-actions>
+                  <v-card-subtitle>
+                    Added {{ reactiveTimeAgo(Number(comment.timestamp)) }} by
+                    {{ comment.author }}
+                  </v-card-subtitle>
+                </v-card-actions>
+                <v-divider />
+              </v-card>
+              <br />
+            </v-list-item-group>
+          </v-list>
+        </div>
+      </v-card-text>
+    </v-card>
     <!-- Comment Dialog -->
 
     <v-dialog v-model="dialogVisible" max-width="30rem" persistent>
@@ -334,8 +335,8 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
 import VuePdfEmbed from "vue-pdf-embed";
-import { usePaperStore } from "../../stores/papers";
-import { useUserStore } from "../../stores/users";
+import { usePaperStore } from "../../../stores/papers";
+import { useUserStore } from "../../../stores/users";
 const pdfRef = ref(null); // Reference to the VuePdfEmbed component
 const showSide = ref(true);
 const comments = ref([]);
@@ -650,7 +651,7 @@ async function saveComment() {
     y: Number(selectedArea.value.y),
     width: Number(selectedArea.value.width),
     height: Number(selectedArea.value.height),
-    author: userStore.user.username,
+    author: userStore.user.personalInfo.username || "Anonymous",
     timestamp: String(Date.now()),
   }; // comments.value.push(commentData);
   /*
@@ -679,7 +680,7 @@ async function saveComment() {
   ]);
   await paperStore.addPaperDiscussion(discussionData);
 
-  window.location.reload;
+  window.location.reload();
 }
 
 // Handle comment cancel
@@ -764,7 +765,6 @@ const reorderedComments = computed(() => {
   // If activeComment not found, return the original comments array
   return comments;
 });
-
 
 // Optional: Wrap in a computed to make it reactive (Vue-specific)
 </script>

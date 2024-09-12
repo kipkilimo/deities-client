@@ -8,7 +8,7 @@
         style="max-height: 7.5rem"
         src="https://upload.wikimedia.org/wikipedia/commons/7/77/Logo_Institut_Curie.jpg"
       />
-      <h3 class="mt-4 mr-11" style="color: #777777">NEMBi Learning Login</h3>
+      <h3 class="mt-4 mr-11" style="color: #777777">NEMBio Learning Login</h3>
     </v-card-title>
     <v-card-text>
       <v-form @submit.prevent="submitLoginPathway">
@@ -62,7 +62,7 @@
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
-                :disabled="!isEmailValid || !usingPassword || password.length >= 6"
+                :disabled="!usingPassword || password.length >= 6"
                 :color="isEmailValid ? 'green' : 'primary'"
                 icon
                 height="30"
@@ -139,7 +139,7 @@
       </v-form>
     </v-card-text>
     <v-divider class="mt-2" />
-    <h3 color="#777777" class="ml-2 mt-2 mb-2">Sponsors</h3>
+    <h3 color="#777777" class="ml-2 mt-2 mb-2">Partners</h3>
     <v-img
       class="mt-3"
       style="border-radius: 0px 0px 5px 5px"
@@ -185,9 +185,13 @@ const isPasswordValid = computed(
 // Computed property to enable or disable the login button
 const canLogin = computed(() => isEmailValid.value && isPasswordValid.value);
 
-const sendOneTimeSignInKey = async () => {
+const sendOneTimeSignInKey = async () => {    
+  if(email.value===''){
+      return false
+    }
   loginLoading.value = true; // Indicate login in progress
   try {
+
     await userStore.singleSignInRequest(email.value);
     if (userStore.user.personalInfo.activatedAccount === false) {
       router.push("/auth/activate");

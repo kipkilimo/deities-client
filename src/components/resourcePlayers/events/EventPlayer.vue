@@ -1,115 +1,238 @@
 <template>
-  <v-container fluid>
-    <v-card>
-      <v-card-title>
-        <v-spacer></v-spacer>
-        <v-btn @click="toggleFullscreen" icon>
-          <v-icon>{{
-            isFullscreen ? "mdiFullscreenExit" : "mdiFullscreen"
-          }}</v-icon>
-        </v-btn>
-      </v-card-title>
-      <v-carousel
-        v-model:currentIndex="currentIndex"
-        :items="preloadedSlides"
-        hide-delimiters
-        hide-gutter
-        show-arrows
-        :cycle="true"
-        :interval="5000"
-        class="v-carousel--fullscreen"
-      >
-        <v-carousel-item v-for="(slide, index) in slides" :key="index">
-          <v-img :src="slide" class="slide-img" contain></v-img>
-        </v-carousel-item>
-      </v-carousel>
-    </v-card>
+  <v-container>
+    <v-row>
+      <!-- Event Cover Image -->
+      <v-col cols="12">
+        <v-card
+          flat
+          class="px-4 py-2"
+          elevation="0"
+          style="border-radius: 15px 15px 15px 15px !important"
+        >
+          <v-row>
+            <v-col cols="5"
+              ><v-img
+                :src="resourceStore.resource.coverImage"
+                alt="Event Cover Image"
+                class="rounded-xs"
+                cover
+                min-width="100%"
+              ></v-img
+            ></v-col>
+            <v-col cols="7">
+              <v-card-title class="text-h4 font-weight-bold">{{
+                currentEvent.event_name
+              }}</v-card-title>
+
+              <!-- Event Date and Time -->
+              <v-card-subtitle class="mt-2 mb-1 text-body-2">
+                <v-icon left small class="mr-1">mdi-calendar-today</v-icon>
+                {{
+                  formatLongDateWithTime(
+                    formatDateWithTimeZone(currentEvent.date_and_time.start)
+                  )
+                }}
+                - {{ formatDateWithTimeZone(currentEvent.date_and_time.end) }}
+              </v-card-subtitle>
+
+              <!-- Location -->
+              <v-card-subtitle class="mt-1 mb-1 text-body-2">
+                <v-icon left small class="mr-1">mdi-map-marker</v-icon>
+                {{ currentEvent.location }}
+              </v-card-subtitle>
+
+              <!-- Target Audience -->
+              <v-card-subtitle class="mt-1 mb-1 text-body-2">
+                <v-icon left small class="mr-1">mdi-account-multiple</v-icon>
+                {{ currentEvent.target_audience }}
+              </v-card-subtitle>
+
+              <!-- Event Type -->
+              <v-card-subtitle class="mt-1 mb-1 text-body-2">
+                <v-icon left small class="mr-1">mdi-tag-outline</v-icon>
+                {{ currentEvent.event_type }}
+              </v-card-subtitle>
+            </v-col>
+          </v-row>
+          <!-- Divider -->
+          <v-divider class="my-3"></v-divider>
+
+          <!-- Event Description -->
+          <v-card-text class="text-body-1">
+            <v-subheader class="mb-2 text-h6">Description</v-subheader>
+            <p>{{ currentEvent.description }}</p>
+          </v-card-text>
+
+          <!-- Keynote Speakers -->
+          <v-card-text class="text-body-1">
+            <v-subheader class="mb-2 text-h6">Keynote Speakers</v-subheader>
+            <ul>
+              <li
+                v-for="(speaker, index) in currentEvent.keynote_speakers"
+                :key="index"
+                class="mb-1"
+              >
+                <v-icon left small class="mr-1">mdi-account</v-icon>
+                <strong>{{ speaker.name }}</strong> -
+                {{ speaker.affiliation }} ({{ speaker.expertise }})
+              </li>
+            </ul>
+          </v-card-text>
+
+          <!-- Registration Details -->
+          <v-card-text class="text-body-1">
+            <v-subheader class="mb-2 text-h6"
+              >Registration & Budget</v-subheader
+            >
+            <v-card-subtitle class="text-body-2 mb-1">
+              <v-icon left small class="mr-1">mdi-cash</v-icon>
+              Registration Fee: {{ currentEvent.registration.fee | currency }}
+            </v-card-subtitle>
+            <v-card-subtitle class="text-body-2 mb-1">
+              <v-icon left small class="mr-1">mdi-calendar-clock</v-icon>
+              Registration Deadline:
+              {{ formatDateWithTimeZone(currentEvent.registration.deadline) }}
+            </v-card-subtitle>
+            <v-card-subtitle class="text-body-2 mb-1">
+              <v-icon left small class="mr-1">mdi-web</v-icon>
+              <a
+                :href="currentEvent.registration.registration_link"
+                target="_blank"
+                >Register Here</a
+              >
+            </v-card-subtitle>
+          </v-card-text>
+
+          <!-- Networking Events -->
+          <v-card-text class="text-body-1">
+            <v-subheader class="mb-6 text-h6">Networking Events</v-subheader>
+            <v-row>
+              <v-chip
+                v-for="(networkEvent, index) in currentEvent.networking_events"
+                :key="index"
+                outlined
+                class="mr-2 mb-2 mt-4"
+              >
+                <v-icon left small class="mr-1">mdi-handshake</v-icon>
+                {{ networkEvent }}
+              </v-chip>
+            </v-row>
+          </v-card-text>
+
+          <!-- Accessibility Features -->
+          <v-card-text class="text-body-1">
+            <v-subheader class="mb-2 text-h6"
+              >Accessibility Features</v-subheader
+            >
+            <v-list dense>
+              <v-list-item
+                v-for="(feature, index) in currentEvent.accessibility.features"
+                :key="index"
+              >
+                <v-list-item-content>
+                  <v-icon small class="mr-1">mdi-human-wheelchair</v-icon>
+                  {{ feature }}
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
-<script setup lang="ts">
-import { ref, watch } from "vue";
+<script setup>
+import { ref } from "vue";
+import { useResourceStore } from "@/stores/resources";
+
+const resourceStore = useResourceStore();
 
 // Slide URLs
-const urls = [
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/978f2423-fa6a-4084-a1ad-145d1d38c013-page-000.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/3599d01f-fb8a-45a0-88ec-4bc5f87f768c-page-001.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/01543dda-d758-4d1a-85b9-56c27df9d2a0-page-002.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/1c56b055-c3d3-499a-aac8-09a299de6bee-page-003.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/ac932133-2cba-46c1-b302-8e102f9bef7f-page-004.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/ebaec5ad-5723-424e-a959-b38ee21bc0a0-page-005.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/b06941cc-5b30-49ce-a0f4-36c395bb51db-page-006.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/d3d0f008-8457-4446-a4a3-ff609ebe64c6-page-007.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/fae99192-c846-4391-881b-b2bad60c6641-page-008.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/b78aba32-fb56-43f3-aa44-de390165764b-page-009.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/8229ee9f-79e0-4156-a5dc-db2d7a290f8a-page-010.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/fb257b8a-e4cf-4255-86d2-9c6cd5683536-page-011.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/02bf02a1-7442-4896-a3c9-8001bb783808-page-012.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/3c59c106-93da-4b16-be0e-15ba70912ad8-page-013.jpg",
-];
+const retrievedParamsRaw = resourceStore.resource.content;
 
 // Sort the URLs
-const sortedUrls = urls.sort((a, b) => {
-  const matchA = a.match(/page-(\d+)\.jpg/);
-  const matchB = b.match(/page-(\d+)\.jpg/);
-
-  // Ensure matches are found and valid before accessing groups
-  if (matchA && matchB) {
-    const pageA = parseInt(matchA[1], 10);
-    const pageB = parseInt(matchB[1], 10);
-    return pageA - pageB;
-  }
-
-  // Handle cases where matches are not found
-  // For example, if one or both of the matches are null, consider them equal or put null values at the end
-  return 0; // or you can choose to return a default value based on your sorting requirements
-});
-
-const currentIndex = ref(0);
-const isFullscreen = ref(false);
-
-// Preload next 4 slides
-const preloadCount = 4;
-const preloadedSlides = ref(sortedUrls.slice(0, preloadCount + 1));
-
-// Update preloaded slides based on current index
-watch(currentIndex, (newIndex) => {
-  const start = Math.max(newIndex, 0);
-  const end = Math.min(newIndex + preloadCount, sortedUrls.length - 1);
-  preloadedSlides.value = sortedUrls.slice(start, end + 1);
-});
-
-// Toggle fullscreen mode
-const toggleFullscreen = () => {
-  if (document.fullscreenElement) {
-    document.exitFullscreen();
-  } else {
-    document.documentElement.requestFullscreen();
-  }
-  isFullscreen.value = !isFullscreen.value;
-};
-
-// Slides data
-const slides = ref(sortedUrls);
+// Assuming you have retrieved paramsObjRaw from storage or API
+const retrievedParams = JSON.parse(retrievedParamsRaw);
+const currentEvent = retrievedParams[0];
+function formatLongDateWithTime(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: true,
+    timeZoneName: "short",
+  });
+}
+function formatDateWithTimeZone(isoString) {
+  const options = {
+    weekday: "long", // Saturday
+    year: "numeric", // 2024
+    month: "short", // Sep
+    day: "numeric", // 7
+    hour: "2-digit", // 15 (24-hour format)
+    minute: "2-digit", // 00
+    timeZoneName: "short", // Time zone abbreviation (e.g., "GMT", "PST")
+  };
+  const date = new Date(isoString);
+  return date.toLocaleString(undefined, options);
+}
 </script>
 
 <style scoped>
-.v-carousel--fullscreen {
-  height: 100vh;
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans:wght@400;700&display=swap");
+
+.v-card {
+  font-family: "Inter", "Noto Sans", sans-serif;
+  border-radius: 10px;
 }
 
-.slide-img {
-  max-height: 100vh;
-  max-width: 100vw;
+.text-h4 {
+  font-weight: 700;
 }
 
-.v-carousel-item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.text-h6 {
+  font-weight: 700;
 }
 
-.v-btn {
-  color: white;
+.v-subheader {
+  font-weight: 700;
+  color: #333;
+}
+
+p {
+  margin: 0;
+}
+
+ul {
+  padding-left: 16px;
+  list-style-type: none;
+}
+
+li {
+  margin-bottom: 8px;
+}
+
+a {
+  color: #1e88e5;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.v-divider {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.rounded-lg {
+  border-radius: 12px;
 }
 </style>

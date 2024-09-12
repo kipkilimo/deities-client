@@ -1,115 +1,277 @@
 <template>
-  <v-container fluid>
-    <v-card>
-      <v-card-title>
-        <v-spacer></v-spacer>
-        <v-btn @click="toggleFullscreen" icon>
-          <v-icon>{{
-            isFullscreen ? "mdiFullscreenExit" : "mdiFullscreen"
-          }}</v-icon>
+  <div>
+    <v-card
+      min-width="99%"
+      style="background-color: #ffffff"
+      flat
+      class="scrollable-content ml-4"
+    >
+      <v-img
+        :src="resourceStore.resource.coverImage"
+        style="border-radius: 5px 5px 0px 0px"
+        class="mb-4 ml-4"
+        cover
+        max-height="45vh"
+        width="100%"
+      ></v-img>
+      <h1 class="bbc-title ma-4">
+        {{ resourceStore.resource.title }}
+      </h1>
+      <v-card-subtitle class="grey--text bbc-subtitle">
+        {{ topic }}
+      </v-card-subtitle>
+
+      <v-row class="d-flex align-center mb-1 ml-2">
+        <v-col cols="auto" class="d-flex align-center">
+          <v-avatar size="42" class="mr-2 ml-2">
+            <v-img :src="getRandomAvatarUrl()" alt="Author Profile Picture" />
+          </v-avatar>
+          <v-card-subtitle class="bbc-meta">
+            <strong>
+              Author:
+              {{
+                resourceStore.resource.createdBy.personalInfo.fullName
+              }}</strong
+            >
+          </v-card-subtitle>
+        </v-col>
+        <v-col cols="auto" class="d-flex align-center">
+          <v-card-text class="bbc-meta">
+            <v-icon left>mdi-clock-outline</v-icon>
+            {{ readDuration }} min read
+          </v-card-text>
+          <v-card-text class="bbc-meta">
+            <v-icon left>mdi-calendar</v-icon>
+            Published
+            {{
+              formatDateWithTimeZone(
+                timezoneConverter(Number(resourceStore.resource.createdAt))
+              )
+            }}
+            |
+            {{ elapsedTime(resourceStore.resource.createdAt) }}
+          </v-card-text>
+        </v-col>
+      </v-row>
+      <v-row class="d-flex align-center justify-center mb-1">
+        <v-col cols="auto" class="d-flex align-center" gap="16">
+          <div class="d-flex align-center">
+            <v-icon
+              @click="handleClap"
+              :style="{ transform: `rotate(${rotation}deg)` }"
+              >mdi-hand-clap</v-icon
+            >
+            <span>{{ claps }}</span>
+            <ConfettiExplosion v-if="exploding" />
+          </div>
+          <div class="d-flex align-center">
+            <v-icon @click="handleLike">mdi-thumb-up-outline</v-icon>
+            <span>{{ likes }}</span>
+          </div>
+          <div class="d-flex align-center">
+            <v-icon @click="handleRate">mdi-star-outline</v-icon>
+            <span>{{ rates }}</span>
+          </div>
+          <div class="d-flex align-center">
+            <v-icon @click="handleShare">mdi-share-variant</v-icon>
+            <span>{{ shares }}</span>
+          </div>
+        </v-col>
+      </v-row>
+      <v-divider />
+
+      <div
+        style="max-width: 81% !important; align-items: center"
+        v-html="resourceStore.resource.content"
+        class="bbc-content ml-8 ma-3"
+      ></div>
+      <v-divider />
+      <div class="d-flex flex-column align-center" style="align-items: center">
+        <v-divider />
+        <v-btn class="mt-4 mb-2" variant="outlined" @click="scrollToTop">
+          <v-icon>mdi-arrow-up</v-icon>Back to Top
         </v-btn>
-      </v-card-title>
-      <v-carousel
-        v-model:currentIndex="currentIndex"
-        :items="preloadedSlides"
-        hide-delimiters
-        hide-gutter
-        show-arrows
-        :cycle="true"
-        :interval="5000"
-        class="v-carousel--fullscreen"
-      >
-        <v-carousel-item v-for="(slide, index) in slides" :key="index">
-          <v-img :src="slide" class="slide-img" contain></v-img>
-        </v-carousel-item>
-      </v-carousel>
+        <br />
+      </div>
     </v-card>
-  </v-container>
+  </div>
 </template>
 
-<script setup lang="ts">
-import { ref, watch } from "vue";
+<script setup>
+import { ref, computed, watch } from "vue";
+import { useResourceStore } from "../../../stores/resources";
+import timezoneConverter from "../../../utilities/timezoneConverter";
+import ConfettiExplosion from "vue-confetti-explosion";
 
-// Slide URLs
-const urls = [
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/978f2423-fa6a-4084-a1ad-145d1d38c013-page-000.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/3599d01f-fb8a-45a0-88ec-4bc5f87f768c-page-001.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/01543dda-d758-4d1a-85b9-56c27df9d2a0-page-002.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/1c56b055-c3d3-499a-aac8-09a299de6bee-page-003.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/ac932133-2cba-46c1-b302-8e102f9bef7f-page-004.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/ebaec5ad-5723-424e-a959-b38ee21bc0a0-page-005.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/b06941cc-5b30-49ce-a0f4-36c395bb51db-page-006.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/d3d0f008-8457-4446-a4a3-ff609ebe64c6-page-007.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/fae99192-c846-4391-881b-b2bad60c6641-page-008.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/b78aba32-fb56-43f3-aa44-de390165764b-page-009.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/8229ee9f-79e0-4156-a5dc-db2d7a290f8a-page-010.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/fb257b8a-e4cf-4255-86d2-9c6cd5683536-page-011.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/02bf02a1-7442-4896-a3c9-8001bb783808-page-012.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/3c59c106-93da-4b16-be0e-15ba70912ad8-page-013.jpg",
-];
+const resourceStore = useResourceStore();
 
-// Sort the URLs
-const sortedUrls = urls.sort((a, b) => {
-  const matchA = a.match(/page-(\d+)\.jpg/);
-  const matchB = b.match(/page-(\d+)\.jpg/);
-
-  // Ensure matches are found and valid before accessing groups
-  if (matchA && matchB) {
-    const pageA = parseInt(matchA[1], 10);
-    const pageB = parseInt(matchB[1], 10);
-    return pageA - pageB;
-  }
-
-  // Handle cases where matches are not found
-  // For example, if one or both of the matches are null, consider them equal or put null values at the end
-  return 0; // or you can choose to return a default value based on your sorting requirements
+const readDuration = computed(() => {
+  const words = resourceStore.resource.content
+    .replace(/<\/?[^>]+(>|$)/g, "")
+    .split(/\s+/).length;
+  const wordsPerMinute = 200;
+  const minutes = Math.ceil(words / wordsPerMinute);
+  return minutes;
 });
-
-const currentIndex = ref(0);
-const isFullscreen = ref(false);
-
-// Preload next 4 slides
-const preloadCount = 4;
-const preloadedSlides = ref(sortedUrls.slice(0, preloadCount + 1));
-
-// Update preloaded slides based on current index
-watch(currentIndex, (newIndex) => {
-  const start = Math.max(newIndex, 0);
-  const end = Math.min(newIndex + preloadCount, sortedUrls.length - 1);
-  preloadedSlides.value = sortedUrls.slice(start, end + 1);
-});
-
-// Toggle fullscreen mode
-const toggleFullscreen = () => {
-  if (document.fullscreenElement) {
-    document.exitFullscreen();
-  } else {
-    document.documentElement.requestFullscreen();
+const claps = ref(0);
+const likes = ref(0);
+const rates = ref(0);
+const exploding = ref(false);
+const handleClap = () => {
+  if (exploding.value === true) {
+    return;
   }
-  isFullscreen.value = !isFullscreen.value;
+  exploding.value = true;
+  animate();
+  claps.value++;
+  setTimeout(() => {
+    
+    cancelAnimationFrame(animationId);
+  }, 90);
+  setTimeout(() => {
+    exploding.value = false;
+    rotation.value = 0; // Reset rotation to default
+  }, 360); // Adjust the delay as needed
 };
 
-// Slides data
-const slides = ref(sortedUrls);
+const rotation = ref(360); // Initialize with a random value
+let animationId = null;
+
+const animate = () => {
+  animationId = requestAnimationFrame(() => {
+    rotation.value += 10; // Adjust the rotation angle as needed
+    if (rotation.value >= 360) {
+      rotation.value = 0;
+    }
+    animate();
+  });
+};
+
+const handleLike = () => {
+  likes.value++;
+  console.log("Post rated");
+};
+const handleRate = () => {
+  rates.value++;
+  console.log("Post rated");
+};
+
+const handleShare = () => {
+  console.log("Share post");
+};
+
+function elapsedTime(millis) {
+  const millisTime = Date.now() - Number(millis);
+  const seconds = Math.floor(millisTime / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const years = Math.floor(days / 365);
+
+  if (years > 0) {
+    return years + " year" + (years > 1 ? "s" : "") + " ago";
+  } else if (days > 0) {
+    return days + " day" + (days > 1 ? "s" : "") + " ago";
+  } else if (hours > 0) {
+    return hours + " hour" + (hours > 1 ? "s" : "") + " ago";
+  } else if (minutes > 0) {
+    return minutes + " minute" + (minutes > 1 ? "s" : "") + " ago";
+  } else {
+    return seconds + " second" + (seconds > 1 ? "s" : "") + " ago";
+  }
+}
+
+const scrollToTop = () => {
+  const scrollableContent = document.querySelector(".scrollable-content");
+  if (scrollableContent) {
+    scrollableContent.scrollTo({ top: 0, behavior: "smooth" });
+  } else {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+};
+
+function formatDateWithTimeZone(isoString) {
+  const options = {
+    weekday: "long", // Saturday
+    year: "numeric", // 2024
+    month: "short", // Sep
+    day: "numeric", // 7
+    hour: "2-digit", // 15 (24-hour format)
+    minute: "2-digit", // 00
+    timeZoneName: "short", // Time zone abbreviation (e.g., "GMT", "PST")
+  };
+  const date = new Date(isoString);
+  return date.toLocaleString(undefined, options);
+}
+function getRandomAvatarUrl() {
+  const randomNumber = Math.floor(Math.random() * 1000); // Generates a random number between 0 and 999
+  return `https://picsum.photos/200/200?random=${randomNumber}`;
+}
 </script>
 
 <style scoped>
-.v-carousel--fullscreen {
-  height: 100vh;
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap");
+
+.v-card {
+  max-width: 800px;
+  margin: auto;
 }
 
-.slide-img {
-  max-height: 100vh;
-  max-width: 100vw;
+.v-img {
+  border-radius: 8px;
 }
 
-.v-carousel-item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.scrollable-content {
+  max-height: 81vh;
+  overflow-y: auto;
 }
 
-.v-btn {
-  color: white;
+.bbc-title {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #222;
+  margin-bottom: 1rem;
+}
+
+.bbc-subtitle {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 21px;
+  color: #3f3d3d;
+  margin-bottom: 1rem;
+}
+
+.bbc-meta {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 14px;
+  color: #3f3d3d;
+  margin-right: 1.5rem;
+}
+
+.bbc-content {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 21px;
+  line-height: 1.6;
+  color: #333;
+}
+.confetti {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: #ffd700;
+  border-radius: 50%;
+  animation: confetti-fall 1.5s ease-in-out;
+}
+
+@keyframes confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translateY(-50px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(50px) scale(0);
+  }
 }
 </style>

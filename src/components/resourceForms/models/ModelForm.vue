@@ -1,146 +1,167 @@
 <template>
-  <v-container>
-    <v-form ref="form" v-model="valid" lazy-validation>
+  <v-form @submit.prevent="submitModel" v-model="isFormValid">
+    <!-- Model Name -->
+    <v-text-field
+      v-model="model.modelName"
+      label="Model Name"
+      :rules="[rules.required]"
+      required
+    ></v-text-field>
+
+    <!-- Description -->
+    <v-textarea
+      v-model="model.description"
+      label="Description"
+      :rules="[rules.required]"
+      required
+    ></v-textarea>
+
+    <!-- Research Paper URL -->
+    <v-text-field
+      v-model="model.researchPaperUrl"
+      label="Research Paper URL"
+      :rules="[rules.required, rules.url]"
+      required
+    ></v-text-field>
+
+    <!-- Dynamic Parameters -->
+    <div v-for="(param, index) in model.parameters" :key="index">
+      <!-- Parameter Name -->
       <v-text-field
-        v-model="eventData.event_title"
-        label="Event Title"
+        v-model="param.name"
+        label="Parameter Name"
         :rules="[rules.required]"
         required
       ></v-text-field>
 
-      <v-row>
-        <v-col cols="12" sm="6">
-          <v-text-field
-            v-model="eventData.event_start_date"
-            label="Start Date"
-            type="date"
-            :rules="[rules.required]"
-            required
-          ></v-text-field>
-        </v-col>
-
-        <v-col cols="12" sm="6">
-          <v-text-field
-            v-model="eventData.event_end_date"
-            label="End Date"
-            type="date"
-            :rules="[rules.required]"
-            required
-          ></v-text-field>
-        </v-col>
-      </v-row>
-
-      <v-row>
-        <v-col cols="12" sm="6">
-          <v-text-field
-            v-model="eventData.event_start_time"
-            label="Start Time"
-            type="time"
-            :rules="[rules.required]"
-            required
-          ></v-text-field>
-        </v-col>
-
-        <v-col cols="12" sm="6">
-          <v-text-field
-            v-model="eventData.event_end_time"
-            label="End Time"
-            type="time"
-            :rules="[rules.required]"
-            required
-          ></v-text-field>
-        </v-col>
-      </v-row>
-
-      <v-text-field
-        v-model="eventData.event_online_platform"
-        label="Online Platform"
-        :rules="[rules.required]"
-        required
-      ></v-text-field>
-
-      <v-text-field
-        v-model="eventData.event_online_link"
-        label="Online Link"
-        :rules="[rules.required, rules.url]"
-        required
-      ></v-text-field>
-
-      <v-text-field
-        v-model="eventData.event_activity_schedule_url"
-        label="Activity Schedule URL"
-        :rules="[rules.required, rules.url]"
-        required
-      ></v-text-field>
-
-      <v-text-field
-        v-model="eventData.event_cover_image_url"
-        label="Cover Image URL"
-        :rules="[rules.required, rules.url]"
-        required
-      ></v-text-field>
-
-      <v-text-field
-        v-model="eventData.event_venue"
-        label="Venue"
-        :rules="[rules.required]"
-        required
-      ></v-text-field>
-
+      <!-- Parameter Type -->
       <v-select
-        v-model="eventData.event_mode"
-        :items="['Online', 'In-Person', 'Hybrid']"
-        label="Event Mode"
+        v-model="param.type"
+        :items="['number', 'boolean', 'string']"
+        label="Parameter Type"
         :rules="[rules.required]"
         required
       ></v-select>
 
-      <v-btn :disabled="!valid" color="primary" @click="submit"> Submit </v-btn>
-    </v-form>
-  </v-container>
+      <!-- Parameter Description -->
+      <v-textarea
+        v-model="param.description"
+        label="Parameter Description"
+        :rules="[rules.required]"
+        required
+      ></v-textarea>
+
+      <!-- Optional Default Value -->
+      <v-text-field
+        v-if="param.type === 'number' || param.type === 'string'"
+        v-model="param.default"
+        label="Default Value"
+      ></v-text-field>
+
+      <v-checkbox
+        v-if="param.type === 'boolean'"
+        v-model="param.default"
+        label="Default Value"
+      ></v-checkbox>
+    </div>
+
+    <!-- Regression Formula -->
+    <v-textarea
+      v-model="model.regressionFormula"
+      label="Regression Formula"
+      :rules="[rules.required]"
+      required
+    ></v-textarea>
+
+    <!-- Result Interpretation -->
+    <v-text-field
+      v-model="model.resultInterpretation.lowRiskThreshold"
+      label="Low Risk Threshold"
+      type="number"
+      :rules="[rules.required, rules.number]"
+      required
+    ></v-text-field>
+
+    <v-text-field
+      v-model="model.resultInterpretation.highRiskThreshold"
+      label="High Risk Threshold"
+      type="number"
+      :rules="[rules.required, rules.number]"
+      required
+    ></v-text-field>
+
+    <v-textarea
+      v-model="model.resultInterpretation.interpretationGuidelines[0]"
+      label="Interpretation Guidelines"
+      :rules="[rules.required]"
+      required
+    ></v-textarea>
+
+    <!-- Submit Button -->
+    <v-btn type="submit" color="primary" :disabled="!isFormValid">
+      Submit Model
+    </v-btn>
+  </v-form>
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
-import { useResourceStore } from "../../../stores/resources"; //
+import { ref, reactive } from "vue";
+import { useResourceStore } from "@/stores/resources";
+
 const resourceStore = useResourceStore();
 
-const valid = ref(false);
-const form = ref(null);
+const isFormValid = ref(false);
 
-const eventData = ref({
-  event_title: "",
-  event_start_time: "",
-  event_end_time: "",
-  event_start_date: "",
-  event_end_date: "",
-  event_online_platform: "",
-  event_online_link: "",
-  event_activity_schedule_url: "",
-  event_cover_image_url: "",
-  event_venue: "",
-  event_mode: "",
+const model = reactive({
+  modelName: "",
+  description: "",
+  researchPaperUrl: "",
+  parameters: [
+    {
+      name: "",
+      type: "string",
+      description: "",
+      default: "",
+    },
+  ],
+  regressionFormula: "",
+  resultInterpretation: {
+    lowRiskThreshold: null,
+    highRiskThreshold: null,
+    interpretationGuidelines: [""],
+  },
 });
 
 const rules = {
   required: (value) => !!value || "Required.",
+  number: (value) => !isNaN(value) || "Must be a number.",
   url: (value) => {
     const pattern = new RegExp(
       "^(https?:\\/\\/)?" + // protocol
-        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|" + // domain name
         "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
         "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
         "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
         "(\\#[-a-z\\d_]*)?$",
       "i"
-    ); // fragment locator
-    return (!!value && pattern.test(value)) || "Invalid URL.";
+    );
+    return pattern.test(value) || "Invalid URL.";
   },
 };
 
-const submit = () => {
-  if (form.value.validate()) {
-    resourceStore.submitEvent(eventData.value); // Pass eventData to the store's submitEvent method
+const submitModel = async () => {
+  if (isFormValid.value) {
+    const paramsObjRaw = [
+      {
+        resourceId: resourceStore.resource.id,
+        resourceContent: JSON.stringify([model], null, 2),
+      },
+    ];
+    console.log({ paramsObjRaw });
+
+    const resourceDetails = JSON.stringify(paramsObjRaw);
+    await resourceStore.addResourceFormContent({ resourceDetails });
+    window.location.reload();
   }
 };
 </script>

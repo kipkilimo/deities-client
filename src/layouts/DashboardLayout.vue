@@ -26,8 +26,8 @@
                 @click="resourceStore.showCreateResourceDialog = true"
               >
                 <v-icon>mdi-note-plus-outline</v-icon>
-              </v-btn></template
-            >
+              </v-btn>
+            </template>
             <span> Add a resource</span>
           </v-tooltip>
         </v-col>
@@ -38,6 +38,7 @@
         <LocaleToggler />
         <ThemeToggler />
       </v-app-bar>
+
       <v-navigation-drawer
         rounded
         v-model="drawer"
@@ -79,12 +80,7 @@
                 class="custom-tooltip"
               >
                 <template v-slot:activator="{ props }" v-show="rail">
-                  <div
-                    v-bind="props"
-                    class="d-flex align-center"
-                    @mouseover="() => onHover(item.path)"
-                    @mouseleave="onLeave"
-                  >
+                  <div v-bind="props" class="d-flex align-center">
                     <v-icon class="me-2">{{ item.iconClass }}</v-icon>
                     <v-list-item-title>{{ item.title }}</v-list-item-title>
                   </div>
@@ -95,7 +91,7 @@
               </v-tooltip>
             </v-list-item>
             <v-divider class="mt-2" />
-            <h3 color="#55565a" class="text-h10 mb-4">Sponsors</h3>
+            <h3 color="#55565a" class="text-h10 mb-4">Partners</h3>
             <v-img
               class="mt-3"
               style="border-radius: 0px 0px 5px 5px"
@@ -103,6 +99,7 @@
             ></v-img>
           </v-list-item-group>
         </v-list>
+
         <template v-slot:append>
           <div class="pa-2">
             <v-btn
@@ -119,12 +116,15 @@
           </div>
         </template>
       </v-navigation-drawer>
+
       <v-main class="text-slate-700 dark:text-slate-300">
         <v-container>
           <RouterView />
         </v-container>
       </v-main>
     </v-layout>
+
+    <!-- Dialogs -->
     <v-dialog
       v-model="resourceStore.showCreateResourceDialog"
       width="85%"
@@ -157,25 +157,15 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <!-- 
-        <v-dialog v-model="showAddResourceContentDialog" width="85%" height="84vh">
-      <v-card height="84vh" title="Add a new resource">
-        <ResourceBaseForm />
-      </v-card>
-    </v-dialog> -->
   </v-app>
 </template>
+
 <script setup lang="ts">
 import { ref, computed, onBeforeMount } from "vue";
-// @ts-ignore
-const { t, locale } = useI18n();
+import { useI18n } from "vue-i18n";
 import { useUserStore } from "../stores/users";
 import { useRouter } from "vue-router";
-const router = useRouter();
-import { useResourceStore } from "../stores/resources"; // Replace with actual path
-
-const resourceStore = useResourceStore();
+import { useResourceStore } from "../stores/resources";
 onBeforeMount(async () => {
   if (typeof localStorage !== "undefined") {
     const storedUser = localStorage.getItem("sessionId");
@@ -187,46 +177,40 @@ onBeforeMount(async () => {
       }
     }
   }
+
+  await fetchPoll();
 });
-function obfuscateEmail(email: { split: (arg0: string) => [any, any] }) {
-  const [localPart, domainPart] = email.split("@");
-
-  if (!localPart || !domainPart) {
-    return email; // Return the original email if the format is incorrect
-  }
-
-  const obfuscatedLocal =
-    localPart.slice(0, 4) + "*".repeat(Math.max(0, localPart.length - 2));
-
-  const domainParts = domainPart.split(".");
-
-  if (domainParts.length < 2) {
-    return email; // Return the original email if the domain format is incorrect
-  }
-
-  const obfuscatedDomain =
-    domainParts[0].slice(0, 1) +
-    "*".repeat(Math.max(0, domainParts[0].length - 1)) +
-    "." +
-    domainParts.slice(1).join(".");
-
-  return `${obfuscatedLocal}@${obfuscatedDomain}`;
-}
-
+const { t, locale } = useI18n();
+const router = useRouter();
 const userStore = useUserStore();
-const user = computed(() => userStore.user);
+const resourceStore = useResourceStore();
 
-function logout() {
-  userStore.logout();
-}
-// papers: Papers https://api.jsonserve.com/CHZMhR
-// poster: Posters
-// poll: Poll
-// news: News
 const drawer = ref(true);
-
 const rail = ref(false);
 const isRTL = computed(() => locale.value === "ar");
+
+const user = computed(() => userStore.user);
+
+const evalPollPath = ref("/poll/participant");
+
+// Function to fetch the latest poll and update the path
+const fetchPoll = async () => {
+  const userId = localStorage.getItem("sessionId");
+  //@ts-ignore
+  await resourceStore.getPublisherLatestPoll(userId);
+
+  // Check if user is creator
+  //@ts-ignore
+  if (resourceStore.resource.createdBy.id === userId) {
+    evalPollPath.value = `/poll/presenter?sessionId=${resourceStore.resource.sessionId}&accessKey=${resourceStore.resource.accessKey}`;
+  } else {
+    evalPollPath.value = `/poll/participant?sessionId=${resourceStore.resource.sessionId}&accessKey=${resourceStore.resource.accessKey}`;
+  }
+};
+
+// Fetch poll on setup
+
+// Computed property for sidebar items
 const sidebarItems = computed(() => [
   {
     title: t("dashboard.sidebar.dashboard-overview"),
@@ -250,7 +234,7 @@ const sidebarItems = computed(() => [
     title: t("dashboard.sidebar.poll"),
     value: "poll",
     iconClass: "mdi-ballot-recount-outline me-4 text-xl",
-    path: "/dashboard/poll",
+    path: evalPollPath.value, // Use the dynamic path here
   },
   {
     title: t("dashboard.sidebar.tasks"),
@@ -269,7 +253,8 @@ const sidebarItems = computed(() => [
     value: "library",
     iconClass: "mdi-bookshelf me-4 text-xl",
     path: "/dashboard/library",
-  },  {
+  },
+  {
     title: t("dashboard.sidebar.programming"),
     value: "programming",
     iconClass: "mdi-code-block-braces me-4 text-xl",
@@ -282,45 +267,40 @@ const sidebarItems = computed(() => [
     path: "/dashboard/consults",
   },
 ]);
-function getTooltipHighlight(key: string): string {
-  const tooltips: { [key: string]: string } = {
-    Dashboard: "Get an overview of our milestones",
-    "Paper Dive": "Contribute in a paper discussion!",
-    Posters: "Share your abstract poster on NEMBi",
-    "Live Poll": "Submit your opinion via NEMBi Live Polls",
-    "Assignment Tasks": "View and attempt Assignment Tasks",
-    "Computational Methods": "Learn programming methods for analyzing research data in the life sciences",
-    "Research Consultation": "Personalized guidance and support to researchers at all stages",
-    Events: "See upcoming NEMBi and external Events",
-    "Resource Center":
-      "Browse a wide range of resources at NEMBi Resource Center",
-    "Research Counsel":
-      "Request for a Professional Research Counselling session with NEMBi Mentor Scholars for all stages of your project!",
-    Logout: "Logout",
-  };
 
-  return tooltips[key] || "Unknown";
+function obfuscateEmail(email: string) {
+  const [localPart, domainPart] = email.split("@");
+
+  if (!localPart || !domainPart) {
+    return email; // Return the original email if the format is incorrect
+  }
+
+  const obfuscatedLocal = localPart.slice(0, 1) + "****" + localPart.slice(-1);
+  return `${obfuscatedLocal}@${domainPart}`;
 }
 
-// Example usage:
-const hoverTimeout = ref(1);
+function getTooltipHighlight(title: string) {
+  // Function to return highlighted tooltip content based on the title
+  return title;
+}
 
-const onHover = (title: any) => {
-  // Start a timer to call a method after 2.1 seconds and pass the title as a parameter
-  // @ts-ignore
-  hoverTimeout.value = setTimeout(() => {
-    handleHover(title);
-  }, 1800); // 2100ms = 2.1 seconds
-};
-
-const onLeave = () => {
-  // Clear the timeout if the user leaves the element before 2.1 seconds
-  clearTimeout(hoverTimeout.value);
-};
-
-const handleHover = (title: any) => {
-  // Your logic that runs after 2.1 seconds, using the title passed from onHover
-  router.push(title);
-  // Replace with any other method you want to call, using the passed parameter
-};
+async function logout() {
+  try {
+    await userStore.logout();
+    router.push("/login");
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+}
 </script>
+
+<style scoped>
+.custom-tooltip .v-tooltip__content {
+  font-size: 14px;
+  color: #333;
+}
+
+.custom-tooltip {
+  padding: 8px;
+}
+</style>

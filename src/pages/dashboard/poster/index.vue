@@ -1,12 +1,19 @@
-<script setup lang="ts"></script>
 <template>
-    <div>
-        <h1>Dashboard Reports (TODO)</h1>
-    </div>
+  <div>
+    <!-- Render the Child Component -->
+    <PostersPlayer />
+  </div>
 </template>
 
-<style scoped></style>
+<script setup>
+import PostersPlayer from "../../../components/commonResourcePlayersHandler/PostersPlayersHandler.vue";
+</script>
+
+<style scoped>
+/* Add your parent component styles here */
+</style>
+
 <route lang="yaml">
 meta:
-    layout: DashboardLayout
+  layout: DashboardLayout
 </route>

@@ -42,7 +42,7 @@
         ></v-select>
       </v-col>
     </v-row>
-    <v-btn @click="convertToTimestamp">Convert to Timestamp</v-btn>
+    <!-- <v-btn @click="convertToTimestamp">Convert to Timestamp</v-btn> -->
     <v-alert v-if="timestamp" type="success">
       Timestamp: {{ timestamp }}
     </v-alert>
@@ -85,7 +85,13 @@ watch(selectedMonth, (newMonth) => {
     selectedDate.value = null; // Reset date if it's not valid for the new month
   }
 });
-
+// Watch selectedMonth to update the number of dates available
+watch(selectedMinute, (newPeriod) => {
+  dates.value = getDatesForMonth(newPeriod);
+  if (selectedDate.value && !dates.value.includes(selectedDate.value)) {
+   convertToTimestamp()
+  }
+});
 function getDatesForMonth(month) {
   const monthIndex = months.indexOf(month);
   if (monthIndex === -1) return [];

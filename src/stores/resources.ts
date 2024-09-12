@@ -58,8 +58,10 @@ interface Resource {
 
 export const useResourceStore = defineStore("resource", {
   state: () => ({
+    prediction: "",
+
     surveyLikertQuestion:
-      "What is your take on NEMBi, 'The Hub for Interactive Life Sciences Research Tools.', after the introduction given?",
+      "What is your take on NEMBio, 'The Hub for Interactive Life Sciences Research Tools.', after the introduction given?",
     surveyLikertOptions: [
       { label: "Waste of time" },
       { label: "Neutral" },
@@ -137,6 +139,31 @@ export const useResourceStore = defineStore("resource", {
       }
       this.sortResources();
     },
+    async getClinicalPrediction() {
+      const CLINICAL_PREDICTION_MODEL = gql`
+        query {
+          getClinicalPrediction {
+            id
+            contentType
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: CLINICAL_PREDICTION_MODEL,
+        });
+
+        const prediction = response.data.getClinicalPrediction;
+        if (prediction) {
+          this.prediction = prediction;
+        } else {
+          throw new Error("Failed to fetch prediction");
+        }
+      } catch (error) {
+        console.error("Error fetching resources:", error);
+      }
+    },
     async getAllResources() {
       const RESOURCE_SUMMARY_QUERY = gql`
         query {
@@ -193,6 +220,96 @@ export const useResourceStore = defineStore("resource", {
         console.error("Error fetching resources:", error);
       }
     },
+    async getPublisherLatestPoll(userId: string) {
+      const GET_LATEST_POLL = gql`
+        query ($userId: String!) {
+          getPublisherLatestPoll(userId: $userId) {
+            id
+            title
+            description
+            content
+            targetRegion
+            targetCountry
+            slug
+            language
+            contentType
+            viewsNumber
+            likesNumber
+            sharesNumber
+            subject
+            topic
+            rating
+            sessionId
+            accessKey
+            keywords
+            coverImage
+            isPublished
+            averageRating
+            reviews
+            createdBy {
+              id
+
+              personalInfo {
+                username
+                email
+                scholarId
+                fullName
+                activationToken
+                resetToken
+                tokenExpiry
+                activatedAccount
+              }
+              role
+            }
+            createdAt
+            updatedAt
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: GET_LATEST_POLL,
+          variables: { userId },
+        });
+
+        const resource = response.data.getPublisherLatestPoll;
+        if (resource) {
+          this.resource = resource;
+        } else {
+          throw new Error("Failed to fetch resource");
+        }
+      } catch (error) {
+        console.error("Error fetching resource:", error);
+      }
+    },
+    // async GetPollDataAndResults($pollId: string) {
+
+    async GetPollDataAndResults(pollId: string) {
+      const GetPollDataAndResults = gql`
+        query ($pollId: String!) {
+          GetPollDataAndResults(pollId: $pollId) {
+            responses
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: GetPollDataAndResults,
+          variables: { pollId },
+        });
+
+        const resource = response.data?.GetPollDataAndResults;
+        if (resource) {
+          this.resource = resource;
+        } else {
+          throw new Error("Failed to fetch resource");
+        }
+      } catch (error) {
+        console.error("Error fetching resource:", error);
+      }
+    },
     async fetchResource(id: string) {
       const resourceQuery = gql`
         query ($id: ID!) {
@@ -226,6 +343,7 @@ export const useResourceStore = defineStore("resource", {
                 username
                 email
                 scholarId
+                fullName
                 activationToken
                 resetToken
                 tokenExpiry
@@ -278,6 +396,8 @@ export const useResourceStore = defineStore("resource", {
             description
             targetRegion
             targetCountry
+            sessionId
+            accessKey
             slug
             language
             contentType
@@ -370,6 +490,31 @@ export const useResourceStore = defineStore("resource", {
         });
 
         const newResource = response.data.createResource;
+        this.resource = newResource;
+        this.resources.push(newResource);
+        this.resources = this.resources;
+      } catch (error) {
+        console.error("Error creating resource:", error);
+      }
+    },
+    //     //     addResourceFormContent(resourceDetails: String!): Resource!         // resourceContent,resourceId
+    async addResourceFormContent(resourceDetails: { resourceDetails: string }) {
+      const ADD_RESOURCE_FORM_INPUT = gql`
+        mutation ($resourceDetails: String!) {
+          addResourceFormContent(resourceDetails: $resourceDetails) {
+            id
+            contentType
+          }
+        }
+      `;
+
+      try {
+        const response = await client.mutate({
+          mutation: ADD_RESOURCE_FORM_INPUT,
+          variables: resourceDetails,
+        });
+
+        const newResource = response.data.addResourceFormContent;
         this.resource = newResource;
         this.resources.push(newResource);
         this.resources = this.resources;

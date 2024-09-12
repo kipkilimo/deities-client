@@ -86,9 +86,10 @@ export const usePaperStore = defineStore("paper", {
             createdDate
             createdBy {
               id
-              username
-              email
               role
+              personalInfo {
+                username
+              }
             }
           }
         }

@@ -6,7 +6,7 @@
         src="https://upload.wikimedia.org/wikipedia/commons/7/77/Logo_Institut_Curie.jpg"
       />
       <h5 class="mt-4 mr-11" style="color: #777777">
-        Create NEMBi Learning Account
+        Create NEMBio Learning Account
       </h5>
     </v-card-title>
     <v-card-text>
@@ -77,7 +77,7 @@
               size="x-small"
               @click="(agreeToTermsDialog = true), (agreeToTerms = false)"
             >
-            <v-icon class="mr-2">mdi-note-check</v-icon>  NEMBi Terms of Use and Privacy Statement</v-btn
+            <v-icon class="mr-2">mdi-note-check</v-icon>  NEMBio Terms of Use and Privacy Statement</v-btn
             >
           </v-col>
         </v-row>

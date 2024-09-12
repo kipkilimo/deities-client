@@ -4,7 +4,7 @@
     <v-row class="hero-section align-center" justify="center">
       <v-col class="text-center" cols="12">
         <v-img
-          src="https://static.vecteezy.com/system/resources/previews/023/639/135/non_2x/molecular-structure-with-dna-strand-for-medical-chemistry-and-science-concept-background-illustration-vector.jpg"
+          src="https://scitechdaily.com/images/DNA-Technology-Concept.gif"
           style="height: 70vh"
           class="hero-image"
           cover
@@ -18,6 +18,24 @@
                     color: '#ffffff', // White text for better contrast
                     textShadow: '16px 16px 18px rgba(14, 35, 79, 0.9)', // Stronger shadow for more definition
                     fontWeight: 'bold', // Make the font weight bold
+                    fontSize: '8.1rem', // Increase font size
+                    lineHeight: '1.2', // Adjust line height for better readability
+                    marginBottom: '20px', // Additional spacing
+                  }"
+                  class="headline mb-4"
+                >
+                  NEMB<span style="font-size: 7.5rem; font-family: Monaco"
+                    ><i>io</i></span
+                  >
+                </h1>
+                <br />
+                <br />
+                <br />
+                <h2
+                  :style="{
+                    color: '#ffffff', // White text for better contrast
+                    textShadow: '16px 16px 18px rgba(14, 35, 79, 0.9)', // Stronger shadow for more definition
+                    fontWeight: 'bold', // Make the font weight bold
                     fontSize: '3.6rem', // Increase font size
                     lineHeight: '1.2', // Adjust line height for better readability
                     marginBottom: '20px', // Additional spacing
@@ -25,7 +43,7 @@
                   class="headline mb-4"
                 >
                   Advancing Life Sciences Research through Collaboration
-                </h1>
+                </h2>
 
                 <br />
                 <br />
@@ -77,11 +95,11 @@
 
             <v-col cols="8">
               <v-card-title>
-                <h2 class="title">
-                  About NEMBi <br />
-                  The Hub for Interactive Life Sciences Learning and Research
-                  Tools.
-                </h2>
+                <h1 class="title">
+                  About NEMB<span style="font-size: 2.1rem; font-family: Monaco"
+                    ><i>io</i></span
+                  >
+                </h1> 
               </v-card-title>
               <v-card-subtitle class="subheading">
                 Epidemiology | Biostatistics | Research Methods | Seminar Series
@@ -90,18 +108,19 @@
 
               <p class="pa-2">
                 Welcome to the Nairobi Epidemiology and Biostatistical Methods
-                Colloquium, NEMBi, a Life Sciences focused a web application hub
-                for learning Epidemiology , Biostatistics and Research Methods .
-                It is a dynamic web environment dedicated to empowering higher
-                level of learning students and members of the faculty in the
-                fields of health and life sciences research. Our objective is to
-                foster a fun , interactive and collaborative environment where
-                life sciences researchers can find help,discuss scientific
-                papers and exchange ideas as well best practices, and in the
-                process advance groundbreaking research together.
+                Colloquium, NEMBio, a Life Sciences focused a web application
+                hub for learning Epidemiology , Biostatistics and Research
+                Methods . It is a dynamic web environment dedicated to
+                empowering higher level of learning students and members of the
+                faculty in the fields of health and life sciences research. Our
+                objective is to foster a fun , interactive and collaborative
+                environment where life sciences researchers can find
+                help,discuss scientific papers and exchange ideas as well best
+                practices, and in the process advance groundbreaking research
+                together.
                 <br />
                 <br />
-                Become part of NEMBi's vibrant community and engage in
+                Become part of NEMBio's vibrant community and engage in
                 collaborative research that explores the complex interplay
                 between disease patterns, exposures, and health outcomes.
                 Develop advanced biostatistical techniques and benefit from our
@@ -202,7 +221,7 @@
         <v-col cols="12">
           <p>
             &copy; {{ currentYear }} Nairobi Epidemiology and Biostatistical
-            Methods Colloquium, NEMBi. All rights reserved.
+            Methods Colloquium, NEMBio. All rights reserved.
           </p>
           <br />
           <v-divider />

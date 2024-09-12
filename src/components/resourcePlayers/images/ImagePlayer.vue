@@ -1,12 +1,25 @@
 <template>
-  <div>
+ <div>
+    <!-- Button to trigger an action, e.g., showing images in a viewer -->
+    <v-btn type="button" variant="outlined" class="mb-2" color="#9dc9dc" @click="show">
+      Click on image to show
+    </v-btn>
+
+    <!-- Image cards -->
     <div class="images" v-viewer>
-      <img v-for="src in images" :key="src" :src="src" />
+      <v-row>
+        <v-col v-for="(src, index) in images" :key="index" cols="12" md="4" lg="3">
+          <v-card class="mx-auto" max-width="344" @click="show">
+            <v-img :src="src" aspect-ratio="1" class="white--text"></v-img>
+          </v-card>
+        </v-col>
+      </v-row>
     </div>
+
+    <!-- Optional viewer component -->
     <viewer :images="images">
       <img v-for="src in images" :key="src" :src="src" />
     </viewer>
-    <button type="button" @click="show">Click to show</button>
   </div>
 </template>
 

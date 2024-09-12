@@ -3,8 +3,8 @@
     <v-alert
       v-if="copyAlert.length > 1"
       max-height="4.5rem"
-      :text="copyAlert"
-      title="URL Copied!"
+      :title="copyAlert"
+      :text="dataset[currentIndex]"
       color="#34e0a2"
       class="custom-alert"
     >
@@ -46,18 +46,22 @@
         <v-divider/>
         <v-container
           :src="dataset[currentIndex]"
-          style="max-height: 45vh; object-fit: cover"
+          style="max-height: 36vh; object-fit: cover"
         />
         <v-container
           class="summary-container"
-          style="color: #050505; max-height: 45vh; overflow-y: auto"
+          style="color: #050505; max-height: 36vh; overflow-y: auto"
         >
           <pre>{{ summary }}</pre>
         </v-container>
+        <v-divider/>
+        <v-card-text>{{ dataset[currentIndex] }}</v-card-text> 
         <v-chip
           @click="copyToClipboard(dataset[currentIndex])"
           color="success"
-          class="mt-2" width="95%"
+          variant="outlined"
+          size="x-large"
+          class=" ma-1" width="95%"
         >
           Copy Dataset URL
         </v-chip>
@@ -211,7 +215,7 @@ const pStyle = {
   margin: "0",
   backgroundColor: "#bfbfbf",
   color: "#ffffff",
-  fontSize: "9px",
+  fontSize: "14px",
   textAlign: "center",
 };
 </script>

@@ -1,5 +1,6 @@
 const generateRandomString = (length: number): string => {
-  const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
+  const characters =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // Include uppercase letters for stronger randomness
   let result = "";
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * characters.length);
@@ -8,6 +9,4 @@ const generateRandomString = (length: number): string => {
   return result;
 };
 
-// Generate a random string of 19 characters
-const randomString = generateRandomString(19);
-console.log(randomString);
+export default generateRandomString;

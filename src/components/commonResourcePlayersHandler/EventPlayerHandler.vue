@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container style="font-family: 'Inter', 'Noto Sans', sans-serif;">
     <!-- Top Row: Sort, Filter, Search Strip -->
     <v-row>
       <v-col cols="12">
@@ -11,7 +11,7 @@
               :items="sortOptions"
               label="Sort by"
               dense
-              style="max-height: 67%"
+              style="max-height: 67%; font-family: 'Inter', sans-serif;"
             ></v-select>
           </v-col>
 
@@ -22,7 +22,7 @@
               :items="filterOptions"
               label="Filter by"
               dense
-              style="max-height: 67%"
+              style="max-height: 67%; font-family: 'Inter', sans-serif;"
             ></v-select>
           </v-col>
 
@@ -34,7 +34,7 @@
               clearable
               dense
               prepend-inner-icon="mdi-file-search"
-              style="max-height: 67%"
+              style="max-height: 67%; font-family: 'Inter', sans-serif;"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -46,7 +46,7 @@
     <!-- Bottom Row: Two Column Layout -->
     <v-row>
       <!-- Left Column: Resource Iterator Cards -->
-      <v-col cols="2" class="pr-2">
+      <v-col cols="2">
         <!-- Container for vertical scrolling -->
         <v-row
           class="overflow-y-auto mt-1"
@@ -58,40 +58,29 @@
             class="pa-0"
           >
             <v-card
-              class="mb-2 px-2 py-2"
-              height="8rem"
+              fluid
+              class="mb-2"
+              height="4.5rem"
               @click="selectResource(resource)"
-              elevation="2"
+              style="font-family: 'Noto Sans', sans-serif;"
             >
               <v-row no-gutters>
-                <v-col cols="3">
-                  <v-img
-                    height="4rem"
-                    width="4rem"
-                    :src="resource.coverImage"
-                    class="rounded"
-                  ></v-img>
+                <!-- Left Column: Image -->
+                <v-col cols="4">
+                  <v-img height="4.5rem" :src="resource.coverImage"></v-img>
                 </v-col>
 
-                <v-col cols="9" class="pl-2">
-                  <v-card-title
-                    class="text-body-1 font-weight-medium mb-1"
-                    style="font-size: 1rem"
-                  >
+                <!-- Right Column: Details -->
+                <v-col cols="8">
+                  <v-card-title style="font-weight: 700;">
                     {{ resource.title }}
                   </v-card-title>
-
-                  <h11 class="text-caption h7 font-weight-light mb-1">
-                    <span>{{ resource.subject }}</span> |
-                    <span>{{ resource.topic }}</span>
-                  </h11>
-
-                  <p
-                    class="text-caption font-weight-light"
-                    style="font-size: 0.8rem"
-                  >
+                  <v-card-subtitle style="font-weight: 400;">
+                    {{ resource.subject }} - {{ resource.topic }}
+                  </v-card-subtitle>
+                  <v-card-text style="font-weight: 400;">
                     {{ truncateText(resource.description, 50) }}
-                  </p>
+                  </v-card-text>
                 </v-col>
               </v-row>
             </v-card>
@@ -112,6 +101,7 @@
             justify-content: center;
             cursor: pointer;
             border-radius: 5px 5px 0px 0px !important;
+            font-family: 'Noto Sans', sans-serif;
           "
         >
           <v-img
@@ -131,8 +121,9 @@
   </v-container>
 </template>
 
+
 <script setup lang="ts">
-import { ref, computed, onBeforeMount } from "vue";
+import { ref, computed, onMounted, onBeforeMount } from "vue";
 import VideoPlayer from "../resourcePlayers/video/VideoPlayer.vue";
 import AudioPlayer from "../resourcePlayers/audio/AudioPlayer.vue";
 import ImagePlayer from "../resourcePlayers/images/ImagePlayer.vue";
@@ -243,11 +234,56 @@ const resourceComponent = computed(() => {
   // @ts-ignore
   return componentMap[selectedResource.value.contentType];
 });
+const currentIndex = ref(0);
 
+// Assuming resourceStore is already imported and used in your setup
+const resources = ref(resourceStore.resources);
+
+const updateIndex = () => {
+  currentIndex.value = (currentIndex.value + 1) % (resources.value.length || 1);
+};
+
+onMounted(() => {
+  const intervalId = setInterval(updateIndex, 15000); // Update every 15 seconds
+
+  // Clean up the interval on component unmount
+  onBeforeUnmount(() => {
+    clearInterval(intervalId);
+  });
+});
 // Fetch resources before mounting the component
 onBeforeMount(async () => {
-  const queryParams = localStorage.getItem("queryParams") || "";
-  await resourceStore.getAllSpecificTypeResources(queryParams);
-  selectResource(resourceStore.resources[0]);
+  const queryParams = [
+    {
+      resourceType: "EVENT",
+      subject: "",
+      topic: "",
+      country: "",
+      targetRegion: "",
+      language: "",
+    },
+  ];
+  await resourceStore.getAllSpecificTypeResources(JSON.stringify(queryParams));
+  selectResource(resourceStore.resources[currentIndex.value]);
 });
 </script>
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans:wght@400;700&display=swap');
+
+.v-container {
+  font-family: 'Inter', 'Noto Sans', sans-serif;
+}
+
+.v-select, .v-text-field, .v-card {
+  font-family: 'Inter', sans-serif;
+}
+
+.v-card-title {
+  font-weight: 700;
+}
+
+.v-card-subtitle, .v-card-text {
+  font-weight: 400;
+}
+</style>
+

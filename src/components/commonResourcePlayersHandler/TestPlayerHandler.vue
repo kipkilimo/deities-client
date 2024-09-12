@@ -58,40 +58,26 @@
             class="pa-0"
           >
             <v-card
-              class="mb-2 px-2 py-2"
-              height="8rem"
+              fluid
+              class="mb-2"
+              height="4.5rem"
               @click="selectResource(resource)"
-              elevation="2"
             >
               <v-row no-gutters>
-                <v-col cols="3">
-                  <v-img
-                    height="4rem"
-                    width="4rem"
-                    :src="resource.coverImage"
-                    class="rounded"
-                  ></v-img>
+                <!-- Left Column: Image -->
+                <v-col cols="4">
+                  <v-img height="4.5rem" :src="resource.coverImage"></v-img>
                 </v-col>
 
-                <v-col cols="9" class="pl-2">
-                  <v-card-title
-                    class="text-body-1 font-weight-medium mb-1"
-                    style="font-size: 1rem"
-                  >
-                    {{ resource.title }}
-                  </v-card-title>
-
-                  <h11 class="text-caption h7 font-weight-light mb-1">
-                    <span>{{ resource.subject }}</span> |
-                    <span>{{ resource.topic }}</span>
-                  </h11>
-
-                  <p
-                    class="text-caption font-weight-light"
-                    style="font-size: 0.8rem"
-                  >
+                <!-- Right Column: Details -->
+                <v-col cols="8">
+                  <v-card-title>{{ resource.title }}</v-card-title>
+                  <v-card-subtitle>
+                    {{ resource.subject }} - {{ resource.topic }}
+                  </v-card-subtitle>
+                  <v-card-text>
                     {{ truncateText(resource.description, 50) }}
-                  </p>
+                  </v-card-text>
                 </v-col>
               </v-row>
             </v-card>
@@ -132,7 +118,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onBeforeMount } from "vue";
+import { ref, computed, onMounted, onBeforeMount } from "vue";
 import VideoPlayer from "../resourcePlayers/video/VideoPlayer.vue";
 import AudioPlayer from "../resourcePlayers/audio/AudioPlayer.vue";
 import ImagePlayer from "../resourcePlayers/images/ImagePlayer.vue";
@@ -243,11 +229,36 @@ const resourceComponent = computed(() => {
   // @ts-ignore
   return componentMap[selectedResource.value.contentType];
 });
+const currentIndex = ref(0);
 
+// Assuming resourceStore is already imported and used in your setup
+const resources = ref(resourceStore.resources);
+
+const updateIndex = () => {
+  currentIndex.value = (currentIndex.value + 1) % (resources.value.length || 1);
+};
+
+onMounted(() => {
+  const intervalId = setInterval(updateIndex, 15000); // Update every 15 seconds
+
+  // Clean up the interval on component unmount
+  onBeforeUnmount(() => {
+    clearInterval(intervalId);
+  });
+});
 // Fetch resources before mounting the component
 onBeforeMount(async () => {
-  const queryParams = localStorage.getItem("queryParams") || "";
-  await resourceStore.getAllSpecificTypeResources(queryParams);
-  selectResource(resourceStore.resources[0]);
+  const queryParams = [
+    {
+      resourceType: "TEST",
+      subject: "",
+      topic: "",
+      country: "",
+      targetRegion: "",
+      language: "",
+    },
+  ];
+  await resourceStore.getAllSpecificTypeResources(JSON.stringify(queryParams));
+  selectResource(resourceStore.resources[currentIndex.value]);
 });
 </script>
