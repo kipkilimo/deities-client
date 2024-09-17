@@ -63,7 +63,7 @@ const topics = {
     "Research Methods": {
         "Core Concepts": [
             "Introduction to Research Methods",
-            "Ethical Issues in Research",
+            "Ethical Consultations in Research",
             "Survey Design and Analysis",
             "Qualitative Research Methods",
             "Mixed Methods Research",

@@ -56,7 +56,7 @@
     <v-dialog width="87%" v-model="resourceSelected" style="overflow: hidden">
       <v-card flat height="13.5rem" class="ma-4" style="padding: 0">
         <h3 color="#b5b1b2" class="text-h10 mb-4 ml-44 mt-2">
-         Specify the resources to get started. The input values are optional.
+          Specify the resources to get started. The input values are optional.
         </h3>
         <v-divider />
         <br />
@@ -148,7 +148,11 @@
 <script setup lang="ts">
 import { ref, computed, onBeforeMount, watch } from "vue";
 import { useResourceStore } from "../../../stores/resources";
-import staticResources from "../../../data/staticResources";
+import staticResourcesData from "@/data/staticResources";
+
+const { resourceType, staticResources } = staticResourcesData;
+
+console.log({ staticResourcesTypes: staticResources.value });
 import { useRouter } from "vue-router";
 import worldRegions from "../../../data/languages";
 import topicsData from "../../../data/topics";
@@ -289,11 +293,11 @@ function goToResourceRenderer(resource: { type: string }) {
   resourceFilterOptionsSelected.value = false;
 }
 
-function saveSelectedFilelds( ) {
+function saveSelectedFilelds() {
   resourceSelected.value = false;
   resourceFilterOptionsSelected.value = true;
-  let rawResource = localStorage.getItem("targetResource")
-  rawResource=JSON.parse(rawResource)[0]
+  let rawResource = localStorage.getItem("targetResource");
+  rawResource = JSON.parse(rawResource)[0];
   goToResourceRenderer(rawResource);
 }
 

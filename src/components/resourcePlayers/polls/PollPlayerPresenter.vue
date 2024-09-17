@@ -2,9 +2,9 @@
   <v-container fluid fill-height>
     <v-row align="left" justify="left">
       <!-- QR Code Section -->
-      <v-col cols="9" class="text-left mb-4">
+      <v-col cols="9" class="text-left mb-1">
         <img
-          style="height: 9rem; cursor: pointer"
+          style="height: 12rem; cursor: pointer"
           :src="qrCodeUrl"
           alt="QR Code"
           @click="showQRCodeDialog = true"
@@ -16,7 +16,16 @@
           @click:outside="showQRCodeDialog = false"
         >
           <v-card>
-            <v-card-title class="text-h5">NEMBio Live Poll</v-card-title>
+            <v-card-title class="text-h5"
+              >Join a NEMBio
+              <span
+                ><img
+                  style="max-height: 1.5rem; cursor: pointer; z-index: -20"
+                  class="mt-4"
+                  src="https://media.tenor.com/3I5SoxI-DiYAAAAi/live.gif"
+              /></span>
+              Poll</v-card-title
+            >
 
             <v-divider />
             <v-card-text>
@@ -41,15 +50,16 @@
         <div>
           <v-row>
             <v-col cols="9">
-              <h1>Presenter's Page</h1>
+              <h1>Presenter</h1>
               <p>Session ID: {{ route.query.sessionId }}</p>
               <p>Access Key: {{ route.query.accessKey }}</p>
             </v-col>
             <v-col cols="3">
               <v-img
                 style="cursor: pointer"
-                height="3rem"
-                src="https://cdn-icons-png.flaticon.com/128/10619/10619786.png"
+                height="3.6rem"
+                @click="closePoll"
+                src="https://cdn11.bigcommerce.com/s-3pbmh1zmv/images/stencil/760x760/products/1822/2093/2694-label__65712.1691921739.png?c=1"
               ></v-img>
             </v-col>
           </v-row>
@@ -58,20 +68,26 @@
 
       <!-- Poll Card Section -->
       <v-col cols="12" v-if="polls.length >= 1">
-        <v-card height="74vh">
+        <v-card min-height="75vh" max-height="75vh">
           <v-card-text>
             <span
-              class="font-weight-black-lighten-2 text-h4 ml-4"
+              class="font-weight-black-lighten-2 text-h4"
               style="color: #55565a; font-family: Ubuntu"
             >
-              {{ polls[currentIndex]?.question }}
+              {{ polls[currentIndex]?.type }} |
+              <strong>{{ polls[currentIndex]?.question }}</strong>
             </span>
           </v-card-text>
-          <v-divider/>
-<br>
+          <v-divider />
+          <br />
           <v-row>
             <v-col cols="4">
-              <v-card flat color="transparent">
+              <v-card
+                flat
+                class="custom-card d-flex flex-column"
+                color="transparent"
+                tile
+              >
                 <!-- Render the appropriate poll type -->
                 <template v-if="polls[currentIndex]?.type === 'Single Choice'">
                   <v-radio-group v-model="polls[currentIndex].selectedAnswer">
@@ -101,6 +117,8 @@
 
                 <template v-else-if="polls[currentIndex]?.type === 'Ranking'">
                   <v-select
+                    class="ma-2"
+                    compact
                     v-model="polls[currentIndex].ranking"
                     :items="polls[currentIndex].options"
                     label="Rank the options"
@@ -118,14 +136,22 @@
                 </template>
 
                 <template v-else-if="polls[currentIndex]?.type === 'Rating'">
-                  <v-rating
-                    v-model="polls[currentIndex].rating"
-                    :length="5"
-                    background-color="primary"
-                  ></v-rating>
+                  <div class="text-center">
+                    <v-rating
+                      v-model="polls[currentIndex].rating"
+                      half-increments
+                      :length="5"
+                      background-color="#00a7ff"
+                      hover
+                    ></v-rating>
+                    <pre>{{ polls[currentIndex].rating }}</pre>
+                  </div>
                 </template>
 
+                <v-divider class="mt-auto" />
+
                 <v-card-actions>
+                  <v-spacer />
                   <v-btn
                     @click="prevQuestion"
                     :disabled="currentIndex === 0"
@@ -140,6 +166,13 @@
                   >
                     Next
                   </v-btn>
+                  <v-spacer />
+                  <v-img
+                    style="cursor: pointer"
+                    height="2.4rem"
+                    @click="reRenderView"
+                    src="https://cdn-icons-png.flaticon.com/128/10619/10619786.png"
+                  ></v-img>
                 </v-card-actions>
               </v-card>
             </v-col>
@@ -148,9 +181,41 @@
               <live-results></live-results>
             </v-col>
           </v-row>
+
+          <v-card-actions>
+            <v-btn
+              color="deep-orange-lighten-2"
+              text="RESET ALL RESPONSES"
+              rounded="xs"
+              border
+              style="width: 32.8%"
+              @click="resetUserInputs = true"
+            ></v-btn>
+          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
+    <v-dialog v-model="resetUserInputs" width="24rem">
+      <v-card>
+        <v-card-title class="text-h6">Clear all Responses?</v-card-title>
+        <v-card-subtitle>
+          This erases all previous participant inputs.
+        </v-card-subtitle>
+        <br />
+        <v-divider />
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            variant="outlined"
+            color="orange"
+            @click="resetAllResponsesConfirmed, (resetUserInputs = false)"
+            >Confirm and Clear</v-btn
+          >
+          <v-spacer />
+          <v-btn @click="resetUserInputs = false" color="green">Cancel</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -163,6 +228,8 @@ import { useRoute, useRouter } from "vue-router";
 
 const wsUrl = import.meta.env.VITE_BASE_WS_URL;
 const showQRCodeDialog = ref(false);
+const resetUserInputs = ref(false);
+
 const apiUrl = import.meta.env.VITE_CLIENT_URL;
 const resourceStore = useResourceStore();
 const route = useRoute();
@@ -232,7 +299,13 @@ const initWebSocket = () => {
     );
   };
 };
-
+function closePoll() {
+  ws.close();
+  router.push("/dashboard/overview");
+  setTimeout(() => {
+    window.location.reload();
+  }, 900);
+}
 // Close WebSocket if the path does not include 'poll'
 const checkRouteAndCloseWS = () => {
   ws.send(
@@ -285,6 +358,7 @@ const nextQuestion = async () => {
     const nextQuestionId = polls.value[currentIndex.value].qstId;
     if (nextQuestionId) {
       activeQuestion.value.qstId = nextQuestionId; // Update active question
+      console.log("Navigating to next question:", nextQuestionId);
       ws.send(
         JSON.stringify({
           type: "update_active_question",
@@ -298,11 +372,12 @@ const nextQuestion = async () => {
 };
 
 const prevQuestion = async () => {
-  if (currentIndex.value > 0) {
+  if (polls.value.length && currentIndex.value > 0) {
     currentIndex.value--;
-    const prevQuestionId = polls.value[currentIndex.value]?.qstId;
+    const prevQuestionId = polls.value[currentIndex.value].qstId;
     if (prevQuestionId) {
       activeQuestion.value.qstId = prevQuestionId; // Update active question
+      console.log("Navigating to previous question:", prevQuestionId);
       ws.send(
         JSON.stringify({
           type: "update_active_question",
@@ -314,6 +389,43 @@ const prevQuestion = async () => {
     }
   }
 };
+
+function resetAllResponsesConfirmed() {
+  //  true
+  let payload = {
+    type: "reset_all_responses",
+    accessKey,
+    sessionId,
+  };
+
+  // Add poll response based on formInputs object
+
+  if (ws.readyState === WebSocket.OPEN) {
+    try {
+      ws.send(JSON.stringify(payload));
+      console.log("Message sent to WebSocket server.");
+    } catch (error) {
+      console.error("Error sending WebSocket message:", error);
+    }
+  } else {
+    console.error(
+      "WebSocket connection is not open. ReadyState:",
+      ws.readyState
+    );
+  }
+}
+function reRenderView() {
+  window.location.reload();
+  return true;
+  const resource = JSON.parse(localStorage.getItem("pollResource"));
+  const pollContent = JSON.parse(resource.content);
+  const pollArray = pollContent.pollArray || [];
+  const activeQuestionId = pollContent.activeQuestion.qstId;
+  const activeQuestion = pollArray.find(
+    (poll) => poll.qstId === activeQuestionId
+  );
+  currentPoll.value = activeQuestion;
+}
 </script>
 
 <style scoped>
@@ -328,5 +440,17 @@ const prevQuestion = async () => {
 .v-btn:disabled {
   background-color: #f5f5f5;
   color: #9e9e9e;
+}
+</style>
+<style scoped>
+.custom-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 95%; /* Adjust as necessary */
+  max-height: 95%; /* Adjust as necessary */
+}
+
+.actions {
+  margin-top: auto !important;
 }
 </style>

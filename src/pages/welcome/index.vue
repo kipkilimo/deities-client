@@ -85,7 +85,7 @@
     <!-- Call to Action -->
     <v-row ref="callToAction" class="call-to-action">
       <v-col cols="12" md="12" class="text-center">
-        <v-card max-height="22.5rem">
+        <v-card max-height="28rem">
           <v-row>
             <v-col cols="4">
               <v-img
@@ -99,7 +99,7 @@
                   About NEMB<span style="font-size: 2.1rem; font-family: Monaco"
                     ><i>io</i></span
                   >
-                </h1> 
+                </h1>
               </v-card-title>
               <v-card-subtitle class="subheading">
                 Epidemiology | Biostatistics | Research Methods | Seminar Series
@@ -120,6 +120,17 @@
                 together.
                 <br />
                 <br />
+                The NEMBio web app has been developed to serve medical and life
+                sciences students,researchers and professionals who wish to
+                learn more about biostatistics,epidemiology and research
+                methods. The site contains carefully selected and reviewed
+                training materials especially suited for a non-statistician
+                audience. This site is being developed in close collaboration
+                with members of the Biostatistics, Epidemiology and Research
+                Methods faculty of the University of Nairobi, School of Public
+                and Global Health.
+                <br />
+                <br />
                 Become part of NEMBio's vibrant community and engage in
                 collaborative research that explores the complex interplay
                 between disease patterns, exposures, and health outcomes.
@@ -127,7 +138,6 @@
                 comprehensive cloud based utilities, designed to support your
                 academic and professional growth. Join us and be at the
                 forefront of the next generation of health sciences scholaly
-                work.
               </p>
             </v-col>
           </v-row>
@@ -136,6 +146,29 @@
     </v-row>
 
     <!-- Cards Section -->
+    <v-card
+      class="mx-auto d-flex flex-column align-center justify-center"
+      prepend-icon="mdi-bookmark-box-multiple-outline"
+      color="transparent"
+      subtitle="Discover our curated resources for Life Sciences research"
+      flat
+      width="100%"
+    >
+      <template v-slot:title>
+        <span class="font-weight-black text-center">NEMBio Features and Solutions</span>
+      </template>
+      <div class="text-overline mb-1 d-flex flex-wrap">
+        <div
+          v-for="(feature, index) in researchCards"
+          :key="index"
+          class="mr-2"
+        >
+          <v-chip rounded="xl" variant="text">{{ index+1 }}. {{ feature.title }}</v-chip>
+        </div>
+      </div>
+    </v-card>
+
+    <v-divider />
     <v-row class="py-5" justify="center">
       <v-col cols="12" md="4">
         <v-card class="research-card">
@@ -157,9 +190,9 @@
             health and disease in patient populations and the relationships
             between exposures or treatments and health outcomes.
           </v-card-text>
-          <v-card-actions>
+          <!-- <v-card-actions>
             <v-btn color="primary">Learn More</v-btn>
-          </v-card-actions>
+          </v-card-actions> -->
         </v-card>
       </v-col>
 
@@ -183,9 +216,9 @@
             biology, and public health, and the development of new tools to
             study these areas.
           </v-card-text>
-          <v-card-actions>
+          <!-- <v-card-actions>
             <v-btn color="primary">Learn More</v-btn>
-          </v-card-actions>
+          </v-card-actions> -->
         </v-card>
       </v-col>
 
@@ -208,13 +241,53 @@
             and relevance.
           </v-card-text>
 
-          <v-card-actions>
+          <!-- <v-card-actions>
             <v-btn color="primary">Explore Resources</v-btn>
-          </v-card-actions>
+          </v-card-actions> -->
         </v-card>
       </v-col>
     </v-row>
 
+    <v-card
+      class="mx-auto d-flex flex-column align-center justify-center"
+      prepend-icon="mdi-rocket-launch"
+      color="transparent"
+      subtitle="Join our mission to empower Life Sciences scholars"
+      flat
+      width="100%"
+    >
+      <template v-slot:title>
+        <span class="font-weight-black text-center">Our partners</span>
+      </template>
+      <div class="text-overline mb-1 d-flex flex-wrap">
+        <div v-for="(partner, index) in partners" :key="index" class="mr-2">
+          <v-chip rounded="xl" variant="text">{{
+            partner.fullname
+          }} | </v-chip>
+        </div>
+      </div>
+    </v-card>
+
+    <v-divider />
+
+    <v-container>
+      <v-carousel height="400" cycle :show-arrows="false" hide-delimiters>
+        <v-carousel-item v-for="(partner, index) in partners" :key="index">
+          <div class="d-flex fill-height justify-center align-center">
+            <div class="text-h2 d-flex flex-column align-center">
+              <img
+                :src="partner.logo"
+                :alt="partner.fullname"
+                style="height: 13.5rem"
+              />
+              <v-card-subtitle class="text-center">{{
+                partner.fullname
+              }}</v-card-subtitle>
+            </div>
+          </div>
+        </v-carousel-item>
+      </v-carousel>
+    </v-container>
     <!-- Footer -->
     <v-footer class="footer">
       <v-row class="text-center">
@@ -225,9 +298,22 @@
           </p>
           <br />
           <v-divider />
-          <v-btn class="mt-2" varianr="outlined" @click="scrollToTop"
-            ><v-icon>mdi-arrow-up</v-icon>Back to Top</v-btn
-          >
+          <v-card-actions>
+            <v-spacer />
+            <v-btn class="mt-2" varianr="outlined" @click="scrollToTop"
+              ><v-icon>mdi-arrow-up</v-icon>Back to Top</v-btn
+            >
+            <v-btn
+              :style="{ backgroundColor: buttonBgColor, width: '24rem' }"
+              class="mt-2 mr-8"
+              varianr="outlined"
+              @click="scrollToCallToAction"
+            >
+              <v-icon>mdi-login</v-icon>
+              Continue to the Application
+            </v-btn>
+            <v-spacer />
+          </v-card-actions>
         </v-col>
       </v-row>
     </v-footer>
@@ -246,6 +332,9 @@ import { ref } from "vue";
 const buttonBgColor = "#fcfcfc"; // Replace with your desired color code
 const currentYear = ref(new Date().getFullYear());
 import { useRouter } from "vue-router";
+// @ts-ignore
+import partners from "../../data/partnersSponsors";
+import { researchCards } from "@/data/researchCards";
 const router = useRouter();
 const scrollToCallToAction = () => {
   const session = localStorage.getItem("sessionId");
@@ -255,6 +344,8 @@ const scrollToCallToAction = () => {
     router.push("/auth/login");
   }
 };
+const hoveredPartner = ref("");
+
 const scrollToCallToAction2 = () => {
   const el = document.querySelector('v-row.ref="callToAction"');
   if (el) {
@@ -315,6 +406,7 @@ const signUp = () => {
   padding: 20px 0;
 }
 </style>
+
 <style scoped>
 .underline {
   content: "";
@@ -334,5 +426,13 @@ const signUp = () => {
 .v-btn {
   align-items: center;
   justify-content: center;
+}
+</style>
+
+<style scoped>
+.logo-strip {
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 </style>

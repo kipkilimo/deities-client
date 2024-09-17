@@ -251,13 +251,13 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   z-index: 1000; /* Ensure it’s on top */
-  background: black; /* Optional: To prevent background issues */
+  background: black; /* Optional: To prevent background Consultations */
 }
 
 .carousel-slide {
   flex: 1;
   text-align: center;
-  overflow: hidden; /* Prevents overflow issues */
+  overflow: hidden; /* Prevents overflow Consultations */
   height: 100%; /* Ensure it takes full height of the container */
 }
 

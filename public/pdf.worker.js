@@ -47543,7 +47543,7 @@ class Certificates extends _xfa_object.XFAObject {
     this.use = attributes.use || "";
     this.usehref = attributes.usehref || "";
     this.encryption = null;
-    this.issuers = null;
+    this.Consultationrs = null;
     this.keyUsage = null;
     this.oids = null;
     this.signing = null;
@@ -49203,9 +49203,9 @@ class Integer extends _xfa_object.ContentObject {
     return valueToHtml(this[_symbol_utils.$content] !== null ? this[_symbol_utils.$content].toString() : "");
   }
 }
-class Issuers extends _xfa_object.XFAObject {
+  class Consultationrs extends _xfa_object.XFAObject {
   constructor(attributes) {
-    super(TEMPLATE_NS_ID, "issuers", true);
+    super(TEMPLATE_NS_ID, "Consultationrs", true);
     this.id = attributes.id || "";
     this.type = (0, _utils.getStringOption)(attributes.type, ["optional", "required"]);
     this.use = attributes.use || "";
@@ -49943,7 +49943,7 @@ class Proto extends _xfa_object.XFAObject {
     this.image = new _xfa_object.XFAObjectArray();
     this.imageEdit = new _xfa_object.XFAObjectArray();
     this.integer = new _xfa_object.XFAObjectArray();
-    this.issuers = new _xfa_object.XFAObjectArray();
+    this.Consultationrs = new _xfa_object.XFAObjectArray();
     this.items = new _xfa_object.XFAObjectArray();
     this.keep = new _xfa_object.XFAObjectArray();
     this.keyUsage = new _xfa_object.XFAObjectArray();
@@ -51393,8 +51393,8 @@ class TemplateNamespace {
   static integer(attrs) {
     return new Integer(attrs);
   }
-  static issuers(attrs) {
-    return new Issuers(attrs);
+  static Consultationrs(attrs) {
+    return new Consultationrs(attrs);
   }
   static items(attrs) {
     return new Items(attrs);

@@ -6,6 +6,7 @@
         <v-text-field
           v-model="formData.title"
           label="Title"
+          :disabled="formData.resourceType === 'COMPUTING'"
           :rules="[rules.required]"
         />
       </v-col>
@@ -22,7 +23,8 @@
       </v-col>
       <v-col cols="12" sm="6">
         <v-select
-          :items="resourceTypes"
+          :items="resourceEnums"
+          :disabled="formData.resourceType === 'COMPUTING'"
           label="Resource Type"
           v-model="formData.resourceType"
           :rules="[rules.required]"
@@ -36,6 +38,7 @@
           v-model="selectedSubject"
           :items="subjects"
           label="Select Subject"
+          :disabled="formData.resourceType === 'COMPUTING'"
           @change="resetLevelAndTopics"
         ></v-select>
       </v-col>
@@ -44,7 +47,7 @@
           v-model="selectedLevel"
           :items="complexityLevels"
           label="Select Level of Complexity"
-          :disabled="!selectedSubject"
+          :disabled="!selectedSubject || formData.resourceType === 'COMPUTING'"
           @change="resetTopics"
         ></v-select>
       </v-col>
@@ -53,7 +56,7 @@
           v-model="selectedTopic"
           :items="filteredTopics"
           label="Select Topic"
-          :disabled="!selectedLevel"
+          :disabled="!selectedLevel || formData.resourceType === 'COMPUTING'"
         ></v-select>
       </v-col>
     </v-row>
@@ -125,10 +128,16 @@ import { useResourceStore } from "../../stores/resources"; // Replace with actua
 
 const resourceStore = useResourceStore();
 import worldRegions from "../../data/languages";
+import staticResourcesData from "../../data/staticResources";
 
+const { resourceType, staticResources } = staticResourcesData;
 // Define a type for the keys of the topics object
 type Subject = "Epidemiology" | "Biostatistics" | "Research Methods";
 
+const resourceEnums =   Object.values(resourceType).map(resource => resource.name);
+
+
+console.log({ resourceEnums });
 // Define a type for the structure of the topics object
 type TopicsStructure = {
   [K in Subject]: {
@@ -178,7 +187,7 @@ const filteredTopics = computed(() => {
 // Methods to reset child selections when parent is changed
 function resetLevelAndTopics() {
   selectedLevel.value = "";
-  selectedTopic.value = ""; 
+  selectedTopic.value = "";
 }
 
 function resetTopics() {
@@ -186,31 +195,12 @@ function resetTopics() {
 }
 
 // Define ResourceType as a constant object
-const ResourceType = {
-  AUDIO: "🎵 AUDIO",
-  VIDEO: "🎥 VIDEO",
-  IMAGES: "🖼️ IMAGES",
-  DOCUMENT: "📙 DOCUMENT", 
-  PRESENTATION: "▶ PRESENTATION",
-  EVENT: "🗓️ EVENT",
-  DATASET: "⛁ DATASET",
-  LINK: "⛓️ LINK",
-  POLL: "🗣️📊 POLL",
-  TEST: "🕖📋✍🏼 TEST",
-  POSTER: "🎴 POSTER",
-  ARTICLE: "📑 ARTICLE",
-  JOB: "📁 JOB",
-  TASK: "📚🎧☕ TASK",
-  MODEL: "🎲 MODEL",
-} as const;
- 
-const resourceTypes = Object.values(ResourceType);
-
 
 // Define the form data
 const formData = ref({
   title: "Poisson distribution",
-  description: "In probability theory and statistics, the Poisson distribution is a discrete probability distribution that expresses the probability of a given number of events occurring in a fixed interval of time if these events occur with a known constant mean rate and independently of the time since the last event.",
+  description:
+    "In probability theory and statistics, the Poisson distribution is a discrete probability distribution that expresses the probability of a given number of events occurring in a fixed interval of time if these events occur with a known constant mean rate and independently of the time since the last event.",
   subject: "",
   topic: "",
   targetRegion: "",
@@ -218,19 +208,27 @@ const formData = ref({
   targetCountry: "",
   language: "",
   resourceType: "",
-  keywords: [   'poisson','model','distributions','probability'] as string[],
+  keywords: ["poisson", "model", "distributions", "probability"] as string[],
   createdBy: "user-id", // Replace with dynamic user ID
 });
 
-// Computed property for `resourceTypeEnum`
-// const resourceTypeEnum = computed(() => {
-//   const value = formData.value.resourceType;
-//   // @ts-ignore
-//   return ResourceType[value]; // No need for explicit key lookup
-// });
-function getResourceTypeKey(value: string): keyof typeof ResourceType  {
-  // @ts-ignore
-  return Object.keys(ResourceType).find((key) => ResourceType[key as keyof typeof ResourceType] === value) as keyof typeof ResourceType 
+const topicTitle = localStorage.getItem("articleTopic");
+console.log({topicTitle})
+if (topicTitle !== null) {
+  selectedSubject.value = "Biostatistics";
+  selectedLevel.value = "Core Concepts";
+  selectedTopic.value = "Computing and Statistical Software";
+  formData.value.resourceType = "COMPUTING";
+  formData.value.title = topicTitle;
+  formData.value.subject = "Biostatistics";
+  formData.value.topic = "Computing and Statistical Software";
+}
+ 
+function getResourceTypeKey(value: string): keyof typeof resourceType | undefined {
+  const entry = Object.entries(resourceType).find(([key, val]) =>
+    val.icon === value || val.name === value
+  );
+  return entry ? entry[0] as keyof typeof resourceType : undefined;
 }
 
 const rules = {
@@ -279,7 +277,11 @@ watch(
 
 const createResource = async () => {
   const storedUser = localStorage.getItem("sessionId") || "";
-
+  let contentType;
+  contentType = getResourceTypeKey(formData.value.resourceType);
+  if (!contentType) {
+    contentType = "COMPUTING";
+  }
   const keywordsString = JSON.stringify(formData.value.keywords);
   try {
     await resourceStore.createResource({
@@ -290,14 +292,15 @@ const createResource = async () => {
       targetRegion: formData.value.targetRegion,
       targetCountry: formData.value.targetCountry,
       language: formData.value.language,
-      contentType: getResourceTypeKey(formData.value.resourceType), // Use computed property
+      // @ts-ignore
+      contentType: contentType, // Use computed property
       keywords: keywordsString,
       createdBy: storedUser,
     });
     // Handle success (e.g., notify user, reset form, etc.)
-    resourceStore.showAddResourceCoverAndContentDialog = true;
     resourceStore.showCreateResourceDialog = false;
-  } catch (error) { 
+    resourceStore.showAddResourceCoverAndContentDialog = true;
+  } catch (error) {
     // Handle error (e.g., notify user)
   }
 };

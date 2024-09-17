@@ -37,14 +37,12 @@
           ></v-select>
           <v-textarea
             label="Description"
-            v-model="event.description"
-            :rules="[rules.required]"
+            v-model="event.description" 
             required
           ></v-textarea>
           <v-text-field
             label="Target Audience"
-            v-model="event.target_audience"
-            :rules="[rules.required]"
+            v-model="event.target_audience" 
             required
           ></v-text-field>
           <v-btn @click="nextStep" :disabled="!isStepValid(1)">Next</v-btn>
@@ -56,22 +54,19 @@
             label="Start Date & Time"
             v-model="event.date_and_time.start"
             :prepend-icon="'mdi-calendar-today'"
-            type="datetime-local"
-            :rules="[rules.required]"
+            type="datetime-local" 
             required
           ></v-text-field>
           <v-text-field
             label="End Date & Time"
             v-model="event.date_and_time.end"
             :prepend-icon="'mdi-calendar-today'"
-            type="datetime-local"
-            :rules="[rules.required]"
+            type="datetime-local" 
             required
           ></v-text-field>
           <v-text-field
             label="Location"
-            v-model="event.location"
-            :rules="[rules.required]"
+            v-model="event.location" 
             required
           ></v-text-field>
           <v-btn @click="prevStep" class="mr-4">Previous</v-btn>
@@ -82,38 +77,32 @@
         <v-stepper-content step="3" v-if="currentStep === 3">
           <v-text-field
             label="Keynote Speaker Name"
-            v-model="event.keynote_speakers[0].name"
-            :rules="[rules.required]"
+            v-model="event.keynote_speakers[0].name" 
             required
           ></v-text-field>
           <v-text-field
             label="Keynote Speaker Affiliation"
-            v-model="event.keynote_speakers[0].affiliation"
-            :rules="[rules.required]"
+            v-model="event.keynote_speakers[0].affiliation" 
             required
           ></v-text-field>
           <v-text-field
             label="Keynote Speaker Expertise"
-            v-model="event.keynote_speakers[0].expertise"
-            :rules="[rules.required]"
+            v-model="event.keynote_speakers[0].expertise" 
             required
           ></v-text-field>
           <v-text-field
             label="Workshop Facilitator Name"
-            v-model="event.workshop_facilitators[0].name"
-            :rules="[rules.required]"
+            v-model="event.workshop_facilitators[0].name" 
             required
           ></v-text-field>
           <v-text-field
             label="Workshop Facilitator Affiliation"
-            v-model="event.workshop_facilitators[0].affiliation"
-            :rules="[rules.required]"
+            v-model="event.workshop_facilitators[0].affiliation" 
             required
           ></v-text-field>
           <v-text-field
             label="Workshop Facilitator Expertise"
-            v-model="event.workshop_facilitators[0].expertise"
-            :rules="[rules.required]"
+            v-model="event.workshop_facilitators[0].expertise" 
             required
           ></v-text-field>
           <v-btn @click="prevStep" class="mr-4">Previous</v-btn>
@@ -125,16 +114,14 @@
           <v-text-field
             label="Registration Fee"
             v-model="event.registration.fee"
-            type="number"
-            :rules="[rules.required, rules.number]"
+            type="number" 
             required
           ></v-text-field>
           <v-text-field
             label="Registration Deadline"
             v-model="event.registration.deadline"
             :prepend-icon="'mdi-calendar-today'"
-            type="date"
-            :rules="[rules.required]"
+            type="date" 
             required
           ></v-text-field>
           <v-combobox
@@ -143,14 +130,12 @@
             :items="paymentMethods"
             multiple
             chips
-            clearable
-            :rules="[rules.required]"
+            clearable 
             required
           ></v-combobox>
           <v-text-field
             label="Registration Link"
-            v-model="event.registration.registration_link"
-            :rules="[rules.required, rules.url]"
+            v-model="event.registration.registration_link" 
             required
           ></v-text-field>
           <v-btn @click="prevStep" class="mr-4">Previous</v-btn>
@@ -164,8 +149,7 @@
             label="Networking Events"
             multiple
             chips
-            clearable
-            :rules="[rules.required]"
+            clearable 
             required
           ></v-combobox>
           <v-combobox
@@ -174,8 +158,7 @@
             multiple
             chips
             clearable
-            :items="accessibilityFeatures"
-            :rules="[rules.required]"
+            :items="accessibilityFeatures" 
             required
           ></v-combobox>
           <v-btn @click="prevStep" class="mr-4">Previous</v-btn>

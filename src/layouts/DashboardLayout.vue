@@ -163,10 +163,19 @@
 <script setup lang="ts">
 import { ref, computed, onBeforeMount } from "vue";
 import { useI18n } from "vue-i18n";
-import { useUserStore } from "../stores/users";
+import { useUserStore } from "@/stores/users";
 import { useRouter } from "vue-router";
-import { useResourceStore } from "../stores/resources";
+import { useResourceStore } from "@/stores/resources";
+const resourceStore = useResourceStore();
+const addingComputing = ref(false);
+const topicTitle = localStorage.getItem("articleTopic");
+if (topicTitle !== null && topicTitle.length > 5) {
+  addingComputing.value = true;
+}
 onBeforeMount(async () => {
+  localStorage.removeItem("articleLanguage");
+  localStorage.removeItem("articleTopic");
+
   if (typeof localStorage !== "undefined") {
     const storedUser = localStorage.getItem("sessionId");
     if (storedUser) {
@@ -183,7 +192,6 @@ onBeforeMount(async () => {
 const { t, locale } = useI18n();
 const router = useRouter();
 const userStore = useUserStore();
-const resourceStore = useResourceStore();
 
 const drawer = ref(true);
 const rail = ref(false);
@@ -258,7 +266,7 @@ const sidebarItems = computed(() => [
     title: t("dashboard.sidebar.programming"),
     value: "programming",
     iconClass: "mdi-code-block-braces me-4 text-xl",
-    path: "/dashboard/programming",
+    path: "/dashboard/computing",
   },
   {
     title: t("dashboard.sidebar.consults"),

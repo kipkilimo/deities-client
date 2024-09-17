@@ -8,9 +8,11 @@ import { createHead } from "@vueuse/head";
 import { createPinia } from "pinia";
 import generatedRoutes from "~pages";
 import i18n from "./plugins/i18n";
+// @ts-ignore
 import { setupLayouts } from "virtual:generated-layouts";
 import vuetify from "./plugins/vuetify";
-
+// import { QuillEditor, Quill } from "vue3-quill-editor-vite";
+import "vue3-quill-editor-vite/dist/style.css";
 import "viewerjs/dist/viewer.css";
 import VueViewer from "v-viewer";
 const routes = setupLayouts(generatedRoutes);
@@ -22,6 +24,7 @@ const app = createApp({
   },
 });
 
+// app.use(QuillEditor);
 app.use(VueViewer);
 app
   .use(createPinia())

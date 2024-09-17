@@ -3,7 +3,8 @@
     <v-row>
       <!-- Image upload and cropping section -->
       <v-col cols="4" v-if="coverUploaded === false">
-        <v-card>{{ resourceStore.resource.content }}
+        <v-card
+          >{{ resourceStore.resource.content }}
           <v-row>
             <!-- File input for selecting the image -->
             <v-col cols="12">
@@ -43,7 +44,6 @@
               >
             </v-col>
           </v-row>
-          
         </v-card>
       </v-col>
       <!-- Other content -->
@@ -81,15 +81,18 @@ import DatasetUploader from "../resourceUploaders/datasets/DatasetUploader.vue";
 import DocumentUploader from "../resourceUploaders/pdf/DocumentUploader.vue";
 import SlidesUploader from "../resourceUploaders/presentation/SlidesUploader.vue";
 import TaskUploader from "../resourceUploaders/tasks/TaskUploader.vue";
-import TestUploader from "../resourceUploaders/test/TestUploader.vue";
+import TestUploader from "../resourceUploaders/test/TestMetaForm.vue";
 import PosterUploader from "../resourceUploaders/posters/PosterUploader.vue";
 import EventForm from "../resourceForms/events/EventForm.vue";
 import ArticleForm from "../resourceForms/articles/ArticleForm.vue";
 import PollForm from "../resourceForms/polls/PollForm.vue";
 import JobForm from "../resourceForms/jobs/JobForm.vue";
-import AssignmentForm from "../resourceForms/assignment/AssignmentForm.vue";
+
+import TaskMetaForm from "../resourceUploaders/tasks/TaskMetaForm.vue";
 import LinksForm from "../resourceForms/links/LinksForm.vue";
 import ModelForm from "../resourceForms/models/ModelForm.vue";
+import ComputingTopicForm from "../resourceForms/computing/ComputingTopicForm.vue";
+import TestMetaForm from "../resourceUploaders/test/TestMetaForm.vue";
 
 // Access the resource store
 const currentResourceType = ref(resourceStore.resource.contentType);
@@ -151,7 +154,7 @@ const uploadCroppedImage = async () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      const { message } = response.data; 
+      const { message } = response.data;
       console.log("Upload successful:", message);
       coverUploaded.value = true;
       loading.value = false;
@@ -162,7 +165,6 @@ const uploadCroppedImage = async () => {
     }
   });
 };
-
 
 // Map resource types to their corresponding components
 const ResourceType = {
@@ -182,6 +184,7 @@ const ResourceType = {
   JOB: "JOB",
   TASK: "TASK",
   MODEL: "MODEL",
+  COMPUTING: "COMPUTING",
 };
 
 const resourceComponentMap = {
@@ -191,15 +194,16 @@ const resourceComponentMap = {
   [ResourceType.DOCUMENT]: { uploader: DocumentUploader, form: null },
   [ResourceType.PRESENTATION]: { uploader: SlidesUploader, form: null },
   [ResourceType.DATASET]: { uploader: DatasetUploader, form: null },
-  [ResourceType.TASK]: { uploader: TaskUploader, form: AssignmentForm },
-  [ResourceType.TEST]: { uploader: TestUploader, form: null },
+  [ResourceType.TASK]: { uploader: null, form: TaskMetaForm },
+  [ResourceType.TEST]: { uploader: null, form: TestMetaForm },
   [ResourceType.POSTER]: { uploader: PosterUploader, form: null },
   [ResourceType.EVENT]: { uploader: null, form: EventForm },
   [ResourceType.ARTICLE]: { uploader: null, form: ArticleForm },
   [ResourceType.POLL]: { uploader: null, form: PollForm },
   [ResourceType.LINK]: { uploader: null, form: LinksForm },
   [ResourceType.JOB]: { uploader: null, form: JobForm },
-  [ResourceType.MODEL]: { uploader: null, form: ModelForm },
+  [ResourceType.MODEL]: { uploader: null, form: ModelForm }, //
+  [ResourceType.COMPUTING]: { uploader: null, form: ComputingTopicForm },
 };
 
 // Computed property to get the matched component based on the current resource type

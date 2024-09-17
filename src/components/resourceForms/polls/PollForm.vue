@@ -29,11 +29,12 @@
               >
                 <v-text-field
                   v-model="newOption"
-                  label="Add Option"
-                  @keyup.enter="addOption"
+                  label="Add Options (separate with #)"
+                  @paste="handlePaste"
+                  @keyup.enter="parseOptions"
                   :rules="[rules.required]"
                 ></v-text-field>
-                <v-btn @click="addOption" color="primary"> Add Option </v-btn>
+                <v-btn @click="parseOptions" color="primary"> Add Options </v-btn>
 
                 <!-- Render Options as v-chips in a horizontal row -->
                 <v-row class="mt-4" dense>
@@ -125,6 +126,7 @@
 import { ref, reactive } from "vue";
 import { useResourceStore } from "@/stores/resources";
 import qstnIdGen from "../../../utilities/accessTokenGenerator";
+
 const resourceStore = useResourceStore();
 const pollTypes = [
   "Single Choice",
@@ -137,12 +139,11 @@ const pollTypes = [
 const rules = {
   required: (value) => !!value || "Required field",
   correctResponse: (value) =>
-    ["Single Choice", "Multiple Choice"].includes(
-      currentlyCreatingPollItem.type
-    )
+    ["Single Choice", "Multiple Choice"].includes(currentlyCreatingPollItem.type)
       ? !!value || "Required field"
       : undefined, // Only required for specific types
 };
+
 const questionId = ref(qstnIdGen(12));
 const currentlyCreatingPollItem = reactive({
   question: "",
@@ -159,16 +160,31 @@ const valid = ref(false);
 const newOption = ref("");
 const formRef = ref(null);
 
-const addOption = () => {
+const handlePaste = (event) => {
+  // Get pasted data
+  const pasteData = event.clipboardData.getData('text');
+  // Parse and update options
+  currentlyCreatingPollItem.options = pasteData
+    .split('#')
+    .map(option => option.trim())
+    .filter(option => option.length > 0); // Ensure no empty options are added
+  // Prevent default paste action
+  event.preventDefault();
+};
+
+const parseOptions = () => {
   if (newOption.value) {
-    currentlyCreatingPollItem.options.push(newOption.value);
-    newOption.value = "";
+    currentlyCreatingPollItem.options = newOption.value
+      .split('#')
+      .map(option => option.trim())
+      .filter(option => option.length > 0); // Ensure no empty options are added
+    newOption.value = ""; // Clear input field after parsing
   }
 };
 
 const addQuestion = () => {
   if (formRef.value.validate()) {
-    pollArray.value.push({ ...currentlyCreatingPollItem }); // Spread to avoid reference issues
+    pollArray.value.push({ ...currentlyCreatingPollItem }); // Spread to avoid reference Consultations
     currentlyCreatingPollItem.question = "";
     currentlyCreatingPollItem.type = "";
     questionId.value = qstnIdGen(12);
@@ -213,12 +229,8 @@ const getOptionDisplay = (type, options) => {
         .map((option, index) => `${index + 1}. ${option}`)
         .join(", ");
     default:
-      return options;
+      return options.join(", "); // For Open-Ended and Rating, just join the options
   }
-};
-
-const updateOption = (index, event) => {
-  currentlyCreatingPollItem.options[index] = event.target.value;
 };
 
 const removeOption = (option) => {

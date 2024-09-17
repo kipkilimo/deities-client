@@ -99,6 +99,7 @@ export const useResourceStore = defineStore("resource", {
       createdAt: "",
       updatedAt: "",
     } as Resource,
+    resourceIsComputing: false,
     resources: [] as Resource[],
     filteredResources: [] as Resource[],
     sortBy: "title" as keyof Resource,
@@ -139,6 +140,57 @@ export const useResourceStore = defineStore("resource", {
       }
       this.sortResources();
     },
+    async getAllTaskResources() {
+      const GET_TASK_RESOURCES = gql`
+        query {
+          getAllTaskResources {
+            id
+            title
+            description
+            targetRegion
+            targetCountry
+            sessionId
+            accessKey
+            slug
+            language
+            contentType
+            viewsNumber
+            likesNumber
+            sharesNumber
+            subject
+            topic
+            rating
+            keywords
+            coverImage
+            averageRating
+            createdBy {
+              id
+
+              personalInfo {
+                username
+              }
+            }
+            createdAt
+            updatedAt
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: GET_TASK_RESOURCES,
+        });
+
+        const resources = response.data.getAllTaskResources;
+        if (resources) {
+          this.resources = resources;
+        } else {
+          throw new Error("Failed to fetch task resources");
+        }
+      } catch (error) {
+        console.error("Error fetching task resources:", error);
+      }
+    },
     async getClinicalPrediction() {
       const CLINICAL_PREDICTION_MODEL = gql`
         query {
@@ -177,9 +229,9 @@ export const useResourceStore = defineStore("resource", {
       try {
         const response = await client.query({ query: RESOURCE_SUMMARY_QUERY });
 
-        const resources = response.data?.getAllResources;
+        const resources = response.data.getAllResources;
         if (resources) {
-          this.setResources(resources);
+          this.resources = resources;
         } else {
           throw new Error("Failed to fetch resources");
         }
@@ -306,6 +358,100 @@ export const useResourceStore = defineStore("resource", {
         } else {
           throw new Error("Failed to fetch resource");
         }
+      } catch (error) {
+        console.error("Error fetching resource:", error);
+      }
+    },
+    async fetchComputingResource(topicParams: string) {
+      const FETCH_COMPUTING_RESOURCE = gql`
+        query ($topicParams: String!) {
+          fetchComputingResource(topicParams: $topicParams) {
+            id
+            title
+            description
+            content
+            targetRegion
+            targetCountry
+            slug
+            language
+            contentType
+            viewsNumber
+            likesNumber
+            sharesNumber
+            subject
+            topic
+            rating
+            sessionId
+            accessKey
+            keywords
+            coverImage
+            isPublished
+            averageRating
+            reviews
+            createdBy {
+              id
+
+              personalInfo {
+                username
+                email
+                scholarId
+                fullName
+                activationToken
+                resetToken
+                tokenExpiry
+                activatedAccount
+              }
+              role
+            }
+            createdAt
+            updatedAt
+          }
+        }
+      `;
+
+      try {
+        this.resource = {
+          id: "",
+          title: "",
+          description: "",
+          content: "",
+          targetRegion: "",
+          targetCountry: "",
+          slug: "",
+          language: "",
+          contentType: "",
+          viewsNumber: 0,
+          likesNumber: 0,
+          sharesNumber: 0,
+          subject: "",
+          topic: "",
+          rating: "",
+          sessionId: "",
+          accessKey: "",
+          keywords: "",
+          coverImage: "",
+          isPublished: false,
+          averageRating: 0,
+          reviews: "",
+          createdBy: "",
+          createdAt: "",
+          updatedAt: "",
+        } as Resource;
+        const response = await client.query({
+          query: FETCH_COMPUTING_RESOURCE,
+          variables: { topicParams },
+        });
+
+        const resource = response.data.fetchComputingResource;
+
+        if (resource !== null) {
+          this.resource = resource; // Clone the resource object
+        } else {
+          // If resource is null, initialize a new object with the desired contentType
+          this.resource.contentType = "COMPUTING";
+        }
+
+        return;
       } catch (error) {
         console.error("Error fetching resource:", error);
       }
@@ -479,6 +625,7 @@ export const useResourceStore = defineStore("resource", {
           ) {
             id
             contentType
+            title
           }
         }
       `;

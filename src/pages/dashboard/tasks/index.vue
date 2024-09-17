@@ -1,49 +1,75 @@
 <template>
-  <v-container class="my-5">
-    <v-row>
+  <v-container fluid>
+    <!-- Progress bar when loading -->
+    <v-progress-linear
+      color="teal"
+      v-if="isLoading"
+      indeterminate
+    ></v-progress-linear>
+
+    <!-- Container for resources -->
+   <v-row
+    v-if="updatedResources"
+    class="d-flex justify-left"
+    style="max-height: 75vh; overflow-y: auto;" <!-- Set max height and enable vertical scrolling -->
+  >
+      <h3 class="ml-4">NEMBio Assignment Tasks</h3>
+      <v-divider class="mx-4 mb-1"></v-divider>
       <v-col
-        v-for="(resource, index) in updatedResources"
-        :key="index"
-        cols="12"
-        md="6"
+        v-for="(resource, index) in resourceStore.resources"
+        :key="resource.id"
+        cols="auto"
+        xl="3"
+        md="4"
         lg="4"
-        xl="4"
+        sm="6"
+        xs="12"
+        class="pa-3"
       >
-        <v-card
-          class="mx-auto my-3 resource-card"
-          max-width="540"
-          height="13.5rem"
-          :disabled="resource.resourceCount === 0"
-          outlined
-          @click="goToResourceRenderer(resource)"
+        <!-- Resource card --><v-card
+          :disabled="isLoading"
+          :loading="isLoading"
+          class="mx-auto my-4"
+          max-width="374"
         >
-          <v-card-title
-            color="#08487f"
-            class="d-flex align-center justify-space-between"
-          >
-            <span class="resource-icon">{{ resource.icon }}</span>
-            <span class="resource-name">
-              {{ resource.name }} ({{ resource.resourceCount }})<v-card-text
-                class="text-h11"
-              >
-                {{ resource.type }}
-              </v-card-text>
-            </span>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text class="resource-description text-h7 py-2">
-            {{ resource.description }}
+          <template v-slot:loader="{ isActive }">
+            <v-progress-linear
+              :active="isActive"
+              color="deep-purple"
+              height="4"
+              indeterminate
+            ></v-progress-linear>
+          </template>
+
+          <v-img height="210" :src="resource.coverImage" cover></v-img>
+
+          <v-card-item>
+            <v-card-title>{{ resource.title }}</v-card-title>
+            <v-card-subtitle>
+              <span class="me-1 text-overline">{{ resource.subject }}</span>
+            </v-card-subtitle>
+          </v-card-item>
+
+          <v-card-text>
+            <v-row align="center" class="mx-0"> </v-row>
+
+            <div class="my-1 text-subtitle-1">
+              {{ resource.topic }} Assignment Task
+            </div>
+
+            <div>{{ truncateText(resource.description, 210) }}</div>
           </v-card-text>
-          <v-card-actions class="fixed-actions mb-1">
+
+          <v-divider class="mx-4 mb-1"></v-divider>
+
+          <v-card-actions>
             <v-btn
-              append-icon="mdi-chevron-right"
-              color="#08487f"
               variant="outlined"
+              @click="goToResourceRenderer(resource)"
               block
-              :disabled="resource.resourceCount === 0"
+              color="teal"
+              >VIEW ASSIGNMENT DETAILS</v-btn
             >
-              Explore {{ resource.name }} resources
-            </v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -52,10 +78,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onBeforeMount } from "vue";
-import { useResourceStore } from "../../../stores/resources";
-import staticResources from "../../../data/staticResources";
+import { ref, computed, onMounted } from "vue";
+import { useResourceStore } from "@/stores/resources";
+import staticResourcesData from "@/data/staticResources";
+const isLoading = ref(false);
 
+const { resourceType, staticResources } = staticResourcesData;
+
+console.log({ staticResources: staticResources.value });
 import { useRouter } from "vue-router";
 const router = useRouter();
 
@@ -63,33 +93,39 @@ const router = useRouter();
 const resourceStore = useResourceStore();
 
 // Compute updated resources with details from the store
-const updatedResources = computed(() => {
-  return staticResources.value.map((resource) => {
-    const matchingResources = resourceStore.resources.filter(
-      (res) => res.contentType === resource.type
-    );
-    return {
-      ...resource,
-      resourceCount: matchingResources.length,
-    };
-  });
-});
+const updatedResources = ref(null);
 
 function goToResourceRenderer(resource) {
-  // console.log({resource})
-  localStorage.setItem("resourceType", resource.type);
+  localStorage.setItem("resourceType", "TASK");
   router.push("/dashboard/player");
-  // Update the staticResources with the fetched data
 }
+function requestToParticipateInTask(resource) {
+  localStorage.setItem("resourceType", "TASK");
+  router.push("/dashboard/player");
+}
+
+const truncateText = (text, length) => {
+  if (!text) {
+    return ""; // or return a default value or an empty string
+  }
+  return text.length > length ? text.substring(0, length) + "..." : text;
+};
 // Fetch resources from the store and update counts
 const fetchAndUpdateResources = async () => {
-  await resourceStore.getAllResources();
-  // Update the staticResources with the fetched data
-  staticResources.value = updatedResources.value;
+  isLoading.value = true;
+  await resourceStore.getAllTaskResources();
 };
+function getTaskResources() {
+  const vals = resourceStore.resources.filter(
+    (res) => res.contentType === "TASK"
+  );
+  updatedResources.value = vals;
+}
 // Fetch resources before mounting the component
-onBeforeMount(() => {
-  fetchAndUpdateResources();
+onMounted(async () => {
+  await fetchAndUpdateResources();
+  getTaskResources();
+  isLoading.value = false;
 });
 </script>
 
