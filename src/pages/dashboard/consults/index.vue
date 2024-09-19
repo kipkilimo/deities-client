@@ -1,13 +1,26 @@
 <template>
   <v-container class="my-5">
-    <v-row>
+    <v-row v-if="Date.now() < Date.now() + 86400000 * 365">
+      <v-col
+        v-for="(resource, index) in 1"
+        :key="index"
+        cols="12"  
+      >
+        <v-img
+          src="https://slideuplift.com/wp-content/uploads/2022/07/Coming-Soon-PowerPoint-Template-0944.jpg"
+          fit   min-width="100%" height="81vh"
+        ></v-img>
+      </v-col>
+    </v-row>
+    <v-row v-if="Date.now() > Date.now() + 86400000 * 365">
       <v-col
         v-for="(resource, index) in updatedResources"
         :key="index"
         cols="12"
-        md="6"
-        lg="4"
-        xl="4"
+        sm="12"
+        md="4"
+        lg="3"
+        xl="3"
       >
         <v-card
           class="mx-auto my-3 resource-card"
@@ -54,7 +67,10 @@
 <script setup>
 import { ref, computed, onBeforeMount } from "vue";
 import { useResourceStore } from "../../../stores/resources";
-import staticResources from "../../../data/staticResources";
+import staticResourcesData from "@/data/staticResources";
+const isLoading = ref(false);
+
+const { resourceType, staticResources } = staticResourcesData;
 
 import { useRouter } from "vue-router";
 const router = useRouter();

@@ -18,7 +18,7 @@
     "semantic-release": "semantic-release"
   },
   "dependencies": {
-    "@apollo/client": "^3.10.8",
+    "@apollo/client": "^3.11.8",
     "@ckeditor/ckeditor5-vue": "^7.0.0",
     "@mdi/font": "^7.2.96",
     "@tinymce/tinymce-vue": "^5.1.1",
@@ -30,7 +30,7 @@
     "@tiptap/starter-kit": "^2.6.6",
     "@tiptap/vue-3": "^2.6.6",
     "@videojs-player/vue": "^1.0.0",
-    "@vue/apollo-composable": "^4.0.2",
+    "@vue/apollo-composable": "^4.2.1",
     "@vueup/vue-quill": "^1.2.0",
     "@vueuse/core": "^10.4.1",
     "@wangeditor/editor": "^5.1.23",

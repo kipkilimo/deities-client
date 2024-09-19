@@ -125,7 +125,6 @@ const handleClap = () => {
   animate();
   claps.value++;
   setTimeout(() => {
-    
     cancelAnimationFrame(animationId);
   }, 90);
   setTimeout(() => {
@@ -251,9 +250,10 @@ function getRandomAvatarUrl() {
 
 .bbc-content {
   font-family: "Cormorant Garamond", serif;
-  font-size: 21px;
+  font-size: 24px;
   line-height: 1.6;
-  color: #333;
+  color: #242424;
+  font-weight: 500; /* Slightly increased font weight */
 }
 .confetti {
   position: absolute;

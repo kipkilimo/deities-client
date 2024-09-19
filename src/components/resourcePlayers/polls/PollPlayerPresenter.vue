@@ -240,7 +240,8 @@ const qrCodeUrl = ref("");
 const polls = ref([]);
 const currentIndex = ref(0);
 const activeQuestion = ref({ qstId: "" }); // Tracking active question
-
+// Function to fetch the latest poll and update the path
+ 
 // WebSocket connection
 let ws;
 
@@ -345,7 +346,8 @@ onMounted(() => {
   initWebSocket();
 });
 
-onBeforeUnmount(() => {
+onBeforeUnmount(async() => {
+//  await fetchPoll()
   if (ws) {
     ws.close();
   }

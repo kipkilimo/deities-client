@@ -72,6 +72,7 @@ export const useResourceStore = defineStore("resource", {
       },
       { label: "Excellent proposition. Can't wait to try it!" },
     ],
+    exams: "",
     resource: {
       id: "",
       title: "",
@@ -106,6 +107,7 @@ export const useResourceStore = defineStore("resource", {
     filterByType: "" as string,
     showAddResourceCoverAndContentDialog: false,
     showCreateResourceDialog: false,
+    showExamsDialog: false,
   }),
   actions: {
     setQuestion(newQuestion: string) {
@@ -139,6 +141,68 @@ export const useResourceStore = defineStore("resource", {
         this.filteredResources = this.resources;
       }
       this.sortResources();
+    },
+    async getAllTestResources(id: string) {
+      const resourceQuery = gql`
+        query ($id: ID!) {
+          getResource(id: $id) {
+            id
+            title
+            description
+            targetRegion
+            targetCountry
+            slug
+            language
+            contentType
+            viewsNumber
+            likesNumber
+            sharesNumber
+            subject
+            topic
+            rating
+            sessionId
+            accessKey
+            keywords
+            coverImage
+            isPublished
+            averageRating
+            reviews
+            createdBy {
+              id
+
+              personalInfo {
+                username
+                email
+                scholarId
+                fullName
+                activationToken
+                resetToken
+                tokenExpiry
+                activatedAccount
+              }
+              role
+            }
+            createdAt
+            updatedAt
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: resourceQuery,
+          variables: { id },
+        });
+
+        const resource = response.data?.getResource;
+        if (resource) {
+          this.resource = resource;
+        } else {
+          throw new Error("Failed to fetch resource");
+        }
+      } catch (error) {
+        console.error("Error fetching resource:", error);
+      }
     },
     async getAllTaskResources() {
       const GET_TASK_RESOURCES = gql`
@@ -270,6 +334,63 @@ export const useResourceStore = defineStore("resource", {
         }
       } catch (error) {
         console.error("Error fetching resources:", error);
+      }
+    },
+    async getPublisherLatestExams(userId: string) {
+      const GET_LATEST_EXAMS = gql`
+        query ($userId: String!) {
+          getPublisherLatestExams(userId: $userId) {
+            id
+            title
+            participants
+            description
+            examMetaInfo {
+              examDate
+              examStartTime
+              examDuration
+              examEndTime
+              selectedTypes
+              numberOfQuestions {
+                SCQ
+                MCQ
+                ATF
+                ETF
+                VSAQ
+                SAQ
+                LEQ
+              }
+              testMeta {
+                testType
+                numberOfQuestions
+              }
+            }
+            subject
+            topic
+            createdBy {
+              id
+            }
+            createdAt
+            sessionId
+            accessKey
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: GET_LATEST_EXAMS,
+          variables: { userId },
+        });
+
+        const exams = response.data.getPublisherLatestExams;
+        if (exams) {
+          this.exams = JSON.stringify(exams);
+          this.showExamsDialog = true;
+        } else {
+          throw new Error("Failed to fetch resource");
+        }
+      } catch (error) {
+        console.error("Error fetching resource:", error);
       }
     },
     async getPublisherLatestPoll(userId: string) {
@@ -721,25 +842,10 @@ export const useResourceStore = defineStore("resource", {
           ) {
             id
             title
-            description
-            content
-            targetRegion
-            targetCountry
             slug
             language
             contentType
-            viewsNumber
-            likesNumber
-            sharesNumber
-            subject
-            topic
-            rating
-            sessionId
-            accessKey
-            keywords
-            coverImage
-            isPublished
-            averageRating
+
             reviews
             createdBy {
               id

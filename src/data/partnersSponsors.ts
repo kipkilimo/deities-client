@@ -7,20 +7,22 @@ const partners = [
     fullname: "School of Public and Global Health",
   },
   {
-    partnerType: "faculty",
-    logo: "https://a2z-v0.s3.eu-central-1.amazonaws.com/photo-removebg-preview.png",
-    fullname: "Berlin Nairobi Global HEART",
-  },
-  {
     partnerType: "sponsor",
     logo: "https://www.drugwatch.com/wp-content/uploads/boehringer-logo-240x0-c-default.png",
     fullname: "Boehringer Ingelheim",
   },
-  //   {
-  //     partnerType: "faculty",
-  //     logo: "faculty-logo-2.png",
-  //     fullname: "Faculty Name 2",
-  //   },
+  {
+    partnerType: "faculty",
+    logo: "https://a2z-v0.s3.eu-central-1.amazonaws.com/csm_Logo_Slogan460x337_e4b64943ea-removebg-preview.png",
+    fullname:
+      "Institut für Biometrie und Klinische Epidemiologie - Institute of Biometry and Clinical Epidemiology",
+  },
+  {
+    partnerType: "faculty",
+    logo: "https://a2z-v0.s3.eu-central-1.amazonaws.com/photo-removebg-preview.png",
+    fullname: "Berlin Nairobi Global HEART",
+  },
+
   //   {
   //     partnerType: "sponsor",
   //     logo: "sponsor-logo-3.png",

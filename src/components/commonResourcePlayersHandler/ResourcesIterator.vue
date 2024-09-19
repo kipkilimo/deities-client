@@ -246,8 +246,20 @@ const resourceComponent = computed(() => {
 
 // Fetch resources before mounting the component
 onBeforeMount(async () => {
-  const queryParams = localStorage.getItem("queryParams") || "";
-  await resourceStore.getAllSpecificTypeResources(queryParams);
+  const taskType = localStorage.getItem("resourceType");
+  const testype = localStorage.getItem("resourceType");
+  const accessKey = ref("");
+  if (testype !== null) {
+    await resourceStore.getAllTestResources(accessKey.value);
+    localStorage.removeItem("resourceType");
+  } else if (taskType !== null) {
+    await resourceStore.getAllTaskResources();
+    localStorage.removeItem("resourceType");
+  } else {
+    const queryParams = localStorage.getItem("queryParams") || "";
+    await resourceStore.getAllSpecificTypeResources(queryParams);
+  }
+
   selectResource(resourceStore.resources[0]);
 });
 </script>

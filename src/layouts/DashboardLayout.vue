@@ -30,6 +30,21 @@
             </template>
             <span> Add a resource</span>
           </v-tooltip>
+          <v-tooltip location="top">
+            <template v-slot:activator="{ props }">
+              <v-btn
+                v-bind="props"
+                icon
+                rounded
+                class="ml-2"
+                density="comfortable"
+                @click="fetchPresentersExams"
+              >
+                <v-icon>mdi-ab-testing</v-icon>
+              </v-btn>
+            </template>
+            <span> Manage my exams</span>
+          </v-tooltip>
         </v-col>
 
         <v-btn icon variant="text" color="inherit">
@@ -95,7 +110,7 @@
             <v-img
               class="mt-3"
               style="border-radius: 0px 0px 5px 5px"
-              src="https://www.boehringer-ingelheim.com/sites/default/files/Innovation/open_innovation/open_innovation_at_boehringer_ingelheim.jpg"
+              src="https://assets.bizclikmedia.net/580/d07c504f4f85d8f6a3c308c34edb7b93:b4ee3e25d34286c263ca95017d7fb60d/bro-3186903594-boehringeringelheim-dec2022.jpg"
             ></v-img>
           </v-list-item-group>
         </v-list>
@@ -157,14 +172,18 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog width="630" v-model="resourceStore.showExamsDialog"> 
+      <PublisherExams /> 
+    </v-dialog>
   </v-app>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onBeforeMount } from "vue";
+import { ref, computed, onMounted, onBeforeMount } from "vue";
 import { useI18n } from "vue-i18n";
 import { useUserStore } from "@/stores/users";
 import { useRouter } from "vue-router";
+import PublisherExams from "@/components/dashboardDialogs/PublisherExams.vue";
 import { useResourceStore } from "@/stores/resources";
 const resourceStore = useResourceStore();
 const addingComputing = ref(false);
@@ -186,7 +205,8 @@ onBeforeMount(async () => {
       }
     }
   }
-
+});
+onMounted(async () => {
   await fetchPoll();
 });
 const { t, locale } = useI18n();
@@ -291,7 +311,14 @@ function getTooltipHighlight(title: string) {
   // Function to return highlighted tooltip content based on the title
   return title;
 }
+async function fetchPresentersExams() {
+  const userId = localStorage.getItem("sessionId");
+  //@ts-ignore
+  await resourceStore.getPublisherLatestExams(userId);
 
+  // Check if user is creator
+  //@ts-ignore
+}
 async function logout() {
   try {
     await userStore.logout();

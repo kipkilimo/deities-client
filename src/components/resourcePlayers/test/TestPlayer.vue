@@ -1,115 +1,107 @@
 <template>
   <v-container fluid>
-    <v-card>
-      <v-card-title>
-        <v-spacer></v-spacer>
-        <v-btn @click="toggleFullscreen" icon>
-          <v-icon>{{
-            isFullscreen ? "mdiFullscreenExit" : "mdiFullscreen"
-          }}</v-icon>
-        </v-btn>
-      </v-card-title>
-      <v-carousel
-        v-model:currentIndex="currentIndex"
-        :items="preloadedSlides"
-        hide-delimiters
-        hide-gutter
-        show-arrows
-        :cycle="true"
-        :interval="5000"
-        class="v-carousel--fullscreen"
-      >
-        <v-carousel-item v-for="(slide, index) in slides" :key="index">
-          <v-img :src="slide" class="slide-img" contain></v-img>
-        </v-carousel-item>
-      </v-carousel>
-    </v-card>
+    <!-- First static row with 8 columns -->
+    <v-row>
+      <v-col v-for="i in 8" :key="i" cols="3">
+        <!-- Static content for each column -->
+        <v-card>
+          <v-card-title>Card {{ i }}</v-card-title>
+          <v-card-subtitle>Details for Card {{ i }}</v-card-subtitle>
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <!-- Second dynamic row with variable number of columns -->
+    <v-row>
+      <v-col v-for="(item, index) in parsedContent" :key="index" :cols="12 / dynamicNumberOfCols">
+        <!-- Dynamic Content in each column -->
+        <v-card>
+          <v-card-title>Dynamic Card {{ index + 1 }}</v-card-title>
+          <v-card-subtitle>{{ item.title }}</v-card-subtitle>
+          <v-card-actions>
+            <!-- Dummy PDF URL for answer key -->
+            <v-btn icon :href="item.pdfUrl" target="_blank">
+              <v-icon>mdi-file-pdf-box</v-icon> Answer Key
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import { useResourceStore } from "@/stores/resources";
 
-// Slide URLs
-const urls = [
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/978f2423-fa6a-4084-a1ad-145d1d38c013-page-000.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/3599d01f-fb8a-45a0-88ec-4bc5f87f768c-page-001.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/01543dda-d758-4d1a-85b9-56c27df9d2a0-page-002.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/1c56b055-c3d3-499a-aac8-09a299de6bee-page-003.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/ac932133-2cba-46c1-b302-8e102f9bef7f-page-004.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/ebaec5ad-5723-424e-a959-b38ee21bc0a0-page-005.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/b06941cc-5b30-49ce-a0f4-36c395bb51db-page-006.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/d3d0f008-8457-4446-a4a3-ff609ebe64c6-page-007.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/fae99192-c846-4391-881b-b2bad60c6641-page-008.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/b78aba32-fb56-43f3-aa44-de390165764b-page-009.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/8229ee9f-79e0-4156-a5dc-db2d7a290f8a-page-010.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/fb257b8a-e4cf-4255-86d2-9c6cd5683536-page-011.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/02bf02a1-7442-4896-a3c9-8001bb783808-page-012.jpg",
-  "https://a2z-v0.s3.eu-central-1.amazonaws.com/3c59c106-93da-4b16-be0e-15ba70912ad8-page-013.jpg",
-];
+// Store access to fetch resource content
+const resourceStore = useResourceStore();
 
-// Sort the URLs
-const sortedUrls = urls.sort((a, b) => {
-  const matchA = a.match(/page-(\d+)\.jpg/);
-  const matchB = b.match(/page-(\d+)\.jpg/);
+// Recursive JSON parser function
+function useDynamicParseContent(initialContent: any) {
+  // Recursive function to parse nested JSON
+  const parseNestedJSON = (data: any): any => {
+    if (typeof data === "string") {
+      try {
+        const parsedData = JSON.parse(data);
+        return parseNestedJSON(parsedData);
+      } catch (e) {
+        return data; // Return raw string if not parseable
+      }
+    } else if (Array.isArray(data)) {
+      return data.map(parseNestedJSON);
+    } else if (typeof data === "object" && data !== null) {
+      for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+          data[key] = parseNestedJSON(data[key]);
+        }
+      }
+      return data;
+    }
+    return data;
+  };
 
-  // Ensure matches are found and valid before accessing groups
-  if (matchA && matchB) {
-    const pageA = parseInt(matchA[1], 10);
-    const pageB = parseInt(matchB[1], 10);
-    return pageA - pageB;
-  }
+  // Reactive ref for parsed content
+  const parsedContent = ref(parseNestedJSON(initialContent));
 
-  // Handle cases where matches are not found
-  // For example, if one or both of the matches are null, consider them equal or put null values at the end
-  return 0; // or you can choose to return a default value based on your sorting requirements
+  // Function to update content dynamically
+  const updateContent = (newContent: any) => {
+    parsedContent.value = parseNestedJSON(newContent);
+  };
+
+  return {
+    parsedContent,
+    updateContent,
+  };
+}
+
+// Initial dummy content (replace with actual resource content later)
+const initialContent = resourceStore.resource.content;
+
+// Parse the initial content
+const { parsedContent, updateContent } = useDynamicParseContent(initialContent);
+
+// Reactive ref for controlling the dynamic number of columns
+const dynamicNumberOfCols = ref(3); // Adjust the number of columns as necessary
+console.log({thisExam:parsedContent})
+// Watch for changes in parsed content (for debugging purposes)
+watch(parsedContent, () => {
+  console.log("Parsed Content:", parsedContent.value);
 });
-
-const currentIndex = ref(0);
-const isFullscreen = ref(false);
-
-// Preload next 4 slides
-const preloadCount = 4;
-const preloadedSlides = ref(sortedUrls.slice(0, preloadCount + 1));
-
-// Update preloaded slides based on current index
-watch(currentIndex, (newIndex) => {
-  const start = Math.max(newIndex, 0);
-  const end = Math.min(newIndex + preloadCount, sortedUrls.length - 1);
-  preloadedSlides.value = sortedUrls.slice(start, end + 1);
-});
-
-// Toggle fullscreen mode
-const toggleFullscreen = () => {
-  if (document.fullscreenElement) {
-    document.exitFullscreen();
-  } else {
-    document.documentElement.requestFullscreen();
-  }
-  isFullscreen.value = !isFullscreen.value;
-};
-
-// Slides data
-const slides = ref(sortedUrls);
 </script>
 
 <style scoped>
-.v-carousel--fullscreen {
-  height: 100vh;
+.v-btn {
+  color: white;
 }
 
-.slide-img {
-  max-height: 100vh;
-  max-width: 100vw;
+.v-carousel--fullscreen {
+  height: 100vh;
 }
 
 .v-carousel-item {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.v-btn {
-  color: white;
 }
 </style>

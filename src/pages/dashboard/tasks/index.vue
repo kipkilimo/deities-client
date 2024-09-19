@@ -11,7 +11,7 @@
    <v-row
     v-if="updatedResources"
     class="d-flex justify-left"
-    style="max-height: 75vh; overflow-y: auto;" <!-- Set max height and enable vertical scrolling -->
+    style="max-height: 75vh; overflow-y: auto;" 
   >
       <h3 class="ml-4">NEMBio Assignment Tasks</h3>
       <v-divider class="mx-4 mb-1"></v-divider>
@@ -96,10 +96,11 @@ const resourceStore = useResourceStore();
 const updatedResources = ref(null);
 
 function goToResourceRenderer(resource) {
+  resourceStore.resource = resource
   localStorage.setItem("resourceType", "TASK");
   router.push("/dashboard/player");
 }
-function requestToParticipateInTask(resource) {
+function requestToParticipateInTask() {
   localStorage.setItem("resourceType", "TASK");
   router.push("/dashboard/player");
 }

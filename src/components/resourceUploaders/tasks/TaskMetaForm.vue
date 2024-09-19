@@ -62,7 +62,7 @@
     <v-dialog max-width="500" v-model="uploadingTaskSet">
       <v-card title="Upload Assignment Set Questions">
         <v-divider />
-        <TestUploader />
+        <TaskUploader />
       </v-card>
     </v-dialog>
   </v-container>
@@ -139,6 +139,7 @@ function submitAssignment() {
       assignmentTitle: assignmentTitle.value,
       assignmentDescription: assignmentDescription.value,
       assignmentDuration: assignmentDuration.value,
+      assignmentDeadline: getDeadline(assignmentDuration.value),
     };
     console.log("Assignment Submitted", formData);
     // You can replace this with an actual form submission logic

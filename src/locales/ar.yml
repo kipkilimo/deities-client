@@ -25,7 +25,7 @@ dashboard:
       إجمالي الإيجارات
     revenue: دخل
     rating: معدل التقييمات
-    rentalFrequency: عدد مرات التأجير
+    publishingFrequency: عدد مرات التأجير
     carsInfo: معلومات السيارات
     carModel: طراز السيارة
     carType: نوع السيارة

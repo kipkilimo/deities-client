@@ -16,6 +16,7 @@
                 alt="Event Cover Image"
                 class="rounded-xs"
                 cover
+                height="15rem"
                 min-width="100%"
               ></v-img
             ></v-col>
@@ -25,7 +26,7 @@
               }}</v-card-title>
 
               <!-- Event Date and Time -->
-              <v-card-subtitle class="mt-2 mb-1 text-body-2">
+              <v-card-subtitle class="text-body-2">
                 <v-icon left small class="mr-1">mdi-calendar-today</v-icon>
                 {{
                   formatLongDateWithTime(
@@ -55,17 +56,14 @@
             </v-col>
           </v-row>
           <!-- Divider -->
-          <v-divider class="my-3"></v-divider>
+          <v-divider class="my-1"></v-divider>
 
           <!-- Event Description -->
           <v-card-text class="text-body-1">
-            <v-subheader class="mb-2 text-h6">Description</v-subheader>
+            <v-subheader class="text-h6">Description</v-subheader>
             <p>{{ currentEvent.description }}</p>
-          </v-card-text>
-
-          <!-- Keynote Speakers -->
-          <v-card-text class="text-body-1">
-            <v-subheader class="mb-2 text-h6">Keynote Speakers</v-subheader>
+ 
+            <v-subheader class=" text-h6">Keynote Speakers</v-subheader>
             <ul>
               <li
                 v-for="(speaker, index) in currentEvent.keynote_speakers"
@@ -77,11 +75,8 @@
                 {{ speaker.affiliation }} ({{ speaker.expertise }})
               </li>
             </ul>
-          </v-card-text>
-
-          <!-- Registration Details -->
-          <v-card-text class="text-body-1">
-            <v-subheader class="mb-2 text-h6"
+ 
+            <v-subheader class=" text-h6"
               >Registration & Budget</v-subheader
             >
             <v-card-subtitle class="text-body-2 mb-1">
@@ -101,17 +96,14 @@
                 >Register Here</a
               >
             </v-card-subtitle>
-          </v-card-text>
-
-          <!-- Networking Events -->
-          <v-card-text class="text-body-1">
-            <v-subheader class="mb-6 text-h6">Networking Events</v-subheader>
+ 
+            <v-subheader class="mb-2 text-h6">Networking Events</v-subheader>
             <v-row>
               <v-chip
                 v-for="(networkEvent, index) in currentEvent.networking_events"
                 :key="index"
                 outlined
-                class="mr-2 mb-2 mt-4"
+                class="mr-2  mt-3"
               >
                 <v-icon left small class="mr-1">mdi-handshake</v-icon>
                 {{ networkEvent }}
@@ -121,7 +113,7 @@
 
           <!-- Accessibility Features -->
           <v-card-text class="text-body-1">
-            <v-subheader class="mb-2 text-h6"
+            <v-subheader class=" text-h6"
               >Accessibility Features</v-subheader
             >
             <v-list dense>

@@ -26,16 +26,16 @@ dashboard:
     logout: Logout
   main:
     dashboard-overview: Overview
-    total-rentals: Total rentals
+    total-publications: Total publications
     revenue: Revenue
     rating: Average rating
-    rentalFrequency: Rental frequency
-    carsInfo: Cars information
-    carModel: Car Model
-    carType: Car Type
-    rentalCost: Rental Cost
-    rentalDuration: Rental Duration
-    mileage: Mileage
+    publishingFrequency: Publishing frequency
+    publicationsInfo: Publications information
+    publicationModel: Publication Level
+    publicationType: Publication Type
+    publicationReach: Publication Reach
+    publicationDuration: Publication Duration
+    age: Published
 error:
   pageNotFound: Page not found
   pageNotFoundDescription: >-

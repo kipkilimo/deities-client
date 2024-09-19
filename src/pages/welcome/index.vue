@@ -1,11 +1,9 @@
 <template>
   <v-container fluid fill-height class="main-content">
-    <!-- Hero Section -->
     <v-row class="hero-section align-center" justify="center">
       <v-col class="text-center" cols="12">
         <v-img
           src="https://scitechdaily.com/images/DNA-Technology-Concept.gif"
-          style="height: 70vh"
           class="hero-image"
           cover
           :aspect-ratio="1"
@@ -13,67 +11,22 @@
           <v-container class="hero-content">
             <v-row>
               <v-col cols="12">
-                <h1
-                  :style="{
-                    color: '#ffffff', // White text for better contrast
-                    textShadow: '16px 16px 18px rgba(14, 35, 79, 0.9)', // Stronger shadow for more definition
-                    fontWeight: 'bold', // Make the font weight bold
-                    fontSize: '8.1rem', // Increase font size
-                    lineHeight: '1.2', // Adjust line height for better readability
-                    marginBottom: '20px', // Additional spacing
-                  }"
-                  class="headline mb-4"
-                >
-                  NEMB<span style="font-size: 7.5rem; font-family: Monaco"
-                    ><i>io</i></span
-                  >
+                <h1 class="headline mb-4 title-text">
+                  NEMB<span class="io-text"><i>io</i></span>
                 </h1>
-                <br />
-                <br />
-                <br />
-                <h2
-                  :style="{
-                    color: '#ffffff', // White text for better contrast
-                    textShadow: '16px 16px 18px rgba(14, 35, 79, 0.9)', // Stronger shadow for more definition
-                    fontWeight: 'bold', // Make the font weight bold
-                    fontSize: '3.6rem', // Increase font size
-                    lineHeight: '1.2', // Adjust line height for better readability
-                    marginBottom: '20px', // Additional spacing
-                  }"
-                  class="headline mb-4"
-                >
+                <h2 class="headline mb-4 subtitle-text">
                   Advancing Life Sciences Research through Collaboration
                 </h2>
 
-                <br />
-                <br />
-                <br />
-                <br />
-                <br />
-                <br />
-                <br />
-                <br />
                 <div class="button-container">
                   <v-btn
-                    :style="{ backgroundColor: buttonBgColor, width: '24rem' }"
+                    class="cta-button"
                     size="x-large"
-                    class="mr-xl"
                     @click="scrollToCallToAction"
                   >
                     <v-icon>mdi-login</v-icon>
                     Continue to the Application
                   </v-btn>
-
-                  <!-- <v-btn
-                    :style="{ backgroundColor: buttonBgColor, width: '200px' }"
-                    large
-                    variant="outlined"
-                    class="ml-xl"
-                    @click="scrollToCallToAction2"
-                  >
-                    <v-icon left>mdi-account-search</v-icon>
-                    Guest Explore
-                  </v-btn> -->
                 </div>
               </v-col>
             </v-row>
@@ -82,23 +35,19 @@
       </v-col>
     </v-row>
 
-    <!-- Call to Action -->
     <v-row ref="callToAction" class="call-to-action">
       <v-col cols="12" md="12" class="text-center">
         <v-card max-height="28rem">
           <v-row>
-            <v-col cols="4">
+            <v-col cols="12" md="4">
               <v-img
                 src="https://img.freepik.com/premium-vector/green-medical-seamless-pattern_74102-633.jpg"
-              ></v-img>
+              />
             </v-col>
-
-            <v-col cols="8">
+            <v-col cols="12" md="8">
               <v-card-title>
                 <h1 class="title">
-                  About NEMB<span style="font-size: 2.1rem; font-family: Monaco"
-                    ><i>io</i></span
-                  >
+                  About NEMB<span class="io-text"><i>io</i></span>
                 </h1>
               </v-card-title>
               <v-card-subtitle class="subheading">
@@ -144,7 +93,6 @@
         </v-card>
       </v-col>
     </v-row>
-
     <!-- Cards Section -->
     <v-card
       class="mx-auto d-flex flex-column align-center justify-center"
@@ -155,7 +103,9 @@
       width="100%"
     >
       <template v-slot:title>
-        <span class="font-weight-black text-center">NEMBio Features and Solutions</span>
+        <span class="font-weight-black text-center"
+          >NEMBio Features and Solutions</span
+        >
       </template>
       <div class="text-overline mb-1 d-flex flex-wrap">
         <div
@@ -163,87 +113,33 @@
           :key="index"
           class="mr-2"
         >
-          <v-chip rounded="xl" variant="text">{{ index+1 }}. {{ feature.title }}</v-chip>
+          <v-chip rounded="xl" variant="text"
+            >{{ index + 1 }}. {{ feature.title }}</v-chip
+          >
         </div>
       </div>
     </v-card>
 
     <v-divider />
     <v-row class="py-5" justify="center">
-      <v-col cols="12" md="4">
+      <v-col
+        v-for="(card, index) in researchCards"
+        :key="index"
+        cols="12"
+        md="4"
+        sm="12"
+      >
         <v-card class="research-card">
           <v-img
-            src="https://www.ohsu.edu/sites/default/files/2019-01/clin-epiicon.jpg"
+            :src="card.image"
             height="200px"
             class="card-image"
             cover
             :aspect-ratio="1"
           />
-          <v-card-title
-            >Epidemiology: Patterns of disease and exposure</v-card-title
-          >
-          <v-card-subtitle
-            >How often diseases occur in different groups of people and why?
-          </v-card-subtitle>
-          <v-card-text>
-            Epidemiology is the study of the patterns, causes, and effects of
-            health and disease in patient populations and the relationships
-            between exposures or treatments and health outcomes.
-          </v-card-text>
-          <!-- <v-card-actions>
-            <v-btn color="primary">Learn More</v-btn>
-          </v-card-actions> -->
-        </v-card>
-      </v-col>
-
-      <v-col cols="12" md="4">
-        <v-card class="research-card">
-          <v-img
-            src="https://sph.umich.edu/biostat/biostat-virtual-admitted-day-experience/images/rshbanner.jpg"
-            height="200px"
-            class="card-image"
-            cover
-            :aspect-ratio="1"
-          />
-          <v-card-title>Biostatistical Methods & Data Analysis</v-card-title>
-          <v-card-subtitle
-            >Explore the art and science of collecting, analyzing, and
-            interpreting data.</v-card-subtitle
-          >
-          <v-card-text>
-            Biostatistics is the application of statistical techniques to
-            scientific research in health-related fields, including medicine,
-            biology, and public health, and the development of new tools to
-            study these areas.
-          </v-card-text>
-          <!-- <v-card-actions>
-            <v-btn color="primary">Learn More</v-btn>
-          </v-card-actions> -->
-        </v-card>
-      </v-col>
-
-      <v-col cols="12" md="4">
-        <v-card class="research-card">
-          <v-img
-            src="https://blogassets.leverageedu.com/blog/wp-content/uploads/2020/03/28214113/Types-of-Research-Design.jpg"
-            class="card-image"
-            cover
-            :aspect-ratio="1"
-          />
-          <v-card-title>Research Methods</v-card-title>
-          <v-card-subtitle
-            >Expand your knowledge in research methods.</v-card-subtitle
-          >
-          <v-card-text>
-            The best method for your project largely depends on your topic, the
-            type of data you will need, and the people or items from which you
-            will be collecting data, including considerations for data accuracy
-            and relevance.
-          </v-card-text>
-
-          <!-- <v-card-actions>
-            <v-btn color="primary">Explore Resources</v-btn>
-          </v-card-actions> -->
+          <v-card-title>{{ card.title }}</v-card-title>
+          <v-card-subtitle>{{ card.subtitle }}</v-card-subtitle>
+          <v-card-text>{{ card.text }}</v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -259,14 +155,23 @@
       <template v-slot:title>
         <span class="font-weight-black text-center">Our partners</span>
       </template>
-      <div class="text-overline mb-1 d-flex flex-wrap">
-        <div v-for="(partner, index) in partners" :key="index" class="mr-2">
-          <v-chip rounded="xl" variant="text">{{
-            partner.fullname
-          }} | </v-chip>
+      <div class="ticker-content">
+        <div class="chip-row">
+          <v-chip
+            v-for="(partner, index) in partners"
+            :key="index"
+            rounded="xl"
+            variant="text"
+            class="text-overline"
+          >
+            {{ partner.fullname }} |
+          </v-chip>
+          <div class="delay-element"></div>
         </div>
       </div>
     </v-card>
+
+    <v-divider />
 
     <v-divider />
 
@@ -278,7 +183,7 @@
               <img
                 :src="partner.logo"
                 :alt="partner.fullname"
-                style="height: 13.5rem"
+                class="partner-logo"
               />
               <v-card-subtitle class="text-center">{{
                 partner.fullname
@@ -288,7 +193,7 @@
         </v-carousel-item>
       </v-carousel>
     </v-container>
-    <!-- Footer -->
+
     <v-footer class="footer">
       <v-row class="text-center">
         <v-col cols="12">
@@ -300,23 +205,22 @@
           <v-divider />
           <v-card-actions>
             <v-spacer />
-            <v-btn class="mt-2" varianr="outlined" @click="scrollToTop"
-              ><v-icon>mdi-arrow-up</v-icon>Back to Top</v-btn
-            >
+            <v-btn class="mt-2" variant="outlined" @click="scrollToTop">
+              <v-icon>mdi-arrow-up</v-icon> Back to Top
+            </v-btn>
             <v-btn
-              :style="{ backgroundColor: buttonBgColor, width: '24rem' }"
-              class="mt-2 mr-8"
-              varianr="outlined"
+              class="mt-2 mr-8 cta-button"
+              variant="outlined"
               @click="scrollToCallToAction"
             >
-              <v-icon>mdi-login</v-icon>
-              Continue to the Application
+              <v-icon>mdi-login</v-icon> Continue to the Application
             </v-btn>
             <v-spacer />
           </v-card-actions>
         </v-col>
       </v-row>
     </v-footer>
+
     <div class="text-caption" style="text-align: center">
       Concept, design & crafting with ♡ by
       <a href="https://vuetifyjs.com/" target="_blank" rel="noopener noreferrer"
@@ -329,13 +233,14 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-const buttonBgColor = "#fcfcfc"; // Replace with your desired color code
-const currentYear = ref(new Date().getFullYear());
 import { useRouter } from "vue-router";
-// @ts-ignore
 import partners from "../../data/partnersSponsors";
 import { researchCards } from "@/data/researchCards";
+
+const buttonBgColor = "#fcfcfc";
+const currentYear = ref(new Date().getFullYear());
 const router = useRouter();
+
 const scrollToCallToAction = () => {
   const session = localStorage.getItem("sessionId");
   if (session) {
@@ -344,95 +249,102 @@ const scrollToCallToAction = () => {
     router.push("/auth/login");
   }
 };
-const hoveredPartner = ref("");
 
-const scrollToCallToAction2 = () => {
-  const el = document.querySelector('v-row.ref="callToAction"');
-  if (el) {
-    el.scrollIntoView({ behavior: "smooth" });
-  }
-};
 const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
-};
-
-const signUp = () => {
-  alert("Sign Up clicked!");
 };
 </script>
 
 <style scoped>
-.main-content {
-  font-family: Roboto, sans-serif;
-  color: #333;
-}
-
 .hero-section {
-  position: relative;
   background-color: #f5f5f5;
 }
-
 .hero-image {
   width: 100%;
+  height: 70vh;
 }
-
 .hero-content {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: white;
   text-align: center;
 }
-
+.title-text {
+  color: #ffffff;
+  text-shadow: 16px 16px 18px rgba(14, 35, 79, 0.9);
+  font-weight: bold;
+  font-size: clamp(3rem, 8vw, 8.1rem);
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+.subtitle-text {
+  color: #ffffff;
+  text-shadow: 16px 16px 18px rgba(14, 35, 79, 0.9);
+  font-weight: bold;
+  font-size: clamp(1.5rem, 4vw, 3.6rem);
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
 .call-to-action {
   background-color: #f0f0f0;
   padding: 50px 0;
 }
-
 .research-card {
   margin: 20px;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 .card-image {
-  width: 100%;
-  height: 200px;
   object-fit: cover;
 }
-
 .footer {
   background-color: #f0f0f0;
   padding: 20px 0;
 }
-</style>
-
-<style scoped>
-.underline {
-  content: "";
-  display: block;
-  width: 100%;
-  height: 1px;
-  background-color: blue;
-  margin-top: 5px; /* Adjust margin as needed */
-}
-</style>
-
-<style scoped>
 .button-container {
-  justify-content: space-between;
-}
-
-.v-btn {
-  align-items: center;
   justify-content: center;
 }
+.cta-button {
+  background-color: #fcfcfc;
+  width: clamp(15rem, 30vw, 24rem);
+}
 </style>
-
 <style scoped>
-.logo-strip {
-  max-width: 100%;
-  overflow-x: auto;
-  white-space: nowrap;
+.io-text {
+  font-family: "Monaco", "Courier New", Courier, monospace;
+}
+.ticker-container {
+  width: 100%;
+  overflow: hidden; /* Hide overflowing content */
+  white-space: nowrap; /* Ensure everything stays on a single line */
+}
+
+.ticker-content {
+  display: inline-block;
+  padding-left: 100%; /* Start the content offscreen to the right */
+  animation: ticker-scroll 60s linear infinite; /* Animate scrolling effect */
+}
+
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(100%); /* Start offscreen on the right */
+  }
+  100% {
+    transform: translateX(-100%); /* End offscreen on the left */
+  }
+}
+
+.chip-wrapper {
+  display: inline-block;
+  white-space: nowrap; /* Prevent individual chips from wrapping */
+}
+.chip-row {
+  display: flex;
+  flex-direction: row; /* Ensure chips are displayed horizontally */
+  align-items: center; /* Optional: Center chips vertically within the row */
+}
+.delay-element {
+  display: inline-block;
+  width: 720px; /* Adjust this value to control the delay duration */
 }
 </style>
