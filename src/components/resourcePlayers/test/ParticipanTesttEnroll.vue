@@ -19,7 +19,7 @@
         <div class="mt-3">
           <v-row>
             <v-col cols="9">
-              <h1 class="text-h6">Exam Participant Enrollment</h1>
+              <h1 class="text-h6">Assignment Participant Enrollment</h1>
               <p>Session ID: {{ sessionId }}</p>
             </v-col>
             <v-col cols="3">
@@ -36,8 +36,16 @@
     </v-row>
     <v-card-actions>
       <v-spacer />
-      <v-btn variant="outlined" @click="submitParticipantData"
-        >Request Exam Enrollment</v-btn
+      <v-btn variant="text" @click="submitParticipantData"
+        >Request Assignment Enrollment</v-btn
+      >
+
+      <v-btn
+        variant="outlined"
+        prepend-icon="mdi-book-edit-outline"
+        v-if="success"
+        @click="submitParticipantPlatResourceData"
+        >Attempt this exam</v-btn
       >
       <v-spacer />
     </v-card-actions>
@@ -80,21 +88,26 @@ const userId = ref(localStorage.getItem("sessionId")); // Retrieve userId from l
 const success = ref(null);
 const errorMessage = ref(null);
 
+const submitParticipantPlatResourceData = () => {
+  console.log("Attempt this exam");
+}
+
 const submitParticipantData = async () => {
   try {
     const data = {
       sessionId: sessionId.value,
       userId: userId.value,
     };
-    // Submit data to server
-    console.log({ data });
-
-    const response = await axios.post(
+    // Submit data to server 
+   const response =  await axios.post(
       `${apiUrl}/resources/uploads/exam/participant`,
       data
     );
+    console.log({response})
+if(response.data.userId){
 
     success.value = "Enrollment request submitted successfully.";
+}
   } catch (error) {
     console.log({ error });
     if (axios.isAxiosError(error)) {
@@ -102,8 +115,5 @@ const submitParticipantData = async () => {
       errorMessage.value = error.response.data.error;
     }
   }
-  setTimeout(() => {
-    window.location = "/";
-  }, 4500);
 };
 </script>

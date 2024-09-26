@@ -1,12 +1,13 @@
 <template>
   <div>
     <!-- Render the Child Component -->
-    <PaperPlayer />
+    <PapersIterator />
   </div>
 </template>
 
 <script setup>
-import PaperPlayer from "../../../components/commonResourcePlayersHandler/PaperTextHighlighter.vue";
+// import PaperPlayer from "../../../components/commonResourcePlayersHandler/PaperTextHighlighter.vue";
+import PapersIterator from '@/components/paperdiveiterator/RecentPapers.vue'
 </script>
 
 <style scoped>

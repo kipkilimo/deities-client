@@ -6,5 +6,5 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import ParticipantEnroll from "@/components/resourcePlayers/test/ParticipanTesttEnroll.vue";
+import ParticipantEnroll from "@/components/resourcePlayers/tasks/ParticipantTaskEnroll.vue";
 </script>

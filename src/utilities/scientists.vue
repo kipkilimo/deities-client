@@ -71,8 +71,8 @@
 <script setup>
 import { ref, onBeforeMount, computed, watch } from "vue";
 // Import the array of notableFigures
-import notableFigures from "../../data/scientists";
-import { useUserStore } from "../../stores/users";
+import notableFigures from "@/data/scientists";
+import { useUserStore } from "@/stores/users";
 
 const userStore = useUserStore();
 function handleChipClick(scientist) {

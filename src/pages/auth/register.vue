@@ -158,7 +158,7 @@ import { useUserStore } from "../../stores/users";
 const userStore = useUserStore();
 
 import { useRouter } from "vue-router";
-import Scientists from "@/components/utilities/scientists.vue";
+import Scientists from "@/utilities/scientists.vue";
 const selectIcon = ref(false);
 const agreeToTerms = ref(false); // agreeToTermsDialog
 const agreeToTermsDialog = ref(false);

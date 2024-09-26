@@ -1,21 +1,21 @@
 // Define resource types with corresponding icons and names
 const resourceType = {
-    AUDIO: { icon: "🎵", name: "🎵 PODCASTS" },
-    PRESENTATION: { icon: "▶", name: "▶ SLIDES PLAYER" },
-    VIDEO: { icon: "📹", name: "📹 RECORDINGS" },
-    IMAGES: { icon: "🖼️", name: "🖼️ GALLERIES" },
-    DOCUMENT: { icon: "📙", name: "📙 DOCUMENTS" },
-    EVENT: { icon: "🗓️", name: "🗓️ EVENTS" },
-    DATASET: { icon: "⛁", name: "⛁⛁ DATASETS" },
-    LINK: { icon: "⛓️", name: "⛓️ RESOURCE LINKS" },
-    POLL: { icon: "🗣️📊", name: "🗣️📊 LIVE POLLS" },
-    TEST: { icon: "🕖📋✍🏼", name: "🕖📋✍🏼 EXAM TESTS" },
-    POSTER: { icon: "🎴", name: "🎴 ABSTRACT POSTERS" },
-    ARTICLE: { icon: "📑", name: "📑 BLOG ARTICLES" },
-    JOB: { icon: "📁", name: "📁 WORK STUDY" },
-    TASK: { icon: "📚🎧", name: "📚🎧 ASSIGNMENT TASKS" },
-    MODEL: { icon: "🎲", name: "🎲 CLINICAL MODELS" },
-    // Add more resource types here if needed
+  PRESENTATION: { icon: "▶", name: "▶ SLIDES PLAYER" },
+  TASK: { icon: "📚🎧", name: "📚🎧 ASSIGNMENT TASKS" },
+  DOCUMENT: { icon: "📙", name: "📙 DOCUMENTS" },
+  TEST: { icon: "🕖📋✍🏼", name: "🕖📋✍🏼 EXAM TESTS" },
+  ARTICLE: { icon: "📑", name: "📑 BLOG ARTICLES" },
+  VIDEO: { icon: "📹", name: "📹 RECORDINGS" },
+  IMAGES: { icon: "🖼️", name: "🖼️ GALLERIES" },
+  AUDIO: { icon: "🎵", name: "🎵 PODCASTS" },
+  EVENT: { icon: "🗓️", name: "🗓️ EVENTS" },
+  DATASET: { icon: "⛁", name: "⛁⛁ DATASETS" },
+  POLL: { icon: "🗣️📊", name: "🗣️📊 LIVE POLLS" },
+  POSTER: { icon: "🎴", name: "🎴 ABSTRACT POSTERS" },
+  JOB: { icon: "📁", name: "📁 WORK STUDY" },
+  LINK: { icon: "⛓️", name: "⛓️ RESOURCE LINKS" },
+  MODEL: { icon: "🎲", name: "🎲 CLINICAL MODELS" },
+  // Add more resource types here if needed
 };
 
 // Define static resources using the resource types

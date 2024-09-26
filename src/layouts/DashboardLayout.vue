@@ -38,9 +38,24 @@
                 rounded
                 class="ml-2"
                 density="comfortable"
+                @click="fetchPresentersTasks"
+              >
+                <v-icon>mdi-calendar-check-outline</v-icon>
+              </v-btn>
+            </template>
+            <span> Manage my assignments</span>
+          </v-tooltip>
+          <v-tooltip location="top">
+            <template v-slot:activator="{ props }">
+              <v-btn
+                v-bind="props"
+                icon
+                rounded
+                class="ml-2"
+                density="comfortable"
                 @click="fetchPresentersExams"
               >
-                <v-icon>mdi-ab-testing</v-icon>
+                <v-icon>mdi-clock-edit-outline</v-icon>
               </v-btn>
             </template>
             <span> Manage my exams</span>
@@ -172,8 +187,11 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog width="630" v-model="resourceStore.showExamsDialog"> 
-      <PublisherExams /> 
+    <v-dialog width="630" v-model="resourceStore.showExamsDialog">
+      <PublisherExams />
+    </v-dialog>
+    <v-dialog width="630" v-model="resourceStore.showAssignmentsDialog">
+      <PublisherAssignments />
     </v-dialog>
   </v-app>
 </template>
@@ -184,6 +202,8 @@ import { useI18n } from "vue-i18n";
 import { useUserStore } from "@/stores/users";
 import { useRouter } from "vue-router";
 import PublisherExams from "@/components/dashboardDialogs/PublisherExams.vue";
+
+import PublisherAssignments from "@/components/dashboardDialogs/PublisherAssignments.vue";
 import { useResourceStore } from "@/stores/resources";
 const resourceStore = useResourceStore();
 const addingComputing = ref(false);
@@ -319,10 +339,48 @@ async function fetchPresentersExams() {
   // Check if user is creator
   //@ts-ignore
 }
-async function logout() {
+async function fetchPresentersTasks() {
+  const userId = localStorage.getItem("sessionId");
+  //@ts-ignore
+  await resourceStore.getPublisherLatestTasks(userId);
+
+  // Check if user is creator
+  //@ts-ignore
+}
+// Clear local storage
+
+// Clear cookies
+function clearCookies() {
+  const cookies = document.cookie.split(";");
+  cookies.forEach((cookie) => {
+    const cookieName = cookie.split("=")[0].trim();
+    document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+  });
+}
+function wipeStorage() {
+  // Wipe local storage
+  localStorage.clear();
+
+  // Wipe cookies
+  const cookies = document.cookie.split(";");
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i];
+    const equalsIndex = cookie.indexOf("=");
+    const name = cookie.substr(0, equalsIndex);
+    document.cookie =
+      name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  }
+
+  // Wipe session storage
+  sessionStorage.clear();
+}
+clearCookies();
+function logout() {
   try {
-    await userStore.logout();
-    router.push("/login");
+    wipeStorage();
+
+    // await userStore.logout();
+    router.push("/auth/login");
   } catch (error) {
     console.error("Logout failed:", error);
   }

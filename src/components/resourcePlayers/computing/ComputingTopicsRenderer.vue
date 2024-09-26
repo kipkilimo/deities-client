@@ -543,7 +543,8 @@ pre {
 }
 </style>
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap');
 
 .v-card {
   max-width: 800px;
@@ -562,7 +563,7 @@ pre {
 }
 
 .bbc-title {
-  font-family: "Cormorant Garamond", serif;
+  font-family: "Lora", serif;
   font-size: 54px;
   font-weight: 700;
   line-height: 1.3;
@@ -570,21 +571,21 @@ pre {
 }
 
 .bbc-subtitle {
-  font-family: "Cormorant Garamond", serif;
+  font-family: "Merriweather", serif;
   font-size: 21px;
   color: #3f3d3d;
   margin-bottom: 1rem;
 }
 
 .bbc-meta {
-  font-family: "Cormorant Garamond", serif;
+  font-family: "Merriweather", serif;
   font-size: 14px;
   color: #3f3d3d;
   margin-right: 1.5rem;
 }
 
 .bbc-content {
-  font-family: "Cormorant Garamond", serif;
+  font-family: "Merriweather", serif;
   font-size: 21px;
   line-height: 1.6;
   color: #333;

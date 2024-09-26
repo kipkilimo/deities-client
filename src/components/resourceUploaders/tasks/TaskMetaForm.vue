@@ -1,7 +1,6 @@
 <template>
-  <v-container>
+  <v-card>
     <v-stepper v-model="step" vertical>
-      <!-- Assignment Details Step -->
       <v-stepper-step step="1" header="Assignment Details">
         <v-form
           ref="form"
@@ -17,30 +16,67 @@
             :menu-props="{ maxHeight: 'none' }"
           ></v-select>
 
-          <v-select
-            v-model="assignmentDuration"
-            :items="assignmentDurationOptions"
-            label="Select Task Duration"
-            required
-            :menu-props="{ maxHeight: 'none' }"
-          ></v-select>
+          <v-card-text class="mb-2 ml-2 h4">
+            Set Task Deadline
+          </v-card-text>  
+          <!-- Time Input Fields with Increment/Decrement Controls -->
+          <v-container>
+            <v-row class="d-flex justify-center">
+              <v-col
+                v-for="field in timeFields"
+                :key="field.label"
+                class="text-center"
+              >
+                <v-container>
+                  <v-row>
+                    <!-- Increment Button Above Value -->
+                    <v-col class="d-flex justify-center align-center">
+                      <v-icon @click="increment(field.ref, field.max)"
+                        >mdi-chevron-up</v-icon
+                      >
+                    </v-col>
+                  </v-row>
+                  <!-- Display Current Value -->
+                  <v-row>
+                    <v-col class="d-flex justify-center align-center">
+                      {{ field.ref.value }} {{ field.label }}
+                    </v-col>
+                  </v-row>
+                  <!-- Decrement Button Below Value -->
+                  <v-row>
+                    <v-col class="d-flex justify-center align-center">
+                      <v-icon @click="decrement(field.ref, field.min)"
+                        >mdi-chevron-down</v-icon
+                      >
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-col>
+            </v-row>
+          </v-container>
+
+          <!-- Display Dynamic Assignment Duration -->
+          <p>Duration: {{ assignmentDuration }}</p>
           <p>Deadline: {{ getDeadline(assignmentDuration) }}</p>
+
+          <!-- Validation Error Message for Time Fields -->
+          <p v-if="!isTimeValid">Please set at least one time duration.</p>
+
           <v-divider />
           <v-text-field
             v-model="assignmentTitle"
             label="Assignment Title"
             required
           ></v-text-field>
-
           <v-textarea
             v-model="assignmentDescription"
             label="Assignment Description"
             required
           ></v-textarea>
 
-          <v-card-actions>
-            <v-btn @click="showAssignmentCreator">Submit Assignment</v-btn>
-          </v-card-actions>
+          <!-- <v-card-actions>
+            <v-btn @click="submitAssignment">Submit Assignment</v-btn>
+          </v-card-actions> -->
         </v-form>
       </v-stepper-step>
 
@@ -51,89 +87,140 @@
           variant="outlined"
           width="7.5rem"
           @click="submitAssignment"
-          :disabled="!isAssignmentValid"
+          :disabled="!isTimeValid"
         >
           Submit
         </v-btn>
         <v-spacer />
       </v-card-actions>
     </v-stepper>
-
-    <v-dialog max-width="500" v-model="uploadingTaskSet">
-      <v-card title="Upload Assignment Set Questions">
+    <v-dialog max-width="500" v-model="uploadingQuestionsSet">
+      <v-card title="Upload Assignment Set Task">
         <v-divider />
         <TaskUploader />
       </v-card>
     </v-dialog>
-  </v-container>
+  </v-card>
 </template>
-<script setup>
-import { ref, computed } from "vue";
 
+<script setup>
+import { ref, computed, watch } from "vue";
+
+// Initial state variables
 const valid = ref(false);
-const uploadingTaskSet = ref(false);
 const step = ref(1);
 const assignmentType = ref("");
 const assignmentTitle = ref("");
 const assignmentDescription = ref("");
-const assignmentDuration = ref("1 week");
+const uploadingQuestionsSet=ref(false)
+const assignmentDuration = ref("10 minutes");
 const assignmentTypes = ["Quiz Tasks", "Project", "Essay", "Research"];
-const assignmentDurationOptions = [
-  "1 day",
-  "2 days",
-  "1 week",
-  "2 weeks",
-  "3 weeks",
-  "4 weeks",
-  "3 months - Term Paper",
+// Time fields with default 3 days set
+const minutes = ref(15);
+const hours = ref(0);
+const days = ref(0);
+const weeks = ref(0);
+const months = ref(0);
+
+// Time fields with v-model
+const timeFields = [
+  { ref: minutes, label: "Minutes", min: 0, max: 59 },
+  { ref: hours, label: "Hours", min: 0, max: 23 },
+  { ref: days, label: "Days", min: 0, max: 7 },
+  { ref: weeks, label: "Weeks", min: 0, max: 4 },
+  { ref: months, label: "Months", min: 0, max: 12 },
 ];
 
-//
-function getDeadline(duration) {
-  const now = new Date();
-  let deadline;
+// Increment and decrement functions for fields
+const increment = (field, max) => {
+  if (field.value < max) field.value++;
+};
+const decrement = (field, min) => {
+  if (field.value > min) field.value--;
+};
 
-  switch (duration) {
-    case "1 day":
-      deadline = new Date(now.getTime() + 24 * 60 * 60 * 1000); // Add 1 day
-      break;
-    case "2 days":
-      deadline = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000); // Add 2 days
-      break;
-    case "1 week":
-      deadline = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // Add 1 week
-      break;
-    case "2 weeks":
-      deadline = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000); // Add 2 weeks
-      break;
-    case "3 weeks":
-      deadline = new Date(now.getTime() + 21 * 24 * 60 * 60 * 1000); // Add 3 weeks
-      break;
-    case "4 weeks":
-      deadline = new Date(now.getTime() + 28 * 24 * 60 * 60 * 1000); // Add 4 weeks
-      break;
-    case "3 months - Term Paper":
-      deadline = new Date(now.setMonth(now.getMonth() + 3)); // Add 3 months
-      break;
-    default:
-      throw new Error("Unknown duration");
-  }
-
-  return deadline;
-}
-const showingAssignmentCreator = ref(true);
-
-const isAssignmentValid = computed(() => {
+// Check if at least one time field is set to a non-zero value
+const isTimeValid = computed(() => {
   return (
-    assignmentType.value !== "" &&
-    assignmentTitle.value !== "" &&
-    assignmentDescription.value !== "" &&
-    assignmentDuration.value !== ""
+    minutes.value > 0 ||
+    hours.value > 0 ||
+    days.value > 0 ||
+    weeks.value > 0 ||
+    months.value > 0
   );
 });
 
-function submitAssignment() {
-  if (valid.value) {
+// Watch time fields and update duration string dynamically
+watch([minutes, hours, days, weeks, months], () => {
+  const totalDuration = [];
+  if (months.value)
+    totalDuration.push(`${months.value} month${months.value > 1 ? "s" : ""}`);
+  if (weeks.value)
+    totalDuration.push(`${weeks.value} week${weeks.value > 1 ? "s" : ""}`);
+  if (days.value)
+    totalDuration.push(`${days.value} day${days.value > 1 ? "s" : ""}`);
+  if (hours.value)
+    totalDuration.push(`${hours.value} hour${hours.value > 1 ? "s" : ""}`);
+  if (minutes.value)
+    totalDuration.push(
+      `${minutes.value} minute${minutes.value > 1 ? "s" : ""}`
+    );
+
+  assignmentDuration.value = totalDuration.join(", ") || "15 minutes";
+});
+
+// Function to calculate the deadline based on assignment duration
+function getDeadline(durationStr) {
+  const now = new Date(); // Get current date and time
+
+  // Define time units in milliseconds
+  const timeUnits = {
+    minute: 60 * 1000,
+    hour: 60 * 60 * 1000,
+    day: 24 * 60 * 60 * 1000,
+    week: 7 * 24 * 60 * 60 * 1000,
+    month: 30 * 24 * 60 * 60 * 1000, // Approximation for month (30 days)
+  };
+
+  // Split the duration string into individual components
+  const durationParts = durationStr.split(",").map((part) => part.trim());
+
+  // Add each component's value to the current time
+  durationParts.forEach((part) => {
+    const [value, unit] = part.split(" ").map((p) => p.trim());
+    const unitKey = unit.replace(/s$/, ""); // Remove plural form (minutes -> minute)
+
+    if (timeUnits[unitKey]) {
+      now.setTime(now.getTime() + parseInt(value) * timeUnits[unitKey]);
+    }
+  });
+
+  // Format the final date and time
+  const options = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+    timeZoneName: "short",
+  };
+
+  return now.toLocaleString("en-US", options); // Returns in local time format
+}
+
+// Example usage
+
+// Form validation for assignment fields
+const isAssignmentValid = computed(
+  () =>
+    assignmentType.value && assignmentTitle.value && assignmentDescription.value
+);
+
+// Submit the assignment with time validation
+const submitAssignment = () => {
+  if (valid.value && isTimeValid.value) {
     const formData = {
       assignmentType: assignmentType.value,
       assignmentTitle: assignmentTitle.value,
@@ -142,9 +229,16 @@ function submitAssignment() {
       assignmentDeadline: getDeadline(assignmentDuration.value),
     };
     console.log("Assignment Submitted", formData);
-    // You can replace this with an actual form submission logic
     localStorage.setItem("assignmentMetaInfo", JSON.stringify(formData));
-    uploadingTaskSet.value = true;
+
+    uploadingQuestionsSet.value = true;
+  } else {
+    console.error(
+      "Please fill in all required fields and ensure the time duration is set."
+    );
   }
-}
+};
+
+// Toggle assignment creator form visibility
+const showingAssignmentCreator = ref(true);
 </script>

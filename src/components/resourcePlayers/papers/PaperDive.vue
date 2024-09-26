@@ -1,285 +1,305 @@
 <template>
   <v-card flat auto-height>
     <!-- Loading Indicator -->
-    <!-- PDF Container -->
-    <v-toolbar
-      style="
-        border-radius: 5px 5px 0 0;
-        box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.9);
-        z-index: 1500;
-        color: #e7f2fb;
-      "
-    >
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
-      <v-toolbar-title color="grey">{{
-        paperStore.paper.title
-      }}</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn
-        variant="text"
-        color="grey"
-        flat
-        class="mr-2"
-        @mousedown="startLongPress('decrement')"
-        @mouseup="stopLongPress"
-        @mouseleave="stopLongPress"
-        @click="handleDecrementClick"
-      >
-        <v-icon>mdi-menu-left</v-icon> Previous Page
-      </v-btn>
-      <v-btn color="grey" flat class="mr-2">
-        <v-icon>mdi-star-box-multiple-outline</v-icon>Page {{ currentPage }} of
-        {{ totalPages }} </v-btn
-      ><v-btn
-        density="default"
-        icon="mdi-file-rotate-right"
-        @click="rotatePage"
-      ></v-btn>
-      <v-btn
-        color="grey"
-        flat
-        @mousedown="startLongPress('increment')"
-        @mouseup="stopLongPress"
-        @mouseleave="stopLongPress"
-        @click="handleIncrementClick"
-      >
-        <v-icon>mdi-menu-right</v-icon>Next Page
-      </v-btn>
-    </v-toolbar>
-    <div id="pdf-container" ref="pdfContainer" class="pdf-container">
-      <template v-if="isLoading"> Loading... </template>
-      <VuePdfEmbed
-        ref="pdfRef"
-        style="overflow-x: hidden"
-        :page="currentPage"
-        @mousedown="startSelection"
-        :rotation="pageRotation"
-        @page-change="updatePageNumber"
-        :source="pdfUrl"
-        @loaded="handleDocumentLoad"
-        @rendered="handleDocumentRender"
-      />
-
-      <!-- highlighted sections -->
-      <div
-        v-for="(commentData, index) in filteredComments"
-        :key="index"
-        :style="commentStyle(commentData)"
-        :id="'comment-' + index"
-        class="comment-marker z-index-common"
-        @mouseover="
-          (showTooltip = index),
-            (hoverIndex = index),
-            moveActiveCardToSecondPosition(commentData.id)
-        "
-        @mouseleave="
-          (showTooltip = null),
-            (activeComment = null),
-            (hoverIndex = null),
-            moveActiveCardToSecondPosition(null)
-        "
-      >
-        <br />
-        <br />
-        <br />
-        <br />
-        <div class="tooltip-wrapper">
-          <v-tooltip bottom v-if="showTooltip === index">
-            <template #activator="{ on, attrs }">
-              <v-row>
-                <v-col>
-                  <div
-                    style="align-items: center; justify-content: center"
-                  ></div>
-                  <v-icon class="ml-44" size="50">mdi-menu-up</v-icon>
-                  <v-card
-                    color="#e7f2fb"
-                    v-bind="attrs"
-                    v-on="on"
-                    :style="computedCardStyle(index)"
-                    style="
-                      width: 24rem;
-                      border: 1px solid #ccc;
-                      border-bottom: 1px solid #ccc;
-                      box-shadow: 0 1px 0 #ccc;
-                      z-index: 10;
-                    "
-                    class="tooltip-card custom-tooltip"
-                  >
-                    <div class="ma-4 text-h6">{{ commentData.title }}</div>
-                    <div class="ma-4 text-h7">
-                      <i>{{ commentData.text }}</i>
-                    </div>
-                    <v-divider />
-                    <v-card-actions>
-                      <v-card-subtitle class="ml-11" align-right>
-                        Added
-                        {{ reactiveTimeAgo(Number(commentData.timestamp)) }}
-                        by {{ commentData.author }}
-                      </v-card-subtitle>
-                    </v-card-actions>
-                  </v-card>
-                </v-col>
-              </v-row>
-            </template>
-          </v-tooltip>
-        </div>
-      </div>
-      <!-- overlay -->
-      <div
-        v-if="selectionActive"
-        :style="overlayStyle"
-        class="selection-overlay"
-        id="selectionOverlay"
-        ref="selectionOverlay"
-      ></div>
-      <v-toolbar
-        id="toolBar2"
-        style="
-          border-radius: 0px 0px 5px 5px;
-          box-shadow: 0 0px 0px rgba(0, 0, 0, 0.9);
-          position: fixed;
-          bottom: 0;
-          left: 0;
-          width: 74.4%;
-          right: 0;
-          color: #cccfcf;
-          background-color: transparent; /* Make the background transparent */
-        "
-      >
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
-        <v-spacer></v-spacer>
-
-        <v-btn
-          size="x-small"
-          color="grey"
-          flat
-          class="mr-2"
+    <!-- PDF Container --><v-row>
+      <v-col cols="9">
+        <v-toolbar
           style="
-            background-color: rgba(
-              255,
-              255,
-              255,
-              0
-            ); /* Transparent background */
+            border-radius: 5px 5px 0 0;
+            box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.9);
+            z-index: 1500;
+            color: #e7f2fb;
           "
         >
-          <v-icon>mdi-star-box-multiple-outline</v-icon>
-          Page {{ currentPage }} of {{ totalPages }}
-        </v-btn>
+          <v-app-bar-nav-icon></v-app-bar-nav-icon>
+          <v-toolbar-title color="grey">{{
+            paperStore.paper.title
+          }}</v-toolbar-title>
+          <router-link to="/dashboard/overview">
+            <v-toolbar-title color="grey">
+              <v-icon>mdi-home</v-icon>
+            </v-toolbar-title>
+          </router-link>
+          <v-spacer></v-spacer>
+          <v-btn
+            variant="text"
+            color="grey"
+            flat
+            class="mr-2"
+            @mousedown="startLongPress('decrement')"
+            @mouseup="stopLongPress"
+            @mouseleave="stopLongPress"
+            @click="handleDecrementClick"
+          >
+            <v-icon>mdi-menu-left</v-icon> Previous Page
+          </v-btn>
+          <v-btn color="grey" flat class="mr-2">
+            <v-icon>mdi-star-box-multiple-outline</v-icon>Page
+            {{ currentPage }} of {{ totalPages }} </v-btn
+          ><v-btn
+            density="default"
+            icon="mdi-file-rotate-right"
+            @click="rotatePage"
+          ></v-btn>
+          <v-btn
+            color="grey"
+            flat
+            @mousedown="startLongPress('increment')"
+            @mouseup="stopLongPress"
+            @mouseleave="stopLongPress"
+            @click="handleIncrementClick"
+          >
+            <v-icon>mdi-menu-right</v-icon>Next Page
+          </v-btn>
+        </v-toolbar>
 
-        <v-btn
-          size="x-small"
-          variant="text"
-          color="grey"
-          flat
-          class="mr-2"
-          @click="handleDecrementClick"
-          style="
-            background-color: rgba(
-              255,
-              255,
-              255,
-              0
-            ); /* Transparent background */
-          "
-        >
-          <v-icon>mdi-menu-left</v-icon> Previous Page
-        </v-btn>
+        <div id="pdf-container" ref="pdfContainer" class="pdf-container">
+          <template v-if="isLoading"> Loading... </template>
+          <VuePdfEmbed
+            ref="pdfRef"
+            style="overflow-x: hidden"
+            :page="currentPage"
+            @mousedown="startSelection"
+            :rotation="pageRotation"
+            @page-change="updatePageNumber"
+            :source="pdfUrl"
+            @loaded="handleDocumentLoad"
+            @rendered="handleDocumentRender"
+          />
 
-        <v-btn
-          size="x-small"
-          density="default"
-          icon="mdi-file-rotate-right"
-          @click="rotatePage"
-          style="
-            background-color: rgba(
-              255,
-              255,
-              255,
-              0
-            ); /* Transparent background */
-          "
-        ></v-btn>
+          <!-- highlighted sections -->
+          <div
+            v-for="(commentData, index) in filteredComments"
+            :key="index"
+            :style="commentStyle(commentData)"
+            :id="'comment-' + index"
+            class="comment-marker z-index-common"
+            @mouseover="
+              (showTooltip = index),
+                (hoverIndex = index),
+                moveActiveCardToSecondPosition(commentData.id)
+            "
+            @mouseleave="
+              (showTooltip = null),
+                (activeComment = null),
+                (hoverIndex = null),
+                moveActiveCardToSecondPosition(null)
+            "
+          >
+            <br />
+            <br />
+            <br />
+            <br />
+            <div class="tooltip-wrapper">
+              <v-tooltip bottom v-if="showTooltip === index">
+                <template #activator="{ on, attrs }">
+                  <v-row>
+                    <v-col>
+                      <div
+                        style="align-items: center; justify-content: center"
+                      ></div>
+                      <v-icon class="ml-44" size="50">mdi-menu-up</v-icon>
+                      <v-card
+                        color="#e7f2fb"
+                        v-bind="attrs"
+                        min-width="27rem"
+                        max-width="27rem"
+                        v-on="on"
+                        :style="computedCardStyle(index)"
+                        style=" 
+                          border: 1px solid #ccc;
+                          border-bottom: 1px solid #ccc;
+                          box-shadow: 0 1px 0 #ccc;
+                          z-index: 10;
+                        "
+                        class="tooltip-card custom-tooltip"
+                      >
+                        <div class="ma-4 text-h6">{{ commentData.title }}</div>
+                        <div class="ma-4 text-h7">
+                          <i>{{ commentData.text }}</i>
+                        </div>
+                        <v-divider />
+                        <v-card-actions>
+                          <v-card-subtitle class="ml-11" align-right>
+                            Added
+                            {{ reactiveTimeAgo(Number(commentData.timestamp)) }}
+                            by {{ commentData.author }}
+                          </v-card-subtitle>
+                        </v-card-actions>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+                </template>
+              </v-tooltip>
+            </div>
+          </div>
+          <!-- overlay -->
+          <div
+            v-if="selectionActive"
+            :style="overlayStyle"
+            class="selection-overlay"
+            id="selectionOverlay"
+            ref="selectionOverlay"
+          ></div>
+          <v-toolbar
+            id="toolBar2"
+            style="
+              border-radius: 0px 0px 5px 5px;
+              box-shadow: 0 0px 0px rgba(0, 0, 0, 0.9);
+              position: fixed;
+              bottom: 0;
+              left: 0;
+              width: 74.4%;
+              right: 0;
+              color: #cccfcf;
+              background-color: transparent; /* Make the background transparent */
+            "
+          >
+            <v-app-bar-nav-icon></v-app-bar-nav-icon>
+            <v-spacer></v-spacer>
 
-        <v-btn
-          size="x-small"
-          color="grey"
-          flat
-          class="mr-2"
-          @click="handleIncrementClick"
-          style="
-            background-color: rgba(
-              255,
-              255,
-              255,
-              0
-            ); /* Transparent background */
-          "
-        >
-          <v-icon>mdi-menu-right</v-icon>Next Page
-        </v-btn>
-      </v-toolbar>
-    </div>
-
-    <!-- draggable comments iterator  -->
-    <v-card
-      class="mr-14"
-      style="
-        position: fixed;
-        z-index: 1000;
-        max-width: 27rem;
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-        max-height: 81vh;
-      "
-      :style="{ top: dialogTop, left: dialogLeft }"
-    >
-      <v-card-title @mousedown.stop="onMouseDown">
-        <span class="headline"
-          >Page {{ currentPage }} Discussion Comments.</span
-        >
-      </v-card-title>
-      <v-divider></v-divider>
-      <v-card-text>
-        <div class="" v-if="filteredSideComments.length === 0">
-          <h5>No discussion comments.</h5>
-        </div>
-
-        <div id="draggableComments">
-          <v-list style="">
-            <v-list-item-group
-              v-for="(comment, index) in reorderedComments"
-              :key="index"
-              :id="'card-' + index"
+            <v-btn
+              size="x-small"
+              color="grey"
+              flat
+              class="mr-2"
+              style="
+                background-color: rgba(
+                  255,
+                  255,
+                  255,
+                  0
+                ); /* Transparent background */
+              "
             >
-              <v-card full-width
-                flat
-                elevation="1"
-                :style="computedSideCardStyle(comment.id)"
-                class="mr-3 hover-card"
-                style="  
-                  border: 1px solid #ccc;
-                "
-              >
-                <div class="ma-4 text-h6">{{ comment.title }}</div>
-                <div class="ma-4 text-h7">
-                  <i>{{ comment.text }}</i>
-                </div>
-                <v-divider />
-                <v-card-actions>
-                  <v-card-subtitle>
-                    Added {{ reactiveTimeAgo(Number(comment.timestamp)) }} by
-                    {{ comment.author }}
-                  </v-card-subtitle>
-                </v-card-actions>
-                <v-divider />
-              </v-card>
-              <br />
-            </v-list-item-group>
-          </v-list>
+              <v-icon>mdi-star-box-multiple-outline</v-icon>
+              Page {{ currentPage }} of {{ totalPages }}
+            </v-btn>
+
+            <v-btn
+              size="x-small"
+              variant="text"
+              color="grey"
+              flat
+              class="mr-2"
+              @click="handleDecrementClick"
+              style="
+                background-color: rgba(
+                  255,
+                  255,
+                  255,
+                  0
+                ); /* Transparent background */
+              "
+            >
+              <v-icon>mdi-menu-left</v-icon> Previous Page
+            </v-btn>
+
+            <v-btn
+              size="x-small"
+              density="default"
+              icon="mdi-file-rotate-right"
+              @click="rotatePage"
+              style="
+                background-color: rgba(
+                  255,
+                  255,
+                  255,
+                  0
+                ); /* Transparent background */
+              "
+            ></v-btn>
+
+            <v-btn
+              size="x-small"
+              color="grey"
+              flat
+              class="mr-2"
+              @click="handleIncrementClick"
+              style="
+                background-color: rgba(
+                  255,
+                  255,
+                  255,
+                  0
+                ); /* Transparent background */
+              "
+            >
+              <v-icon>mdi-menu-right</v-icon>Next Page
+            </v-btn>
+          </v-toolbar>
         </div>
-      </v-card-text>
-    </v-card>
+      </v-col>
+      <v-col cols="3">
+        <!-- draggable comments iterator  -->
+        <v-card-title @mousedown.stop="onMouseDown">
+          <span class="headline"
+            >Page {{ currentPage }} Discussion Comments.</span
+          >
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-card-text>
+          <div class="" v-if="filteredSideComments.length === 0">
+            <h5>No discussion comments.</h5>
+          </div>
+
+          <div id="draggableComments">
+            <v-row style="">
+              <v-col
+                v-for="(comment, index) in reorderedComments"
+                :key="index"
+                :id="'card-' + index"
+              >
+                <v-card
+                  full-width
+                  flat
+                  @mouseover="
+                    (showTooltip = index),
+                      (hoverIndex = index),
+                      moveActiveCardToSecondPosition(comment.id),
+                      handleDraggableCardClick(hoverIndex)
+                  "
+                  @mouseleave="
+                    (showTooltip = null),
+                      (activeComment = null),
+                      (hoverIndex = null),
+                      moveActiveCardToSecondPosition(null)
+                  "
+                  @click="handleDraggableCardClick(index)"
+                  color="#e7f2fb"
+                  v-bind="attrs"
+                  v-on="on"
+                  :style="computedCardStyle(index)"
+                  style="
+                    width: 24rem;
+                    border: 1px solid #ccc;
+                    border-bottom: 1px solid #ccc;
+                    box-shadow: 0 1px 0 #ccc;
+                    z-index: 10;
+                  "
+                  class="tooltip-card custom-tooltip"
+                >
+                  <div class="ma-4 text-h6">{{ comment.title }}</div>
+                  <div class="ma-4 text-h7">
+                    <i>{{ comment.text }}</i>
+                  </div>
+                  <v-divider />
+                  <v-card-actions>
+                    <v-card-subtitle>
+                      Added
+                      {{ reactiveTimeAgo(Number(comment.timestamp)) }} by
+                      {{ comment.author }}
+                    </v-card-subtitle>
+                  </v-card-actions>
+                  <v-divider />
+                </v-card>
+                <br />
+              </v-col>
+            </v-row>
+          </div>
+        </v-card-text>
+      </v-col>
+    </v-row>
     <!-- Comment Dialog -->
 
     <v-dialog v-model="dialogVisible" max-width="30rem" persistent>
@@ -359,6 +379,33 @@ const dragStartX = ref(0);
 const dragStartY = ref(0);
 const totalPages = ref(0);
 // Filter comments for the current page
+const highlightedComment = ref(null);
+
+// Method to scroll to the comment
+const scrollToComment = (commentId) => {
+  const commentElement = document.getElementById(commentId);
+
+  if (commentElement) {
+    commentElement.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+
+    // Apply the highlight class
+    highlightedComment.value = commentId;
+
+    // Remove the highlight after a short delay (e.g., 2 seconds)
+    setTimeout(() => {
+      highlightedComment.value = null;
+    }, 2000);
+  }
+};
+
+// Method to handle draggable card click
+const handleDraggableCardClick = (commentIndex) => {
+  const commentId = `comment-${commentIndex}`;
+  scrollToComment(commentId);
+};
 const filteredComments = computed(() => {
   return comments.value.filter((comment) => comment.page === currentPage.value);
 });

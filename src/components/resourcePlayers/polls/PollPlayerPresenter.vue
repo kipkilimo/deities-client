@@ -40,7 +40,7 @@
         </v-dialog>
       </v-col>
       <v-col cols="3" class="text-left mb-4">
-        <router-link to="/welcome" class="flex items-center">
+        <router-link to="/dashboard/overview" class="flex items-center">
           <v-img
             src="https://www.hda-institute.com/wp-content/uploads/2021/05/hdai_logo_FINAL_horz-2lines_full-color_wo-tag.png"
             :width="100"

@@ -42,6 +42,7 @@ export const usePaperStore = defineStore("paper", {
   state: () => ({
     paper: {} as Paper,
     papers: [] as Paper[],
+    showCreatePaper: false,
     filteredPapers: [] as Paper[],
     sortBy: "name" as keyof Paper,
     filterByLocality: "" as string,
@@ -62,14 +63,15 @@ export const usePaperStore = defineStore("paper", {
     //     objective,
     //     publisherId,
 
-    async getMostRecentPaper() {
-      const getMostRecentPaper = gql`
-        query {
-          getMostRecentPaper {
+    async getMostRecentPapers(userId: string) {
+      const getMostRecentPapers = gql`
+        query ($userId: ID!) {
+          getMostRecentPapers(userId: $userId) {
             id
             title
             objective
             url
+            participants
             sessionId
             discussion {
               page
@@ -97,15 +99,16 @@ export const usePaperStore = defineStore("paper", {
 
       try {
         const response = await client.query({
-          query: getMostRecentPaper,
+          query: getMostRecentPapers,
+          variables: { userId },
         });
 
-        const paper = response.data?.getMostRecentPaper;
-        if (paper) {
-          this.paper = paper;
-          // this.setPapers(paper)
+        const papers = response.data?.getMostRecentPapers;
+        if (papers) {
+          this.papers = papers;
+          // this.setPapers(papers)
         } else {
-          throw new Error("Failed to fetch paper");
+          throw new Error("Failed to fetch papers");
         }
       } catch (error) {
         console.error("Error fetching papers:", error);

@@ -116,7 +116,9 @@
             <span>Forgot Password?</span>
           </v-tooltip>
         </div>
-        <v-card class="mt-4" disabled
+        <v-card
+          class="mt-4"
+          disabled
           style="
             width: 100%;
             cursor: pointer;
@@ -126,7 +128,7 @@
         >
           <v-tooltip location="bottom">
             <template v-slot:activator="{ props }">
-              <v-img 
+              <v-img
                 v-bind="props"
                 @click="orcIDAuthenticate"
                 src="https://blog.noyam.org/wp-content/uploads/2021/02/noyamblog17.jpg"
@@ -185,13 +187,12 @@ const isPasswordValid = computed(
 // Computed property to enable or disable the login button
 const canLogin = computed(() => isEmailValid.value && isPasswordValid.value);
 
-const sendOneTimeSignInKey = async () => {    
-  if(email.value===''){
-      return false
-    }
+const sendOneTimeSignInKey = async () => {
+  if (email.value === "") {
+    return false;
+  }
   loginLoading.value = true; // Indicate login in progress
   try {
-
     await userStore.singleSignInRequest(email.value);
     if (userStore.user.personalInfo.activatedAccount === false) {
       router.push("/auth/activate");
@@ -232,6 +233,7 @@ const sendOneTimeSignInKey = async () => {
 function submitLoginPathway() {
   if (usingPassword.value === true) {
     submitLogin();
+    return;
   }
   submitSingleSigninLogin();
 }

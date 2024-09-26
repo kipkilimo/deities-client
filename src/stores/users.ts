@@ -54,6 +54,7 @@ export const useUserStore = defineStore("login", {
                 email
                 activatedAccount
               }
+              role
             }
           }
         }
@@ -93,14 +94,13 @@ export const useUserStore = defineStore("login", {
       const REQUEST_RESET_PASSWORD = gql`
         mutation requestPasswordReset($email: String!) {
           requestPasswordReset(email: $email) {
-            user {
-              id
-              personalInfo {
-                username
-                email
-                activatedAccount
-              }
+            id
+            personalInfo {
+              username
+              email
+              activatedAccount
             }
+            role
           }
         }
       `;
@@ -130,6 +130,7 @@ export const useUserStore = defineStore("login", {
                 email
                 activatedAccount
               }
+              role
             }
           }
         }
@@ -308,7 +309,7 @@ export const useUserStore = defineStore("login", {
             },
             role: user.personalInfo.role,
           };
-          localStorage.setItem("sessionId", this.user.id);
+          localStorage.setItem("sessionId", user.id);
         } else {
           throw new Error("Invalid email or password");
         }
@@ -370,7 +371,7 @@ export const useUserStore = defineStore("login", {
             },
             role: user.personalInfo.role,
           };
-          localStorage.setItem("sessionId", this.user.id);
+          localStorage.setItem("sessionId", user.id);
         } else {
           throw new Error("Invalid email or password");
         }

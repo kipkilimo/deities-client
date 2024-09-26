@@ -9,7 +9,7 @@
         />
       </v-col>
       <v-col cols="12" sm="3" class="text-left mb-4">
-        <router-link to="/welcome" class="d-flex align-center">
+        <router-link to="/dashboard/overview" class="d-flex align-center">
           <v-img
             src="https://www.hda-institute.com/wp-content/uploads/2021/05/hdai_logo_FINAL_horz-2lines_full-color_wo-tag.png"
             width="100"

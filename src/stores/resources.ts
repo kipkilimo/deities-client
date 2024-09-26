@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { client } from "@/graphql/apolloClient"; // Replace with your Apollo Client instance
 import gql from "graphql-tag";
+import { useAlertsStore } from "./alerts"; // Import alerts store
 
 // Define the ResourceType enum
 export enum ResourceType {
@@ -73,6 +74,7 @@ export const useResourceStore = defineStore("resource", {
       { label: "Excellent proposition. Can't wait to try it!" },
     ],
     exams: "",
+    tasks: "",
     resource: {
       id: "",
       title: "",
@@ -108,6 +110,7 @@ export const useResourceStore = defineStore("resource", {
     showAddResourceCoverAndContentDialog: false,
     showCreateResourceDialog: false,
     showExamsDialog: false,
+    showAssignmentsDialog: false,
   }),
   actions: {
     setQuestion(newQuestion: string) {
@@ -334,6 +337,103 @@ export const useResourceStore = defineStore("resource", {
         }
       } catch (error) {
         console.error("Error fetching resources:", error);
+      }
+    },
+    async getUserTasks(userId: string) {
+      const GET_LATEST_TASK = gql`
+        query ($userId: String!) {
+          getUserTasks(userId: $userId) {
+            getPublisherLatestPoll(userId: $userId) {
+              id
+              title
+              description
+              content
+              sessionId
+              accessKey
+              coverImage
+              isPublished
+              createdBy {
+                id
+
+                personalInfo {
+                  username
+                  email
+                  scholarId
+                  fullName
+                  activationToken
+                  resetToken
+                  tokenExpiry
+                  activatedAccount
+                }
+                role
+              }
+              createdAt
+              updatedAt
+            }
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: GET_LATEST_TASK,
+          variables: { userId },
+        });
+
+        const resources = response.data.getUserTasks;
+        if (resources) {
+          // @ts-ignore
+          this.resources = JSON.stringify(resources);
+        } else {
+          throw new Error("Failed to fetch resource");
+        }
+      } catch (error) {
+        console.error("Error fetching resource:", error);
+      }
+    },
+    async getPublisherLatestTasks(userId: string) {
+      const GET_LATEST_TASKS = gql`
+        query ($userId: String!) {
+          getPublisherLatestTasks(userId: $userId) {
+            assignmentType
+            assignmentTitle
+            assignmentDescription
+            assignmentDuration
+            assignmentDeadline
+            assignmentAnswersKey
+            assignmentTaskSet
+            id
+            title
+            coverImage
+            description
+            subject
+            topic
+            createdBy {
+              id
+            }
+            createdAt
+            sessionId
+            accessKey
+            participants
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: GET_LATEST_TASKS,
+          variables: { userId },
+        });
+
+        const tasks = response.data.getPublisherLatestTasks;
+        if (tasks) {
+          this.tasks = JSON.stringify(tasks);
+          this.showAssignmentsDialog = true;
+        } else {
+          throw new Error("Failed to fetch resource");
+        }
+      } catch (error) {
+        console.error("Error fetching resource:", error);
       }
     },
     async getPublisherLatestExams(userId: string) {
