@@ -4,7 +4,7 @@ const partners = [
   {
     partnerType: "faculty",
     logo: "https://cartafrica.org/wp-content/uploads/2020/01/UoN_Logo.png",
-    fullname: "School of Public and Global Health",
+    fullname: "University of Nairobi, School of Public and Global Health",
   },
   {
     partnerType: "sponsor",

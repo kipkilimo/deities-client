@@ -4,10 +4,10 @@
       <v-app-bar class="!fixed">
         <router-link to="/welcome" class="px-8 flex items-center w-64">
           <v-img
-            src="https://www.hda-institute.com/wp-content/uploads/2021/05/hdai_logo_FINAL_horz-2lines_full-color_wo-tag.png"
-            :width="100"
-            :height="40"
-          />
+            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/NEMBio+Logo+wide.png"
+            :width="120"
+            :height="70"
+          /> 
         </router-link>
 
         <v-btn icon @click="drawer = !drawer">
@@ -116,7 +116,7 @@
                   </div>
                 </template>
                 <span class="custom-tooltip_content">{{
-                  getTooltipHighlight(item.title)
+                  getTooltipHighlight(item.tooltip)
                 }}</span>
               </v-tooltip>
             </v-list-item>
@@ -201,9 +201,9 @@ import { ref, computed, onMounted, onBeforeMount } from "vue";
 import { useI18n } from "vue-i18n";
 import { useUserStore } from "@/stores/users";
 import { useRouter } from "vue-router";
-import PublisherExams from "@/components/dashboardDialogs/PublisherExams.vue";
+import PublisherExams from "@/components/resourcePlayers/test/PublisherExams.vue";
 
-import PublisherAssignments from "@/components/dashboardDialogs/PublisherAssignments.vue";
+import PublisherAssignments from "@/components/resourcePlayers/tasks/PublisherAssignments.vue";
 import { useResourceStore } from "@/stores/resources";
 const resourceStore = useResourceStore();
 const addingComputing = ref(false);
@@ -258,63 +258,79 @@ const fetchPoll = async () => {
 
 // Fetch poll on setup
 
-// Computed property for sidebar items
 const sidebarItems = computed(() => [
   {
     title: t("dashboard.sidebar.dashboard-overview"),
+    tooltip: "Glance at an overview of the resources added to NEMBio",
     value: "dashboard-overview",
     iconClass: "i-iconoir-dashboard-speed me-4 text-xl",
     path: "/dashboard/overview",
   },
   {
     title: t("dashboard.sidebar.papers"),
+    tooltip: "Read and participate in interactive journal papers discussion",
     value: "papers",
     iconClass: "mdi-note-text-outline me-4 text-xl",
     path: "/dashboard/papers",
   },
   {
     title: t("dashboard.sidebar.poster"),
+    tooltip: "Create and share your posters for presentations",
     value: "poster",
     iconClass: "mdi-image-frame me-4 text-xl",
     path: "/dashboard/poster",
   },
   {
     title: t("dashboard.sidebar.poll"),
+    tooltip: "Create and participate in LIVE polls",
     value: "poll",
     iconClass: "mdi-ballot-recount-outline me-4 text-xl",
     path: evalPollPath.value, // Use the dynamic path here
   },
   {
     title: t("dashboard.sidebar.tasks"),
+    tooltip: "Manage and track your assignments",
     value: "tasks",
     iconClass: "i-iconoir-doc-star me-4 text-xl",
     path: "/dashboard/tasks",
   },
   {
     title: t("dashboard.sidebar.events"),
+    tooltip: "View and schedule events",
     value: "events",
     iconClass: "mdi-calendar-multiple-check me-4 text-xl",
     path: "/dashboard/events",
   },
   {
     title: t("dashboard.sidebar.library"),
+    tooltip: "Access the digital library",
     value: "library",
     iconClass: "mdi-bookshelf me-4 text-xl",
     path: "/dashboard/library",
   },
   {
     title: t("dashboard.sidebar.programming"),
+    tooltip: "Learn and practice programming",
     value: "programming",
     iconClass: "mdi-code-block-braces me-4 text-xl",
     path: "/dashboard/computing",
   },
   {
     title: t("dashboard.sidebar.consults"),
+    tooltip: "Consult experts and get advice at all stages of your study",
     value: "consults",
     iconClass: "mdi-timeline-question-outline me-4 text-xl",
     path: "/dashboard/consults",
   },
+  {
+    title: t("dashboard.sidebar.analysis"),
+    tooltip: "We collect, analyze and generate reports from data",
+    value: "analysis",
+    iconClass: "mdi-database-refresh-outline me-4 text-xl",
+    path: "/dashboard/analysis",
+  },
 ]);
+
 
 function obfuscateEmail(email: string) {
   const [localPart, domainPart] = email.split("@");

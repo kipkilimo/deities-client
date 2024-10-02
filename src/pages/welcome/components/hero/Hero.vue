@@ -33,7 +33,7 @@
 
                         <v-col cols="4" class="align-right justify-end">
 
-                            <v-img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Logo_Institut_Curie.jpg" />
+                            <v-img src="https://a2z-v0.s3.eu-central-1.amazonaws.com/NEMBio+Logo+wide.png" />
 
                         </v-col>
 

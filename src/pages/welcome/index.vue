@@ -18,16 +18,22 @@
                   Advancing Life Sciences Research through Collaboration
                 </h2>
 
-                <div class="button-container">
-                  <v-btn
-                    class="cta-button"
-                    size="x-large"
-                    @click="scrollToCallToAction"
-                  >
-                    <v-icon>mdi-login</v-icon>
-                    Continue to the Application
-                  </v-btn>
-                </div>
+                <v-row class="text-center">
+                  <v-col cols="12">
+                    <v-spacer />
+                    <v-spacer />
+                    <v-btn
+                      class="cta-button"
+                      size="x-large"
+                      @click="scrollToCallToAction"
+                    >
+                      <v-icon>mdi-login</v-icon>
+                      Continue to the Application
+                    </v-btn>
+                    <v-spacer />
+                    <v-spacer />
+                  </v-col>
+                </v-row>
               </v-col>
             </v-row>
           </v-container>
@@ -313,38 +319,29 @@ const scrollToTop = () => {
 .io-text {
   font-family: "Monaco", "Courier New", Courier, monospace;
 }
-.ticker-container {
-  width: 100%;
-  overflow: hidden; /* Hide overflowing content */
-  white-space: nowrap; /* Ensure everything stays on a single line */
-}
-
 .ticker-content {
-  display: inline-block;
-  padding-left: 100%; /* Start the content offscreen to the right */
-  animation: ticker-scroll 60s linear infinite; /* Animate scrolling effect */
+  overflow: hidden;
+  white-space: nowrap;
 }
 
-@keyframes ticker-scroll {
+.chip-row {
+  display: inline-block;
+  animation: scroll 30s linear infinite;
+}
+
+.v-chip {
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+/* Continuous scrolling effect */
+@keyframes scroll {
   0% {
-    transform: translateX(100%); /* Start offscreen on the right */
+    transform: translateX(100%);
   }
   100% {
-    transform: translateX(-100%); /* End offscreen on the left */
+    transform: translateX(-100%);
   }
 }
 
-.chip-wrapper {
-  display: inline-block;
-  white-space: nowrap; /* Prevent individual chips from wrapping */
-}
-.chip-row {
-  display: flex;
-  flex-direction: row; /* Ensure chips are displayed horizontally */
-  align-items: center; /* Optional: Center chips vertically within the row */
-}
-.delay-element {
-  display: inline-block;
-  width: 720px; /* Adjust this value to control the delay duration */
-}
 </style>

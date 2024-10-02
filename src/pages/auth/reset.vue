@@ -3,7 +3,7 @@
     <v-card-title class="text-center">
       <v-img
         style="max-height:7.5rem;"
-        src="https://upload.wikimedia.org/wikipedia/commons/7/77/Logo_Institut_Curie.jpg"
+        src="https://a2z-v0.s3.eu-central-1.amazonaws.com/NEMBio+Logo+wide.png"
       />
       <h3 class="mt-4 mr-11" style="color: #777777">Password Reset</h3>
     </v-card-title>

@@ -5,17 +5,16 @@
       <v-col cols="9" class="text-left mb-1">
         <img
           style="height: 12rem; cursor: pointer"
-          :src="qrCodeUrl"
+          :src="qrCodeUrlImg"
           alt="QR Code"
           @click="showQRCodeDialog = true"
         />
         <!-- QR Code Dialog -->
-        <v-dialog
+        <v-dialog max-width="720"
           v-model="showQRCodeDialog"
-          max-width="600"
           @click:outside="showQRCodeDialog = false"
         >
-          <v-card>
+          <v-card min-width="720">
             <v-card-title class="text-h5"
               >Join a NEMBio
               <span
@@ -27,11 +26,12 @@
               Poll</v-card-title
             >
 
-            <v-divider />
+            <v-divider  class="ma-2" />
             <v-card-text>
-              <v-img :src="qrCodeUrl" alt="QR Code" />
+              <v-img :src="qrCodeUrlImg" alt="QR Code" />
             </v-card-text>
-            <v-divider />
+            <v-divider class="ma-2" />
+            <p class="ma-2">{{ qrCodeUrlLink }}</p>
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn text @click="showQRCodeDialog = false">Close</v-btn>
@@ -42,7 +42,7 @@
       <v-col cols="3" class="text-left mb-4">
         <router-link to="/dashboard/overview" class="flex items-center">
           <v-img
-            src="https://www.hda-institute.com/wp-content/uploads/2021/05/hdai_logo_FINAL_horz-2lines_full-color_wo-tag.png"
+            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/NEMBio+Logo+wide.png"
             :width="100"
             :height="40"
           />
@@ -51,7 +51,7 @@
           <v-row>
             <v-col cols="9">
               <h1>Presenter</h1>
-              <p>Session ID: {{ route.query.sessionId }}</p>
+              <p>Poll ID: {{ route.query.sessionId }}</p>
               <p>Access Key: {{ route.query.accessKey }}</p>
             </v-col>
             <v-col cols="3">
@@ -236,12 +236,14 @@ const route = useRoute();
 const router = useRouter();
 const accessKey = route.query.accessKey;
 const sessionId = route.query.sessionId;
-const qrCodeUrl = ref("");
+const qrCodeUrlImg = ref("");
+const qrCodeUrlLink = ref("");
+
 const polls = ref([]);
 const currentIndex = ref(0);
 const activeQuestion = ref({ qstId: "" }); // Tracking active question
 // Function to fetch the latest poll and update the path
- 
+
 // WebSocket connection
 let ws;
 
@@ -249,7 +251,7 @@ let ws;
 const generateQRCode = async (data) => {
   try {
     const url = await QRCode.toDataURL(data, { type: "png" });
-    qrCodeUrl.value = url;
+    qrCodeUrlImg.value = url;
   } catch (err) {
     console.error(err);
   }
@@ -342,12 +344,13 @@ watch(
 // Component lifecycle hooks
 onMounted(() => {
   const data = `${apiUrl}/poll/participant?sessionId=${sessionId}&accessKey=${accessKey}`;
+  qrCodeUrlLink.value = data;
   generateQRCode(data);
   initWebSocket();
 });
 
-onBeforeUnmount(async() => {
-//  await fetchPoll()
+onBeforeUnmount(async () => {
+  //  await fetchPoll()
   if (ws) {
     ws.close();
   }

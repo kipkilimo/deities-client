@@ -5,16 +5,11 @@
       class="overflow-y-auto mt-1"
       style="height: 95vh; max-height: 95vh; overflow-y: auto"
     >
-      <v-col
-        v-for="(item, index) in parsedExams"
-        :key="index"
-        cols="12" 
-      >
+      <v-col v-for="(item, index) in parsedExams" :key="index" cols="12">
         <v-card
           class="mx-auto my-4"
           max-width="51rem"
-                    min-width="51rem"
-
+          min-width="51rem"
           style="
             background-image: url(&quot;https://img.freepik.com/free-vector/hand-drawn-school-supplies-pattern-background_23-2150855728.jpg&quot;);
             background-size: cover;
@@ -26,21 +21,16 @@
             >{{ item.subject }} EXAMINATION</v-card-title
           >
           <v-divider />
-          <v-card-subtitle>
-            <h5>
+          <v-card-subtitle  color="#0c0c0c">
+            <h3 color="#0c0c0c">
               <strong>
                 DATE:
-                {{
-                  formatDateTime(
-                    item.examMetaInfo.examDate,
-                    item.examMetaInfo.examStartTime
-                  )
-                }}
+                {{ formatDateTime(item.examMetaInfo.examDate) }}
                 | START: {{ item.examMetaInfo.examStartTime }} | DURATION:
                 {{ item.examMetaInfo.examDuration }} | END:
                 {{ item.examMetaInfo.examEndTime }}</strong
               >
-            </h5>
+            </h3>
           </v-card-subtitle>
           <v-card-text>{{ item.description }}</v-card-text>
           <v-row>
@@ -62,15 +52,33 @@
           </v-row>
           <v-divider />
           <v-card-actions>
+            <v-spacer /><v-spacer /><v-spacer />
+            <v-btn
+              variant="outlined"
+              @click="handleGetLinkDialog(item), (getLinkDialog = true)"
+            >
+              <v-icon size="32">mdi-link</v-icon> Participants link</v-btn
+            >
             <v-spacer />
-            <v-btn @click="handleGetLinkDialog(item), (getLinkDialog = true)"
-              >Participants link</v-btn
-            > 
-            <v-spacer />
-            <v-btn @click="manageExamParticipantsDialog = true"
+            <v-btn
+              @click="
+                setPapericipants(item), (manageExamParticipantsDialog = true)
+              "
               >Manage Participants</v-btn
             >
             <v-spacer />
+            <v-tooltip location="top">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  color="info"
+                  icon="mdi-clipboard-text-clock-outline"
+                  size="large"
+                  @click="(resourceStore.exam = JSON.stringify(item)), (showEditDialog = true)"
+                ></v-btn>
+              </template>
+              <span>Update Exam Start Date and time</span>
+            </v-tooltip>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -105,161 +113,161 @@
           >
           <v-spacer />
         </v-card-actions>
+        <v-alert
+          border="top"
+          type="warning"
+          variant="outlined"
+          prominent
+          class="ml-38 mt-4"
+          width="72%"
+          v-if="errorMessage"
+        >
+          {{ errorMessage }}
+        </v-alert>
+
+        <v-alert
+          border="top"
+          v-if="success"
+          type="success"
+          class="ml-38 mt-4"
+          width="72%"
+          variant="outlined"
+          prominent
+        >
+          {{ success }}
+        </v-alert>
       </v-card>
     </v-dialog>
     <!-- Participant management dialog -->
-    <v-dialog v-model="manageExamParticipantsDialog" max-width="80%">
-      <v-card>
-        <v-card-title class="headline">
-          <v-icon class="mr-2">mdi-account-multiple-check-outline</v-icon>
-          Manage Participant Requests
-        </v-card-title>
-
-        <v-card-subtitle>
-          <v-divider></v-divider>
-        </v-card-subtitle>
-
-        <v-card-text>
-          <!-- PENDING requests -->
-          <v-expansion-panels>
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                <v-icon class="mr-2">mdi-clock-outline</v-icon>
-                PENDING Participant Requests
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-row>
-                  <v-col
-                    v-for="(request, index) in pendingRequests"
-                    :key="index"
-                    cols="12"
-                    sm="6"
-                    md="4"
-                    class="d-flex align-center justify-center"
-                  >
-                    <v-card
-                      class="ma-2"
-                      max-height="6rem"
-                      width="100%"
-                      color="#f2f2f2"
-                    >
-                      <v-card-text>
-                        <div class="font-weight-bold">
-                          Name: {{ request.participantName }}
-                        </div>
-                        <v-divider></v-divider>
-                        <v-card-actions>
-                          <v-btn
-                            color="green"
-                            @click="handleAcceptRequest(request)"
-                          >
-                            Accept
-                          </v-btn>
-                          <v-btn
-                            color="red"
-                            @click="handleRejectRequest(request)"
-                          >
-                            Reject
-                          </v-btn>
-                        </v-card-actions>
-                      </v-card-text>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-
-            <!-- REJECTED requests with RESTORE -->
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                <v-icon class="mr-2">mdi-cancel</v-icon>
-                REJECTED Participant Requests
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-row>
-                  <v-col
-                    v-for="(request, index) in rejectedRequests"
-                    :key="index"
-                    cols="12"
-                    sm="6"
-                    md="4"
-                    class="d-flex align-center justify-center"
-                  >
-                    <v-card class="ma-2">
-                      <v-card-text>
-                        <div class="font-weight-bold">
-                          Name: {{ request.participantName }}
-                        </div>
-                        <v-divider></v-divider>
-                        <v-card-actions>
-                          <v-btn
-                            color="orange"
-                            @click="handleRestoreRequest(request)"
-                          >
-                            Restore to Pending
-                          </v-btn>
-                        </v-card-actions>
-                      </v-card-text>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-
-            <!-- ACCEPTED requests with UNDO -->
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                <v-icon class="mr-2">mdi-check-circle-outline</v-icon>
-                ACCEPTED Participant Requests
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <v-row>
-                  <v-col
-                    v-for="(request, index) in acceptedRequests"
-                    :key="index"
-                    cols="12"
-                    sm="6"
-                    md="4"
-                    class="d-flex align-center justify-center"
-                  >
-                    <v-card class="ma-2">
-                      <v-card-text>
-                        <div class="font-weight-bold">
-                          Name: {{ request.participantName }}
-                        </div>
-                        <v-divider></v-divider>
-                        <v-card-actions>
-                          <v-btn color="red" @click="handleUndoAccept(request)">
-                            Undo Accept
-                          </v-btn>
-                        </v-card-actions>
-                      </v-card-text>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="primary"
-            variant="outlined"
-            :disabled="acceptedRequests.length === 0"
-            @click="saveParticipantsList"
+    <v-dialog v-model="manageExamParticipantsDialog" max-width="66%">
+      <!-- Display participants when available -->
+      <v-card min-height="7.5em">
+        <h4
+          color="#55565a"
+          class="ma-4"
+          v-if="pendingParticipants.length === 0"
+        >
+          No pending participants
+        </h4>
+        <h4 color="#55565a" class="ma-4" v-if="pendingParticipants.length >= 1">
+          Pending participants
+        </h4>
+        <v-row
+          class="overflow-y-auto mt-1"
+          style="height: 95vh; max-height: 95vh"
+        >
+          <v-col
+            cols="12"
+            md="6"
+            v-for="(participant, index) in pendingParticipants"
+            :key="index"
           >
-            <v-icon class="mr-2">mdi-update</v-icon>
-            SUBMIT ALL CHANGES
-          </v-btn>
-          <v-spacer></v-spacer>
-        </v-card-actions>
+            <v-card
+              :loading="loading"
+              class="mx-auto my-3"
+              max-width="33rem"
+              color="#dbdbdf"
+            >
+              <v-card
+                flat
+                color="transparent"
+                class="mx-auto"
+                prepend-icon="mdi-account-check"
+                :subtitle="participant.userId"
+              >
+                <template v-slot:title>
+                  <span class="font-weight-black">{{
+                    participant.participantName
+                  }}</span>
+                </template>
+              </v-card>
+              <v-divider class="mx-4 mb-1" />
+              <v-card-actions>
+                <!-- Action buttons for participant request -->
+                <v-btn color="red" text @click="rejectRequest(participant)"
+                  >REJECT</v-btn
+                >
+                <v-spacer />
+                <v-btn
+                  color="green"
+                  variant="text"
+                  @click="acceptRequest(participant)"
+                  >ACCEPT
+                </v-btn>
+                <v-spacer />
+                <!-- Accept all button, shown only if the user is the creator 
+              v-if="userId === participant.createdBy.id"-->
+                <v-btn
+                  color="success"
+                  variant="outlined"
+                  @click="acceptAllRequests"
+                  rounded
+                >
+                  <v-icon size="32">mdi-cloud-lock-open-outline</v-icon>
+                  ACCEPT ALL REQUESTS
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+        <v-alert
+          border="top"
+          type="warning"
+          variant="outlined"
+          prominent
+          class="ml-38 mt-4"
+          width="72%"
+          v-if="errorMessage"
+        >
+          {{ errorMessage }}
+        </v-alert>
+
+        <v-alert
+          border="top"
+          v-if="success"
+          type="success"
+          class="ml-38 mt-4"
+          width="72%"
+          variant="outlined"
+          prominent
+        >
+          {{ success }}
+        </v-alert>
       </v-card>
     </v-dialog>
 
     <!-- Participant  //   const acceptedRequests = ref([]);
+    
   // const rejectedRequests = ref([]); management dialog -->
+
+    <v-alert
+      border="top"
+      type="warning"
+      variant="outlined"
+      prominent
+      class="ml-38 mt-4"
+      width="72%"
+      v-if="errorMessage"
+    >
+      {{ errorMessage }}
+    </v-alert>
+
+    <v-alert
+      border="top"
+      v-if="success"
+      type="success"
+      class="ml-38 mt-4"
+      width="72%"
+      variant="outlined"
+      prominent
+    >
+      {{ success }}
+    </v-alert>
+    <v-dialog width="81%" v-model="showEditDialog">
+      <v-card>
+        <update-date-time />
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 <script setup>
@@ -271,6 +279,7 @@ import { useResourceStore } from "@/stores/resources";
 
 const resourceStore = useResourceStore();
 const getLinkDialog = ref(false);
+const showEditDialog = ref(false);
 const manageExamParticipantsDialog = ref(false);
 const qrCodeUrl = ref("");
 const parsedExams = ref([]);
@@ -280,7 +289,17 @@ const parsedParticipantsData = ref([]);
 const urlData = ref(
   `${apiUrl}/exam/participant?sessionId=${parsedExams.value.length > 0 ? parsedExams.value[0].sessionId : ""}`
 );
+const participants = ref([]);
+const pendingParticipants = ref([]);
+const success = ref(null);
+const errorMessage = ref(null);
 
+function setPapericipants(item) {
+  participants.value = JSON.parse(item.participants);
+  pendingParticipants.value = participants.value.filter(
+    (p) => p.requestStatus === "PENDING"
+  );
+}
 const saveLink = () => {
   const padding = 4;
   const lineThickness = 0.1;
@@ -348,33 +367,15 @@ const acceptedRequests = ref([]);
 const rejectedRequests = ref([]);
 
 // TIME
-function formatDateTime(dateString, newTime) {
-  // Parse the date string into a Date object
-  const date = new Date(dateString);
+function formatDateTime(examDate) {
+  // Create a Date object from the examDate string
+  const date = new Date(examDate);
 
-  // Split the newTime into hours and minutes
-  const [hours, minutes] = newTime.split(":").map(Number);
+  // Get the local date string (without time)
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  const fullDate = date.toLocaleDateString(undefined, options);
 
-  // Set the new hours and minutes
-  date.setUTCHours(hours - 3, minutes, 0, 0);
-
-  // Define options for date formatting
-  const options = {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
-    timeZone: "Africa/Nairobi", // East Africa Time (EAT)
-  };
-
-  // Format the date into the desired string format
-  return date
-    .toLocaleString("en-US", options)
-    .replace("AM", "AM (EAT)")
-    .replace("PM", "PM (EAT)");
+  return fullDate;
 }
 
 // Consolidated function to update request status and move between lists
@@ -464,6 +465,74 @@ const generateQRCode = async (sessionId) => {
     qrCodeUrl.value = url;
   } catch (err) {
     console.error(err);
+  }
+};
+
+const acceptRequest = async (participant) => {
+  console.log("ACCEPT", {
+    participantId: participant.userId,
+    action: "REJECT",
+    sessionId: participant.sessionId,
+  });
+  try {
+    await axios.post(`${serverUrl}/resources/uploads/exam/enroll`, {
+      participantId: participant.userId,
+      action: "ACCEPT",
+      sessionId: participant.sessionId,
+    });
+
+    success.value = `Participant ${participant.participantName} enrolled.`;
+    setTimeout(() => {
+      success.value = "";
+    }, 4200);
+    // Filter out the enrolled participant from the pendingParticipants array
+    pendingParticipants.value = pendingParticipants.value.filter(
+      (p) => p.userId !== participant.userId
+    );
+  } catch (error) {
+    errorMessage.value = `Error rejecting ${participant.participantName}: ${error.message}`;
+  }
+};
+
+const rejectRequest = async (participant) => {
+  console.log("REJECT", {
+    participantId: participant.userId,
+    action: "REJECT",
+    sessionId: participant.sessionId,
+  });
+  try {
+    await axios.post(`${serverUrl}/resources/uploads/exam/enroll`, {
+      participantId: participant.userId,
+      action: "REJECT",
+      sessionId: participant.sessionId,
+    });
+
+    success.value = `Participant ${participant.participantName} rejected.`;
+    setTimeout(() => {
+      success.value = "";
+    }, 4200);
+    // Filter out the rejected participant from the pendingParticipants array
+    pendingParticipants.value = pendingParticipants.value.filter(
+      (p) => p.userId !== participant.userId
+    );
+  } catch (error) {
+    errorMessage.value = `Error rejecting ${participant.participantName}: ${error.message}`;
+  }
+};
+
+const acceptAllRequests = async () => {
+  try {
+    const participantIds = pendingParticipants.value.map((p) => p.userId);
+    await axios.post(`${serverUrl}/resources/uploads/exam/enroll`, {
+      participantIds,
+      action: "ACCEPT_ALL",
+      sessionId: pendingParticipants.value[0].sessionId,
+    });
+
+    success.value = "All participant requests accepted successfully.";
+    window.location.reload();
+  } catch (error) {
+    errorMessage.value = `Error accepting all participants: ${error.message}`;
   }
 };
 </script>

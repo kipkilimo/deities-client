@@ -116,16 +116,14 @@
               </template>
             </v-list-item>
           </v-card-actions>
-          <v-divider class="mx-4 mb-1"></v-divider>
+          <v-divider class="mx-1 mb-1"></v-divider>
 
           <v-card-actions>
             <v-btn
-              @click="handleSetPaper(paper)"
-              variant="outlined"
-              rounded="xs"
+              @click="handleSetPaper(paper)" 
               class="mr-2"
             >
-              <v-icon class="mr-2">mdi-dots-vertical</v-icon> About Paper
+              <v-icon class="mr-2">mdi-dots-vertical</v-icon> About  
             </v-btn>
             <v-btn
               color="deep-purple-lighten-2"
@@ -137,7 +135,7 @@
             </v-btn>
             <v-spacer />
             <v-btn variant="text" @click="submitPaperData(paper)"
-              >VIEW AND DISCUSS PAPER</v-btn
+              >DISCUSS PAPER</v-btn
             >
             <v-spacer />
 
@@ -241,7 +239,7 @@
         <v-divider />
         <v-card-actions>
           <v-btn
-            text="Close dialog"
+            text="Close"
             variant="text"
             color="orange"
             @click="journalTask = false"

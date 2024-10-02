@@ -11,7 +11,7 @@
       <v-col cols="12" sm="3" class="text-left mb-4">
         <router-link to="/welcome" class="d-flex align-center">
           <v-img
-            src="https://www.hda-institute.com/wp-content/uploads/2021/05/hdai_logo_FINAL_horz-2lines_full-color_wo-tag.png"
+            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/NEMBio+Logo+wide.png"
             width="100"
             height="40"
           />
@@ -20,7 +20,7 @@
           <v-row>
             <v-col cols="9">
               <h1 class="text-h6">Assignment Participant Enrollment</h1>
-              <p>Session ID: {{ sessionId }}</p>
+              <p>Task ID: {{ sessionId }}</p>
             </v-col>
             <v-col cols="3">
               <v-img

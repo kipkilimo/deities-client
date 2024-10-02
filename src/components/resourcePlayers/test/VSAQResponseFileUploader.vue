@@ -2,9 +2,9 @@
   <v-container>
     <v-file-input
       v-model="files"
-      accept=".pdf"
-      label="Upload PDF Assignment Set File"
-      prepend-icon="mdi-file-document-multiple-outline"
+      accept=".jpg, .jpeg, .png, .avif, .webp, .pdf, .docx, .txt"
+      label="Upload Files"
+      prepend-icon="mdi-file-upload"
       :multiple="true"
       :counter="true"
       :rules="fileRules"
@@ -41,15 +41,6 @@
         class="custom-alert"
       ></v-alert>
     </div>
-
-    <!-- Upload dialog for questions and answers -->
-       <!-- Upload dialog for questions and answers -->
-    <v-dialog width="630" v-model="uploadingTaskAnswerKeys">
-      <v-card title="Upload Assignment Marking Guide">
-        <v-divider />
-        <TaskAnswerKeysUploader />
-      </v-card>
-    </v-dialog> 
   </v-container>
 </template>
 
@@ -58,8 +49,7 @@ import { ref, computed } from "vue";
 import axios from "axios";
 import { useResourceStore } from "../../../stores/resources";
 import { useRouter } from "vue-router";
-import TestAnswerKeysUploader from "./TaskAnswerKeysUploader.vue";
-const uploadingTaskAnswerKeys = ref(false);
+const userId = ref(localStorage.getItem("sessionId")); // Retrieve userId from local storage
 
 const resourceStore = useResourceStore();
 const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -73,7 +63,7 @@ const isUploadSuccessful = ref(false);
 const error = ref(null);
 
 const maxItems = 1;
-const maxTotalSizeMB = 25;
+const maxTotalSizeMB = 2;
 
 const fileRules = computed(() => [
   () =>
@@ -112,7 +102,7 @@ const uploadFiles = async () => {
     return;
   }
 
-  const resourceId = resourceStore.resource.id;
+  const userId = userId.value;
   const resourceType = resourceStore.resource.contentType;
   const fileCreationStage = "CONTENT";
 
@@ -121,8 +111,8 @@ const uploadFiles = async () => {
     formData.append("files", file);
   });
 
-  const url = `${apiUrl}/resources/uploads?resourceId=${encodeURIComponent(
-    resourceId
+  const url = `${apiUrl}/resources/uploads/exam/attempt?userId=${encodeURIComponent(
+    userId
   )}&resourceType=${encodeURIComponent(
     resourceType
   )}&fileCreationStage=${encodeURIComponent(fileCreationStage)}`;
@@ -144,11 +134,6 @@ const uploadFiles = async () => {
     });
 
     if (response.status === 200) {
-      console.log(response.data);
-      localStorage.setItem('assignmentTaskSet',response.data.url)
-      uploadingTaskAnswerKeys.value = true;
-      return;
-
       isUploadSuccessful.value = true;
       // Delay the reload to ensure progress is visible
       setTimeout(() => {
@@ -166,7 +151,7 @@ const uploadFiles = async () => {
 
 <style scoped>
 .custom-alert {
-  background-color: #ffffff; /* Dark background */
+  background-color: #ffffff;
   padding: 20px;
   border-radius: 5px;
 }

@@ -11,7 +11,7 @@
       <v-col cols="12" sm="3" class="text-left mb-4">
         <router-link to="/dashboard/overview" class="d-flex align-center">
           <v-img
-            src="https://www.hda-institute.com/wp-content/uploads/2021/05/hdai_logo_FINAL_horz-2lines_full-color_wo-tag.png"
+            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/NEMBio+Logo+wide.png"
             width="100"
             height="40"
           />
@@ -20,7 +20,7 @@
           <v-row>
             <v-col cols="9">
               <h1 class="text-h6">Participant</h1>
-              <p>Session ID: {{ route.query.sessionId }}</p>
+              <p>Poll ID: {{ route.query.sessionId }}</p>
               <p>Access Key: {{ route.query.accessKey }}</p>
             </v-col>
             <v-col cols="3">
@@ -54,7 +54,7 @@
       <v-divider />
       <br />
       <v-row>
-        <v-col cols="12" sm="4">
+        <v-col cols="12" sm="5">
           <v-card height="75vh" flat color="transparent">
             <br />
             <template v-if="currentPoll.type === 'Single Choice'">
@@ -128,7 +128,7 @@
 
         <v-divider class="d-none d-sm-block" vertical min-height="76vh" />
 
-        <v-col cols="12" sm="7">
+        <v-col cols="6" class="justify-center align-center ml-28">
           <LiveResults />
         </v-col>
       </v-row>

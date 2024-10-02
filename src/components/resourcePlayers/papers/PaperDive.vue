@@ -12,12 +12,10 @@
           "
         >
           <v-app-bar-nav-icon></v-app-bar-nav-icon>
-          <v-toolbar-title color="grey">{{
-            paperStore.paper.title
-          }}</v-toolbar-title>
+          <v-toolbar-title color="grey"></v-toolbar-title>
           <router-link to="/dashboard/overview">
             <v-toolbar-title color="grey">
-              <v-icon>mdi-home</v-icon>
+              <v-icon>mdi-home</v-icon>NEMBio
             </v-toolbar-title>
           </router-link>
           <v-spacer></v-spacer>
@@ -35,12 +33,19 @@
           </v-btn>
           <v-btn color="grey" flat class="mr-2">
             <v-icon>mdi-star-box-multiple-outline</v-icon>Page
-            {{ currentPage }} of {{ totalPages }} </v-btn
-          ><v-btn
-            density="default"
-            icon="mdi-file-rotate-right"
+            {{ currentPage }} of {{ totalPages }}
+          </v-btn>
+          <v-btn 
+            variant="text"
+            color="grey"
+            flat
+            size="lg"
+            class="mr-2"
+            style="background-color: rgba(255, 255, 255, 0)"
             @click="rotatePage"
-          ></v-btn>
+            ><v-icon>mdi-file-rotate-right-outline</v-icon></v-btn
+          >
+
           <v-btn
             color="grey"
             flat
@@ -106,7 +111,7 @@
                         max-width="27rem"
                         v-on="on"
                         :style="computedCardStyle(index)"
-                        style=" 
+                        style="
                           border: 1px solid #ccc;
                           border-bottom: 1px solid #ccc;
                           box-shadow: 0 1px 0 #ccc;
@@ -156,6 +161,7 @@
             "
           >
             <v-app-bar-nav-icon></v-app-bar-nav-icon>
+
             <v-spacer></v-spacer>
 
             <v-btn
@@ -163,14 +169,7 @@
               color="grey"
               flat
               class="mr-2"
-              style="
-                background-color: rgba(
-                  255,
-                  255,
-                  255,
-                  0
-                ); /* Transparent background */
-              "
+              style="background-color: rgba(255, 255, 255, 0)"
             >
               <v-icon>mdi-star-box-multiple-outline</v-icon>
               Page {{ currentPage }} of {{ totalPages }}
@@ -183,32 +182,10 @@
               flat
               class="mr-2"
               @click="handleDecrementClick"
-              style="
-                background-color: rgba(
-                  255,
-                  255,
-                  255,
-                  0
-                ); /* Transparent background */
-              "
+              style="background-color: rgba(255, 255, 255, 0)"
             >
               <v-icon>mdi-menu-left</v-icon> Previous Page
             </v-btn>
-
-            <v-btn
-              size="x-small"
-              density="default"
-              icon="mdi-file-rotate-right"
-              @click="rotatePage"
-              style="
-                background-color: rgba(
-                  255,
-                  255,
-                  255,
-                  0
-                ); /* Transparent background */
-              "
-            ></v-btn>
 
             <v-btn
               size="x-small"
@@ -216,17 +193,20 @@
               flat
               class="mr-2"
               @click="handleIncrementClick"
-              style="
-                background-color: rgba(
-                  255,
-                  255,
-                  255,
-                  0
-                ); /* Transparent background */
-              "
+              style="background-color: rgba(255, 255, 255, 0)"
             >
               <v-icon>mdi-menu-right</v-icon>Next Page
             </v-btn>
+            <v-btn
+              size="x-small"
+              variant="text"
+              color="grey"
+              flat
+              class="mr-2"
+              style="background-color: rgba(255, 255, 255, 0)"
+              @click="rotatePage"
+              ><v-icon>mdi-file-rotate-right-outline</v-icon>nnn</v-btn
+            >
           </v-toolbar>
         </div>
       </v-col>

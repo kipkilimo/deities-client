@@ -275,6 +275,7 @@ export const useUserStore = defineStore("login", {
       `;
 
       try {
+        localStorage.setItem("sessionId", "");
         const response = await client.mutate({
           mutation: LOGIN_USER,
           variables: { accessKey },
@@ -337,6 +338,7 @@ export const useUserStore = defineStore("login", {
       `;
 
       try {
+        localStorage.setItem("sessionId", "");
         const response = await client.mutate({
           mutation: LOGIN_USER,
           variables: { email, password },

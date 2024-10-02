@@ -23,6 +23,7 @@ dashboard:
 
     programming: Computational Methods
     consults: Research Consultation
+    analysis: Data Analysis
     logout: Logout
   main:
     dashboard-overview: Overview

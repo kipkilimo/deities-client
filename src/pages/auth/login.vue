@@ -3,12 +3,13 @@
     <div v-if="loginError">
       <v-alert :text="loginError" title="Login error" type="error"></v-alert>
     </div>
-    <v-card-title class="text-center">
+    <h3 class="mt-4 mr-11 ml-2" style="color: #777777">NEMBio Learning Login</h3>
+    <v-divider/>
+    <v-card-title class="text-center mb-2">
       <v-img
         style="max-height: 7.5rem"
-        src="https://upload.wikimedia.org/wikipedia/commons/7/77/Logo_Institut_Curie.jpg"
+        src="https://a2z-v0.s3.eu-central-1.amazonaws.com/NEMBio+Logo+wide.png"
       />
-      <h3 class="mt-4 mr-11" style="color: #777777">NEMBio Learning Login</h3>
     </v-card-title>
     <v-card-text>
       <v-form @submit.prevent="submitLoginPathway">

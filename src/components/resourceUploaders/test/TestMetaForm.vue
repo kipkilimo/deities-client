@@ -34,7 +34,7 @@
           <p>Exam Duration: {{ formattedDuration }}</p>
           <v-divider />
           <v-row>
-            <v-col cols="6">
+            <v-col cols="5">
               <v-time-picker
                 v-model="examStartTime"
                 :allowed-minutes="allowedMinutes"
@@ -45,12 +45,21 @@
                 required
               ></v-time-picker>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="5">
               <v-date-picker
                 v-model="examDate"
                 label="Select Exam Date"
                 required
               ></v-date-picker>
+            </v-col>
+
+            <v-col cols="2">
+              <v-select
+                :items="timeZones"
+                density="compact"
+                v-model="timeZone"
+                label="Time zone"
+              ></v-select>
             </v-col>
           </v-row>
 
@@ -153,10 +162,30 @@ const uploadingQuestionsSet = ref(false);
 const formDataJson = ref("");
 const showingDateTimePicker = ref(true);
 const showingExamCreator = ref(false);
+const timeZonesAll = [
+  { name: "GMT", region: "Greenwich Mean Time", iana: "GMT" },
+  { name: "CET", region: "Central European Time", iana: "Europe/Berlin" },
+  { name: "EET", region: "Eastern European Time", iana: "Europe/Helsinki" },
+  { name: "CAT", region: "Central Africa Time", iana: "Africa/Harare" },
+  { name: "WAT", region: "West Africa Time", iana: "Africa/Lagos" },
+  { name: "EAT", region: "East Africa Time", iana: "Africa/Nairobi" },
+  { name: "EST", region: "Eastern Standard Time", iana: "America/New_York" },
+  { name: "PST", region: "Pacific Standard Time", iana: "America/Los_Angeles" },
+  { name: "IST", region: "India Standard Time", iana: "Asia/Kolkata" },
+];
 
-const examStartTime = ref("09:00");
+// Example usage 
+
+const timeZones = computed(() => {
+  const tz = timeZonesAll.map((z) => {
+    return z.region;
+  });
+  return tz;
+});
+const examStartTime = ref(null);
 const examDate = ref(new Date(Date.now() + 86400000));
 const examDuration = ref("");
+const timeZone = ref("");
 const examEndTime = ref(null);
 const allowedMinutes = (val) => [0, 15, 30, 45].includes(val);
 const selectedHour = ref("0");
@@ -219,9 +248,8 @@ const isTestCreationValid = computed(() => {
     selectedTypes.value.length > 0 &&
     Object.keys(numberOfQuestions.value).length ===
       selectedTypes.value.length &&
-    selectedTypes.value.every(
-      (type) => 
-        isValidMarkingScheme(type, markingSchemes.value[type])
+    selectedTypes.value.every((type) =>
+      isValidMarkingScheme(type, markingSchemes.value[type])
     )
   );
 });
@@ -345,9 +373,22 @@ function submitForm() {
     }
   });
   if (valid.value) {
+    function getTimeZoneAbbreviation(region) {
+      // Find the time zone with the matching region
+      const timeZone = timeZonesAll.find((tz) => tz.region === region);
+
+      // Return the name (abbreviation) if found, otherwise return null or an error message
+      return timeZone ? timeZone.name : null;
+    }
+
+    // Example usage
+    const selectedRegion = timeZone.value;
+    const timeZoneAbbreviation = getTimeZoneAbbreviation(selectedRegion);
+    console.log(timeZoneAbbreviation); // Output: EAT
+
     formDataJson.value = JSON.stringify({
       examDate: examDate.value,
-      examStartTime: examStartTime.value,
+      examStartTime: `${examStartTime.value} ${timeZoneAbbreviation}`,
       examDuration: examDuration.value,
       examEndTime: examEndTime.value,
       selectedTypes: selectedTypes.value,

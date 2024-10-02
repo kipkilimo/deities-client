@@ -12,7 +12,7 @@
       :defaultConfig="editorConfig"
       v-model="defaultHtml"
       @on-change="handleChange"
-      style="height: 300px; overflow-y: hidden; border-radius: 20px"
+      style="height: 81vh; overflow-y: hidden; border-radius: 20px"
       :mode="mode"
       @on-created="handleCreated"
     />

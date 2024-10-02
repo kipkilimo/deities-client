@@ -74,7 +74,9 @@ export const useResourceStore = defineStore("resource", {
       { label: "Excellent proposition. Can't wait to try it!" },
     ],
     exams: "",
+    exam: "",
     tasks: "",
+    task: "",
     resource: {
       id: "",
       title: "",
@@ -429,6 +431,64 @@ export const useResourceStore = defineStore("resource", {
         if (tasks) {
           this.tasks = JSON.stringify(tasks);
           this.showAssignmentsDialog = true;
+        } else {
+          throw new Error("Failed to fetch resource");
+        }
+      } catch (error) {
+        console.error("Error fetching resource:", error);
+      }
+    },
+    async getCurrentExam(sessionId: string) {
+      const GET_CURRENT_EXAM = gql`
+        query ($sessionId: String!) {
+          getCurrentExam(sessionId: $sessionId) {
+            id
+            title
+            participants
+            description
+            examMetaInfo {
+              examDate
+              examStartTime
+              examDuration
+              examQuestionsSet
+              # examAnswersKey
+              examEndTime
+              selectedTypes
+              numberOfQuestions {
+                SCQ
+                MCQ
+                ATF
+                ETF
+                VSAQ
+                SAQ
+                LEQ
+              }
+              testMeta {
+                testType
+                numberOfQuestions
+              }
+            }
+            subject
+            topic
+            createdBy {
+              id
+            }
+            createdAt
+            sessionId
+            accessKey
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: GET_CURRENT_EXAM,
+          variables: { sessionId },
+        });
+
+        const exam = response.data.getCurrentExam;
+        if (exam) {
+          this.exam = JSON.stringify(exam);
         } else {
           throw new Error("Failed to fetch resource");
         }

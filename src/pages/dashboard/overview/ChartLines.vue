@@ -22,9 +22,19 @@ const props = defineProps({
 
 const lineChart = ref(null);
 
+// Function to format data for the chart
 const formatData = (trends) => {
-  const labels = trends.map((trend) => `Month ${trend.month}`);
-  const data = trends.map((trend) => trend.count);
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth(); // Current month (0-indexed)
+  const lastMonth = (currentMonth - 1 + 12) % 12; // Last month (0-indexed)
+
+  const labels = [
+    `${new Date(currentDate.getFullYear(), lastMonth).toLocaleString('default', { month: 'short' })} '${currentDate.getFullYear() % 100}`,
+    `${currentDate.toLocaleString('default', { month: 'short' })} '${currentDate.getFullYear() % 100}`
+  ];
+
+  // Assuming the trends array has counts for last month and current month
+  const data = trends.map((trend) => trend.count); // Make sure this matches your data structure
   return { labels, data };
 };
 
@@ -52,7 +62,6 @@ onMounted(() => {
       responsive: true,
       scales: {
         x: {
-          beginAtZero: true,
           title: {
             display: true,
             text: "Months",
