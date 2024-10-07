@@ -1,9 +1,41 @@
 <template>
   <v-container>
+    <v-card flat  style="z-index: 99999 !important">
+      <v-alert
+        border="top"
+        type="warning"
+        variant="outlined"
+        prominent
+        class="ma-4"
+        style="z-index: 99999 !important"
+        v-if="error"
+      >
+        {{ error }}
+      </v-alert>
+      <v-progress-linear
+        v-if="uploading"
+        :value="uploadProgress"
+        height="6"
+        color="green darken-2"
+        class="mt-4"
+      ></v-progress-linear>
+      <v-alert
+        border="top"
+        type="success"
+        class="ma-4"
+        style="z-index: 99999 !important"
+        variant="outlined"
+        prominent
+        v-if="isUploadSuccessful"
+      >
+        <h4>{{ isUploadSuccessful }}</h4>
+        <h6>You can always upload a new response</h6>
+      </v-alert>
+    </v-card>
     <v-file-input
       v-model="files"
       accept=".jpg, .jpeg, .png, .pdf"
-      label="Upload SAQ Responses"
+      label="Upload Assignment Responses"
       prepend-icon="mdi-file-upload"
       :multiple="true"
       :counter="true"
@@ -16,53 +48,33 @@
     <v-row justify="center" class="mt-4">
       <v-col cols="auto">
         <v-btn @click="uploadFiles" :disabled="files.length === 0 || uploading">
-          <v-icon class="mr-2">mdi-cloud-upload</v-icon>Upload SAQ Response
+          <v-icon class="mr-2">mdi-cloud-upload</v-icon>Upload TASK Response
         </v-btn>
       </v-col>
     </v-row>
-
-    <v-alert v-if="error" type="error" class="mt-4">
-      {{ error }}
-    </v-alert>
-
-    <v-progress-linear
-      v-if="uploading"
-      :value="uploadProgress"
-      height="6"
-      color="green darken-2"
-      class="mt-4"
-    ></v-progress-linear>
-
-    <v-alert
-      v-if="isUploadSuccessful"
-      type="success"
-      class="mt-4 custom-alert"
-      text
-    >
-      Files uploaded successfully!
-    </v-alert>
   </v-container>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
-import axios from "axios";
 import { useResourceStore } from "../../../stores/resources";
 import { useRouter, useRoute } from "vue-router";
+import axios from "axios";
+const apiUrl = import.meta.env.VITE_BASE_URL;
+const uploadProgress = ref(0);
+const isUploadSuccessful = ref(null);
+const error = ref(null);
 
 const resourceStore = useResourceStore();
-const apiUrl = import.meta.env.VITE_BASE_URL;
+const resource = resourceStore.resource;
 const route = useRoute();
 const router = useRouter();
 
 const userId = ref(localStorage.getItem("sessionId"));
-const sessionId = ref(route.query.sessionId || route.params.sessionId);
+const sessionId = ref(resource.sessionId);
 
 const files = ref([]);
 const uploading = ref(false);
-const uploadProgress = ref(0);
-const isUploadSuccessful = ref(false);
-const error = ref(null);
 
 const maxItems = 1; // Maximum number of files
 const maxTotalSizeMB = 32; // Maximum total file size
@@ -109,25 +121,26 @@ const uploadFiles = async () => {
     formData.append("files", file);
   });
 
-  const questionType = "SAQ";
-  const url = `${apiUrl}/resources/uploads/exam/attempt?userId=${encodeURIComponent(userId.value)}&sessionId=${encodeURIComponent(sessionId.value)}&questionType=${encodeURIComponent(questionType)}`;
+  const questionType = "TASK_UPLOAD";
+  const url = `${apiUrl}/resources/uploads/task/response?userId=${encodeURIComponent(userId.value)}&sessionId=${encodeURIComponent(sessionId.value)}&questionType=${encodeURIComponent(questionType)}`;
 
   try {
     const response = await axios.post(url, formData, {
       onUploadProgress: (progressEvent) => {
-        uploadProgress.value = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total
-        );
+        const total = progressEvent.total || 1; // Fallback to 1 to avoid division by zero
+        uploadProgress.value = Math.round((progressEvent.loaded * 100) / total);
       },
     });
 
     if (response.status === 200) {
-      isUploadSuccessful.value = true;
+      isUploadSuccessful.value = "Task response saved successfully";
       error.value = null;
+      setTimeout(() => {
+        window.location.href = "tasks";
+      }, 4200);
     }
   } catch (err) {
     error.value = "Failed to upload files. Please try again.";
-    console.error("Error uploading files:", err);
   } finally {
     uploading.value = false;
   }

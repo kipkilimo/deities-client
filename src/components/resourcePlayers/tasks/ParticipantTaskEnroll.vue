@@ -40,13 +40,13 @@
         >Request Assignment Enrollment</v-btn
       >
 
-      <v-btn
+      <!-- <v-btn
         variant="outlined"
         prepend-icon="mdi-book-edit-outline"
         v-if="success"
         @click="submitParticipantPlatResourceData"
         >Attempt this assignment</v-btn
-      >
+      > -->
       <v-spacer />
     </v-card-actions>
 

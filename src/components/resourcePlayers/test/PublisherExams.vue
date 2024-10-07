@@ -21,7 +21,7 @@
             >{{ item.subject }} EXAMINATION</v-card-title
           >
           <v-divider />
-          <v-card-subtitle  color="#0c0c0c">
+          <v-card-subtitle color="#0c0c0c">
             <h3 color="#0c0c0c">
               <strong>
                 DATE:
@@ -71,10 +71,13 @@
               <template v-slot:activator="{ props }">
                 <v-btn
                   v-bind="props"
-                  color="info"
+                  color=""
                   icon="mdi-clipboard-text-clock-outline"
                   size="large"
-                  @click="(resourceStore.exam = JSON.stringify(item)), (showEditDialog = true)"
+                  @click="
+                    (resourceStore.exam = JSON.stringify(item)),
+                      (showEditDialog = true)
+                  "
                 ></v-btn>
               </template>
               <span>Update Exam Start Date and time</span>

@@ -80,9 +80,29 @@
           <v-btn
             class="ms-2"
             size="small"
-            color="success"
-            disabled
-            text="SUBMIT TASK RESPONSE"
+            :prepend-icon="
+              hasContentForUserId(resource.participants, userId)
+                ? 'mdi-clipboard-text-clock-outline'
+                : 'mdi-file-edit-outline'
+            "
+            :color="
+              hasContentForUserId(resource.participants, userId)
+                ? 'orange'
+                : 'success'
+            "
+            :disabled="
+              !(
+                timeLeft.days > 0 ||
+                timeLeft.hours > 0 ||
+                timeLeft.minutes > 0 ||
+                timeLeft.seconds > 0
+              )
+            "
+            :text="
+              hasContentForUserId(resource.participants, userId)
+                ? 'RE-SUBMIT TASK RESPONSE'
+                : 'SUBMIT TASK RESPONSE'
+            "
             variant="outlined"
             @click="showTaskResponseEditor = true"
           ></v-btn>
@@ -94,7 +114,22 @@
           <v-btn @click="showDetails = true" color="primary" size="small">
             View task details
           </v-btn>
-          <v-spacer />
+          <v-spacer /> <v-spacer />
+          <v-tooltip location="top">
+            <template v-slot:activator="{ props }">
+              <v-btn
+                v-bind="props"
+                size="medium"
+                class="mb-0"
+                variant="outlined"
+                icon="mdi-arrow-left"
+                @click="goBackToAssignments"
+                color="info"
+              >
+              </v-btn>
+            </template>
+            <span>Go back to assignments</span>
+          </v-tooltip>
         </v-card-actions>
       </v-col>
     </v-row>
@@ -145,9 +180,29 @@
           <v-btn
             class="ms-2"
             size="small"
-            color="success"
-            disabled
-            text="SUBMIT TASK RESPONSE"
+            :prepend-icon="
+              hasContentForUserId(resource.participants, userId)
+                ? 'mdi-clipboard-text-clock-outline'
+                : 'mdi-file-edit-outline'
+            "
+            :color="
+              hasContentForUserId(resource.participants, userId)
+                ? 'orange'
+                : 'success'
+            "
+            :disabled="
+              !(
+                timeLeft.days > 0 ||
+                timeLeft.hours > 0 ||
+                timeLeft.minutes > 0 ||
+                timeLeft.seconds > 0
+              )
+            "
+            :text="
+              hasContentForUserId(resource.participants, userId)
+                ? 'RE-SUBMIT TASK RESPONSE'
+                : 'SUBMIT TASK RESPONSE'
+            "
             variant="outlined"
             @click="showTaskResponseEditor = true"
           ></v-btn>
@@ -157,53 +212,101 @@
     </v-dialog>
 
     <v-dialog v-model="showTaskResponseEditor" max-width="85%" persistent>
+      <v-card flat style="z-index: 99999 !important">
+        <v-alert
+          border="top"
+          type="warning"
+          variant="outlined"
+          prominent
+          class="ma-4"
+          style="z-index: 99999 !important"
+          v-if="error"
+        >
+          {{ error }}
+        </v-alert>
+
+        <v-alert
+          border="top"
+          type="success"
+          class="ma-4"
+          style="z-index: 99999 !important"
+          variant="outlined"
+          prominent
+          v-if="isUploadSuccessful"
+        >
+          <h4>{{ isUploadSuccessful }}</h4>
+          <h6>You can always overwrite existing response</h6>
+        </v-alert>
+      </v-card>
       <v-card>
-        <RichTextEditor v-model="typedTaskResponse" />
+        <!-- Error Alert -->
+
+        <!-- Rich Text Editor -->
+        <RichTextEditor
+          counter
+          v-model="typedTaskResponse"
+          :rules="richTextRules"
+        />
+
         <v-divider />
+
+        <!-- Card Actions with buttons and tooltips -->
         <v-card-actions>
-          <v-spacer /><v-spacer />
+          <v-spacer />
+
+          <!-- Upload Button with Tooltip -->
           <v-tooltip location="top">
-            <template v-slot:activator="{ props }">
+            <template v-slot:activator="{ on, attrs }">
               <v-btn
-                v-bind="props"
+                v-bind="attrs"
+                v-on="on"
                 width="18rem"
-                color="primary"
+                color="#022568"
                 variant="outlined"
                 prepend-icon="mdi-cloud-upload-outline"
                 @click="showTaskResponseUploader = true"
-                >UPLOAD A FILE RESPONSE</v-btn
               >
+                UPLOAD A FILE RESPONSE
+              </v-btn>
             </template>
             <span
-              >Only one response will be saved. Typed response will be
-              dropped.</span
+              >You may submit both a typed and uploaded file. Refer to relevant
+              instruction.</span
             >
           </v-tooltip>
 
           <v-spacer />
+
+          <!-- Save Button with Tooltip -->
           <v-tooltip location="top">
-            <template v-slot:activator="{ props }">
+            <template v-slot:activator="{ on, attrs }">
               <v-btn
-                v-bind="props"
+                v-bind="attrs"
+                v-on="on"
                 width="18rem"
-                color="primary"
-                prepend-icon="mdi-text-box-edit-outline"
+                color="#05909f"
                 variant="outlined"
+                prepend-icon="mdi-text-box-edit-outline"
                 @click="saveAssignmentDetail()"
-                >SAVE ASSIGNMENT RESPONSE</v-btn
+                :disabled="!isFormValid"
               >
+                SAVE ASSIGNMENT RESPONSE
+              </v-btn>
             </template>
             <span
-              >Only one response will be saved.Uploaded response will be
-              dropped.</span
+              >You may submit both a typed and uploaded file. Refer to relevant
+              instruction..</span
             >
           </v-tooltip>
 
-          <v-spacer /><v-spacer /><v-spacer /> <v-spacer />
+          <v-spacer />
+
+          <!-- Exit Button with Tooltip -->
           <v-tooltip location="top">
-            <template v-slot:activator="{ props }">
+            <template v-slot:activator="{ on, attrs }">
               <v-btn
-                v-bind="props"
+                v-bind="attrs"
+                v-on="on"
                 color="error"
                 icon="mdi-location-exit"
                 size="x-large"
@@ -214,31 +317,13 @@
           </v-tooltip>
         </v-card-actions>
       </v-card>
-      <v-dialog v-model="showTaskResponseUploader" max-width="24%">
-        <v-card>
+
+      <!-- Upload Dialog -->
+      <v-dialog v-model="showTaskResponseUploader" max-width="27%">
+        <v-card height="13.5rem">
           <TaskResponseFileUploader />
         </v-card>
       </v-dialog>
-      <v-alert v-if="error" type="error" class="mt-4">
-        {{ error }}
-      </v-alert>
-
-      <v-progress-linear
-        v-if="uploading"
-        :value="uploadProgress"
-        height="6"
-        color="green darken-2"
-        class="mt-4"
-      ></v-progress-linear>
-
-      <v-alert
-        v-if="isUploadSuccessful"
-        type="success"
-        class="mt-4 custom-alert"
-        text
-      >
-        Files uploaded successfully!
-      </v-alert>
     </v-dialog>
   </v-container>
 </template>
@@ -248,6 +333,9 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useResourceStore } from "@/stores/resources";
 import "vue3-pdf-app/dist/icons/main.css";
 import VuePdfApp from "vue3-pdf-app";
+import { useRouter } from "vue-router"; // Import useRouter
+
+const router = useRouter();
 import TaskResponseFileUploader from "./TaskResponseFileUploader.vue";
 import axios from "axios";
 const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -261,9 +349,16 @@ const showTaskResponseEditor = ref(false);
 const userId = ref(localStorage.getItem("sessionId"));
 const sessionId = ref(resource.sessionId);
 const uploadProgress = ref(0);
-const isUploadSuccessful = ref(false);
+const isUploadSuccessful = ref(null);
 const error = ref(null);
+// Method to handle navigation
+const goBackToAssignments = () => {
+  // Get router instance
 
+  router.push("tasks"); // Use absolute path for clarity
+};
+
+const uploading = ref(false);
 const pdfUrl = ref(null);
 const { assignmentMetaInfo, assignmentAnswersKey, assignmentTaskSet } =
   JSON.parse(resource.content);
@@ -279,7 +374,35 @@ const assignmentMeta = ref({
 });
 
 const timezoneOffHours = ref(0);
+// Validation rule to limit text length
+// Define rich text rules as an array
+const richTextRules = [
+  (v) => v.length <= 5000 || "Maximum 5000 characters allowed.",
+];
+function hasContentForUserId(participantsJson, userId) {
+  // Parse the JSON string
+  const participants = JSON.parse(participantsJson);
 
+  // Find the participant by userId
+  const participant = participants.find(
+    (participant) => participant.userId === userId
+  );
+
+  // If participant is found, check their resourceResponses
+  if (participant && participant.resourceResponses) {
+    // Check if any resourceResponse has a truthy questionResponse
+    return participant.resourceResponses.some((response) =>
+      Boolean(response.questionResponse)
+    );
+  }
+
+  // Return false if participant is not found or has no resourceResponses
+  return false;
+}
+// Computed property to check if the input is valid
+const isFormValid = computed(() => {
+  return richTextRules.every((rule) => rule(typedTaskResponse.value) === true);
+});
 // Convert deadline to UTC milliseconds
 function getUtcMillis(dateString) {
   // Extract the timezone offset (e.g., GMT+3) from the string
@@ -383,6 +506,7 @@ async function saveAssignmentDetail() {
   // Handle task detail submission logic here
   // Example usage
 
+  uploading.value = true;
   const formDataJson = JSON.stringify({
     questionType: "TASK_TEXT",
     questionResponse: typedTaskResponse.value,
@@ -392,7 +516,7 @@ async function saveAssignmentDetail() {
   const url = `${apiUrl}/resources/uploads/task/response?userId=${encodeURIComponent(userId.value)}&sessionId=${encodeURIComponent(sessionId.value)}`;
   try {
     // Send the data using axios
-    await axios.post(
+    const response = await axios.post(
       url,
       formDataJson, // The body data to send
       {
@@ -403,10 +527,13 @@ async function saveAssignmentDetail() {
     );
 
     // Handle success response
-    success.value = "Assignment updated successfully.";
-    setTimeout(() => {
-      window.location.reload();
-    }, 4200);
+    if (response) {
+      isUploadSuccessful.value = "Task response saved successfully";
+      uploading.value = false;
+      setTimeout(() => {
+        window.location.href = "tasks";
+      }, 6300);
+    }
   } catch (error) {
     // Handle error
     errorMessage.value = "Error updating task:";

@@ -342,54 +342,50 @@ export const useResourceStore = defineStore("resource", {
       }
     },
     async getUserTasks(userId: string) {
-      const GET_LATEST_TASK = gql`
+      const GET_LATEST_TASKS = gql`
         query ($userId: String!) {
           getUserTasks(userId: $userId) {
-            getPublisherLatestPoll(userId: $userId) {
+            id
+            title
+            description
+            content
+            sessionId
+            contentType
+            accessKey
+            coverImage
+            isPublished
+            createdBy {
               id
-              title
-              description
-              content
-              sessionId
-              accessKey
-              coverImage
-              isPublished
-              createdBy {
-                id
 
-                personalInfo {
-                  username
-                  email
-                  scholarId
-                  fullName
-                  activationToken
-                  resetToken
-                  tokenExpiry
-                  activatedAccount
-                }
-                role
+              personalInfo {
+                username
+                email
+                scholarId
+                fullName
+                activationToken
+                resetToken
+                tokenExpiry
+                activatedAccount
               }
-              createdAt
-              updatedAt
+              role
             }
+            createdAt
+            updatedAt
           }
         }
       `;
 
       try {
         const response = await client.query({
-          query: GET_LATEST_TASK,
+          query: GET_LATEST_TASKS,
           variables: { userId },
         });
 
         const resources = response.data.getUserTasks;
-        if (resources) {
-          // @ts-ignore
-          this.resources = JSON.stringify(resources);
-        } else {
-          throw new Error("Failed to fetch resource");
-        }
+        // @ts-ignore
+        this.resources = resources;
       } catch (error) {
+        this.resources = [];
         console.error("Error fetching resource:", error);
       }
     },
@@ -750,6 +746,7 @@ export const useResourceStore = defineStore("resource", {
             slug
             language
             contentType
+            participants
             viewsNumber
             likesNumber
             sharesNumber

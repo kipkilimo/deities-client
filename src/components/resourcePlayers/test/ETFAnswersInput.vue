@@ -3,7 +3,7 @@
     <!-- Generate the table for each question -->
     <div v-for="(question, qIndex) in ETFQuestions" :key="qIndex">
       <h3>ETF Question {{ qIndex + 1 }}  of {{ ETFQuestions.length }}</h3>
-      <v-table class="striped-table">
+      <v-table class="striped-table" style="min-width:100% !important;">
         <thead>
           <tr>
             <th>Options</th>
@@ -83,7 +83,7 @@ const updateSelectedOption = (qIndex, index, value) => {
 }
 
 .striped-table th, .striped-table td {
-  padding: 10px; /* Add padding for better spacing */
+  padding: 5px; /* Add padding for better spacing */
   text-align: left; /* Align text to the left */
 }
 </style>

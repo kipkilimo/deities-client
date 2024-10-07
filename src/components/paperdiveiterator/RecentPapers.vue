@@ -53,10 +53,15 @@
           :disabled="loading"
           max-width="48rem"
           min-width="48rem"
-          height="21rem"
+          height="18rem"
           :loading="loading"
           class="mx-auto my-3"
           color="#f9f3b9"
+          style="
+            background-image: url(&quot;https://png.pngtree.com/background/20211215/original/pngtree-mathematics-tutoring-mathematics-background-picture-image_1473414.jpg&quot;);
+            background-size: cover;
+            background-position: center;
+          "
         >
           <template v-slot:loader="{ isActive }">
             <v-progress-linear
@@ -68,16 +73,35 @@
           </template>
 
           <v-card-item class="ma-2">
-            <v-card-title>{{ paper.title }}</v-card-title>
+            <h5
+              style="
+                white-space: transparent;
+                overflow: visible;
+                text-overflow: clip;
+                background-color: transparent;
+              "
+            >
+              <h5 style="margin: 0; white-space: transparent">
+                {{
+                  paper.title.length > 125
+                    ? paper.title.substring(0, 125) + "..."
+                    : paper.title + "\n"
+                }}
+                <span v-if="paper.title.length <= 125"><br /></span>
+              </h5>
+            </h5>
 
             <v-divider />
-            <v-card-text
-              ><strong><h5>Paper objective</h5></strong
-              >{{ paper.objective }}</v-card-text
-            >
+            <v-card-text>
+              <strong><h5>Paper objective</h5></strong>
+              {{
+                paper.objective.length > 255
+                  ? paper.objective.substring(0, 255) + "..."
+                  : paper.objective
+              }}
+            </v-card-text>
           </v-card-item>
 
-          <v-divider class="mx-4 mb-1"></v-divider>
           <v-card-actions>
             <v-list-item class="w-100">
               <template v-slot:prepend>
@@ -87,9 +111,10 @@
                 ></v-avatar>
               </template>
 
-              <v-list-item-title>{{
-                paper.createdBy.personalInfo.username
-              }}</v-list-item-title>
+              <v-list-item-title
+                >By
+                {{ paper.createdBy.personalInfo.username }}</v-list-item-title
+              >
 
               <v-list-item-subtitle>{{
                 paper.createdBy.role
@@ -118,38 +143,44 @@
           </v-card-actions>
           <v-divider class="mx-1 mb-1"></v-divider>
 
-          <v-card-actions>
-            <v-btn
-              @click="handleSetPaper(paper)" 
-              class="mr-2"
-            >
-              <v-icon class="mr-2">mdi-dots-vertical</v-icon> About  
-            </v-btn>
-            <v-btn
-              color="deep-purple-lighten-2"
-              text
-              :href="paper.url"
-              target="_blank"
-            >
-              Read Paper
-            </v-btn>
-            <v-spacer />
-            <v-btn variant="text" @click="submitPaperData(paper)"
-              >DISCUSS PAPER</v-btn
-            >
+          <v-card-actions
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              width: 100%;
+            "
+          >
+            <div style="display: flex; align-items: center">
+              <v-btn @click="handleSetPaper(paper)" class="mr-2">
+                <v-icon class="mr-2">mdi-dots-vertical</v-icon> About
+              </v-btn>
+
+              <v-btn color="#EB7082" text :href="paper.url" target="_blank">
+                Read Paper
+              </v-btn>
+            </div>
+
             <v-spacer />
 
-            <v-btn
-              color="#6a808b"
-              v-if="userId === paper.createdBy.id"
-              variant="outlined"
-              @click="showPaperLinkInviteGenerator(paper)"
-              rounded
-              style="display: inline-flex; align-items: center"
-            >
-              <v-icon size="32">mdi-cloud-lock-open-outline</v-icon>MANAGE
-              PARTICIPANTS
-            </v-btn>
+            <div style="display: flex; align-items: center">
+              <v-btn variant="text" @click="submitPaperData(paper)"
+                >DISCUSS PAPER</v-btn
+              >
+
+              <v-btn
+                color="#6a808b"
+                class="mr-4"
+                v-if="userId === paper.createdBy.id"
+                variant="outlined"
+                @click="showPaperLinkInviteGenerator(paper)"
+                rounded
+                style="display: inline-flex; align-items: center"
+              >
+                <v-icon size="32">mdi-cloud-lock-open-outline</v-icon>MANAGE
+                PARTICIPANTS
+              </v-btn>
+            </div>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -270,9 +301,9 @@ const journalTask = ref(false);
 const paperContributorsDialog = ref(false);
 const errorMessage = ref(null);
 
-function handleSetPaper(paper){
-  paperStore.setPaper(paper)
-  journalTask.value = true
+function handleSetPaper(paper) {
+  paperStore.setPaper(paper);
+  journalTask.value = true;
 }
 function evalClosingDate(timestamp) {
   // Convert the timestamp to an integer

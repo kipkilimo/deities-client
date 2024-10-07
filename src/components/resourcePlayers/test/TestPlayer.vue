@@ -62,8 +62,7 @@
                           : 'mdi-alert-outline'
                       "
                       :color="scqSaved ? 'primary' : 'orange'"
-                      @click="answersStore.saveSCQAnswer, (scqSaved = true)"
-                      class="mt-4"
+                      @click="saveAnswer(SCQAnswers, 'SCQ'), (scqSaved = true)"
                     >
                       {{ scqSaved ? "Saved SCQ Answers" : "Save SCQ Answers" }}
                     </v-btn>
@@ -115,14 +114,13 @@
                     <v-spacer />
                     <v-btn
                       variant="outlined"
-                      @click="answersStore.saveMCQAnswer, (mcqSaved = true)"
                       :prepend-icon="
                         mcqSaved
                           ? 'mdi-book-check-outline'
                           : 'mdi-alert-outline'
                       "
+                      @click="saveAnswer(MCQAnswers, 'MCQ'), (mcqSaved = true)"
                       :color="mcqSaved ? 'primary' : 'orange'"
-                      class="mt-4"
                     >
                       {{ mcqSaved ? "Saved MCQ Answers" : "Save MCQ Answers" }}
                     </v-btn>
@@ -175,8 +173,7 @@
                           : 'mdi-alert-outline'
                       "
                       :color="atfSaved ? 'primary' : 'orange'"
-                      @click="answersStore.saveATFAnswer, (atfSaved = true)"
-                      class="mt-4"
+                      @click="saveAnswer(ATFAnswers, 'ATF'), (atfSaved = true)"
                     >
                       {{ atfSaved ? "Saved ATF Answers" : "Save ATF Answers" }}
                     </v-btn>
@@ -192,13 +189,14 @@
                   Extended True / False (ETF)
                 </div>
                 <!-- Pass down questions and options to the child -->
-                <v-card flat>
+                <v-card flat full-width>
                   <v-card-title class="text-h6"
                     >ETF Questions Answer Input</v-card-title
                   >
                   <div>
                     <!-- Bind the ETFQuestions and handle answer updates -->
                     <ETFAnswersInput
+                      style="min-width: 100% !important"
                       :ETFQuestions="ETFQuestions"
                       @updateAnswers="handleAnswerUpdate"
                       @click="etfSaved = false"
@@ -211,13 +209,6 @@
 
                   <v-divider></v-divider>
 
-                  <v-card-title class="text-h6"
-                    >Submitted ETF String</v-card-title
-                  >
-                  <v-card-text>
-                    {{ flattenedETFAnswers }}
-                  </v-card-text>
-                  <v-divider class="my-1"></v-divider>
                   <v-card-actions>
                     <v-spacer />
                     <v-btn
@@ -228,8 +219,9 @@
                           : 'mdi-alert-outline'
                       "
                       :color="etfSaved ? 'primary' : 'orange'"
-                      @click="answersStore.saveETFAnswer, (etfSaved = true)"
-                      class="mt-4"
+                      @click="
+                        saveAnswer(answerString, 'ETF'), (etfSaved = true)
+                      "
                     >
                       {{ etfSaved ? "Saved ETF Answers" : "Save ETF Answers" }}
                     </v-btn>
@@ -253,9 +245,11 @@
                 </div>
                 <v-card>
                   <RichTextEditor
-                    v-model="userAnswers['VSAQ-' + index]"
+                    :rules="richTextRules"
+                    v-model="vsaqTypedResponseMini"
                     :disabled="!showVSAQEditor"
-                    @input="saveAnswer('VSAQ-' + index)"
+                    @input="vsaqSaved = false"
+                    @click="vsaqSaved = false"
                     :style="{
                       maxHeight: '240px',
                       overflowY: 'auto',
@@ -267,6 +261,7 @@
                       color="primary"
                       variant="outlined"
                       @click="showVSAQEditor = true"
+                      prepend-icon="mdi-fullscreen"
                       >Expand Editor View</v-btn
                     >
                     <v-spacer />
@@ -274,19 +269,42 @@
                       <template v-slot:activator="{ props }">
                         <v-btn
                           v-bind="props"
-                          color="info"
-                          icon="mdi-content-save-check-outline"
                           size="x-large"
-                          @click="saveVSAQResponse"
-                        ></v-btn>
+                          class="mb-2"
+                          :disabled="!isFormValid"
+                          @click="
+                            saveAnswer(vsaqTypedResponseMini, 'VSAQ'),
+                              (vsaqSaved = true)
+                          "
+                          :prepend-icon="
+                            vsaqSaved
+                              ? 'mdi-book-check-outline'
+                              : 'mdi-alert-outline'
+                          "
+                          :color="vsaqSaved ? 'primary' : 'orange'"
+                        >
+                        </v-btn>
                       </template>
-                      <span>Save VSAQ Responses</span>
+                      <span>{{
+                        vsaqSaved
+                          ? "Saved VSAQ Responses"
+                          : "Save VSAQ Responses"
+                      }}</span>
                     </v-tooltip>
 
                     <v-spacer />
-                    <v-btn color="primary" @click="showVSAQUploader = true"
-                      >Upload ANSWERS</v-btn
-                    >
+                    <v-tooltip location="bottom">
+                      <template v-slot:activator="{ props }">
+                        <v-btn
+                          v-bind="props"
+                          prepend-icon="mdi-cloud-upload"
+                          color="primary"
+                          @click="showVSAQUploader = true"
+                          >VSAQ</v-btn
+                        >
+                      </template>
+                      <span>Upload very short answer responses</span>
+                    </v-tooltip>
 
                     <v-spacer />
                   </v-card-actions>
@@ -301,9 +319,11 @@
                 </div>
                 <v-card>
                   <RichTextEditor
+                    :rules="richTextRules"
                     :disabled="!showSAQEditor"
-                    v-model="userAnswers['SAQ-' + index]"
-                    @input="saveAnswer('SAQ-' + index)"
+                    v-model="saqTypedResponseMini"
+                    @input="saqSaved = false"
+                    @click="saqSaved = false"
                     :style="{
                       maxHeight: '240px',
                       overflowY: 'auto',
@@ -315,6 +335,7 @@
                       color="primary"
                       variant="outlined"
                       @click="showSAQEditor = true"
+                      prepend-icon="mdi-fullscreen"
                       >Expand Editor View</v-btn
                     >
                     <v-spacer />
@@ -322,19 +343,40 @@
                       <template v-slot:activator="{ props }">
                         <v-btn
                           v-bind="props"
-                          color="info"
-                          icon="mdi-content-save-check-outline"
                           size="x-large"
-                          @click="saveSAQInput"
-                        ></v-btn>
+                          class="mb-2"
+                          @click="
+                            saveAnswer(saqTypedResponseMini, 'SAQ'),
+                              (saqSaved = true)
+                          "
+                          :disabled="!isFormValid"
+                          :prepend-icon="
+                            saqSaved
+                              ? 'mdi-book-check-outline'
+                              : 'mdi-alert-outline'
+                          "
+                          :color="saqSaved ? 'primary' : 'orange'"
+                        >
+                        </v-btn>
                       </template>
-                      <span>Save SAQ Responses</span>
+                      <span>{{
+                        saqSaved ? "Saved SAQ Responses" : "Save SAQ Responses"
+                      }}</span>
                     </v-tooltip>
 
                     <v-spacer />
-                    <v-btn color="primary" @click="showSAQUploader = true"
-                      >Upload ANSWERS</v-btn
-                    >
+                    <v-tooltip location="bottom">
+                      <template v-slot:activator="{ props }">
+                        <v-btn
+                          v-bind="props"
+                          prepend-icon="mdi-cloud-upload"
+                          color="primary"
+                          @click="showSAQUploader = true"
+                          >SAQ</v-btn
+                        >
+                      </template>
+                      <span>Upload short answer responses</span>
+                    </v-tooltip>
 
                     <v-spacer />
                   </v-card-actions>
@@ -349,9 +391,11 @@
                 </div>
                 <v-card>
                   <RichTextEditor
+                    :rules="richTextRules"
                     :disabled="!showLEQEditor"
-                    v-model="userAnswers['LEQ-' + index]"
-                    @input="saveAnswer('LEQ-' + index)"
+                    v-model="leqTypedResponseMini"
+                    @input="leqSaved = false"
+                    @click="leqSaved = false"
                     :style="{
                       maxHeight: '240px',
                       overflowY: 'auto',
@@ -363,6 +407,7 @@
                       color="primary"
                       variant="outlined"
                       @click="showLEQEditor = true"
+                      prepend-icon="mdi-fullscreen"
                       >Expand Editor View</v-btn
                     >
                     <v-spacer />
@@ -370,19 +415,40 @@
                       <template v-slot:activator="{ props }">
                         <v-btn
                           v-bind="props"
-                          color="info"
-                          icon="mdi-content-save-check-outline"
                           size="x-large"
-                          @click="saveLEQInput"
-                        ></v-btn>
+                          class="mb-2"
+                          :disabled="!isFormValid"
+                          @click="
+                            saveAnswer(leqTypedResponseMini, 'LEQ'),
+                              (leqSaved = true)
+                          "
+                          :prepend-icon="
+                            leqSaved
+                              ? 'mdi-book-check-outline'
+                              : 'mdi-alert-outline'
+                          "
+                          :color="leqSaved ? 'primary' : 'orange'"
+                        >
+                        </v-btn>
                       </template>
-                      <span>Save LEQ Responses</span>
+                      <span>{{
+                        leqSaved ? "Saved LEQ Responses" : "Save LEQ Responses"
+                      }}</span>
                     </v-tooltip>
 
                     <v-spacer />
-                    <v-btn color="primary" @click="showLEQUploader = true"
-                      >Upload ANSWERS</v-btn
-                    >
+                    <v-tooltip location="bottom">
+                      <template v-slot:activator="{ props }">
+                        <v-btn
+                          v-bind="props"
+                          prepend-icon="mdi-cloud-upload"
+                          color="primary"
+                          @click="showLEQUploader = true"
+                          >LEQ</v-btn
+                        >
+                      </template>
+                      <span>Upload long essay response</span>
+                    </v-tooltip>
 
                     <v-spacer />
                   </v-card-actions>
@@ -391,8 +457,11 @@
             </v-col>
           </v-row>
           <v-card-actions style="position: relative">
-            <v-spacer /><v-btn variant="outlined" @click="submitAllAnswers"
-              >End Exam & Submit</v-btn
+            <v-spacer /><v-btn
+              :disabled="!allAnswersSaved"
+              variant="outlined"
+              @click="submitAllAnswers"
+              >Close Exam & Exit</v-btn
             >
             <v-spacer />
           </v-card-actions>
@@ -401,18 +470,17 @@
     </v-row>
     <v-dialog v-model="showVSAQUploader" max-width="24%">
       <v-card>
-        <VSAQResponseFileUploader
-          v-model="userFiles['VSAQ-' + index]"
-          @change="saveAnswer('VSAQ-' + index)"
-        />
+        <VSAQResponseFileUploader />
       </v-card>
     </v-dialog>
 
     <v-dialog v-model="showVSAQEditor" max-width="85%" persistent>
       <v-card>
         <RichTextEditor
-          v-model="userFiles['VSAQ-' + index]"
-          @change="saveAnswer('VSAQ-' + index)"
+          :rules="richTextRules"
+          v-model="vsaqTypedResponse"
+          @change="vsaqSaved = false"
+          @click="vsaqSaved = false"
         />
         <v-card-actions>
           <v-spacer />
@@ -421,8 +489,11 @@
               <v-btn
                 width="15rem"
                 color="primary"
+                :disabled="!isFormValid"
                 variant="outlined"
-                @click="saveVSAQResponse"
+                @click="
+                  saveAnswer(vsaqTypedResponse, 'VSAQ'), (vsaqSaved = true)
+                "
                 >SAVE VSAQ RESPONSES</v-btn
               >
             </template>
@@ -447,18 +518,17 @@
 
     <v-dialog v-model="showSAQUploader" max-width="24%">
       <v-card>
-        <SAQResponseFileUploader
-          v-model="userFiles['SAQ-' + index]"
-          @change="saveAnswer('SAQ-' + index)"
-        />
+        <SAQResponseFileUploader />
       </v-card>
     </v-dialog>
 
     <v-dialog v-model="showSAQEditor" max-width="85%" persistent>
       <v-card>
         <RichTextEditor
-          v-model="userFiles['SAQ-' + index]"
-          @change="saveAnswer('SAQ-' + index)"
+          :rules="richTextRules"
+          v-model="saqTypedResponse"
+          @change="saqSaved = false"
+          @click="saqSaved = false"
         />
         <v-card-actions>
           <v-spacer />
@@ -468,7 +538,8 @@
                 width="15rem"
                 color="primary"
                 variant="outlined"
-                @click="saveSAQResponse"
+                :disabled="!isFormValid"
+                @click="saveAnswer(saqTypedResponse, 'SAQ'), (saqSaved = true)"
                 >SAVE SAQ RESPONSES</v-btn
               >
             </template>
@@ -493,18 +564,17 @@
 
     <v-dialog v-model="showLEQUploader" max-width="24%">
       <v-card>
-        <LEQResponseFileUploader
-          v-model="userFiles['LEQ-' + index]"
-          @change="saveAnswer('LEQ-' + index)"
-        />
+        <LEQResponseFileUploader />
       </v-card>
     </v-dialog>
 
     <v-dialog v-model="showLEQEditor" max-width="85%" persistent>
       <v-card>
         <RichTextEditor
-          v-model="userFiles['LEQ-' + index]"
-          @change="saveAnswer('LEQ-' + index)"
+          :rules="richTextRules"
+          v-model="leqTypedResponse"
+          @change="leqSaved = false"
+          @click="leqSaved = false"
         />
         <v-card-actions>
           <v-spacer />
@@ -514,7 +584,8 @@
                 width="15rem"
                 color="primary"
                 variant="outlined"
-                @click="saveLEQResponse"
+                :disabled="!isFormValid"
+                @click="saveAnswer(leqTypedResponse, 'LEQ'), (leqSaved = true)"
                 >SAVE LEQ RESPONSES</v-btn
               >
             </template>
@@ -539,8 +610,11 @@
 
     <v-divider />
     <v-card-actions style="position: fixed">
-      <v-spacer /><v-btn variant="outlined" @click="submitAllAnswers"
-        >End Exam & Submit</v-btn
+      <v-spacer /><v-btn
+        :disabled="!allAnswersSaved"
+        variant="outlined"
+        @click="submitAllAnswers"
+        >Close Exam & Exit</v-btn
       >
       <v-spacer />
     </v-card-actions>
@@ -548,7 +622,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useResourceStore } from "@/stores/resources";
 import axios from "axios";
@@ -563,9 +637,19 @@ import MCQAnswersInput from "./MCQAnswersInput.vue";
 import VSAQResponseFileUploader from "./VSAQResponseFileUploader.vue";
 import SAQResponseFileUploader from "./SAQResponseFileUploader.vue";
 import LEQResponseFileUploader from "./LEQResponseFileUploader.vue";
-import RichTextEditor from "@/components/commonResourceCreateItems/formItems/RichTextEditor.vue";
 import { useAnswersStore } from "@/stores/answers";
+const apiUrl = import.meta.env.VITE_BASE_URL;
+const uploadProgress = ref(0);
+const isUploadSuccessful = ref(false);
+const error = ref(null);
+const richTextRules = [
+  (v) => v.length <= 5000 || "Maximum 5000 characters allowed.",
+];
 
+// Computed property to check if the input is valid
+const isFormValid = computed(() => {
+  return richTextRules.every((rule) => rule(typedTaskResponse.value) === true);
+});
 // Use Pinia store
 const answersStore = useAnswersStore();
 
@@ -576,10 +660,23 @@ const sessionId = ref(route.query.sessionId || route.params.sessionId); // Fetch
 const userId = ref(localStorage.getItem("sessionId")); // Retrieve userId from local storage
 const showVSAQUploader = ref(false);
 const showVSAQEditor = ref(false);
+const uploading = ref(false);
+
 const scqSaved = ref(false);
 const mcqSaved = ref(false);
 const atfSaved = ref(false);
 const etfSaved = ref(false);
+const vsaqSaved = ref(false);
+const saqSaved = ref(false);
+const leqSaved = ref(false);
+
+const vsaqTypedResponseMini = ref("Clear and add your VSAQ response here");
+const saqTypedResponseMini = ref("Clear and add your SAQ response here");
+const leqTypedResponseMini = ref("Clear and add your LEQ response here");
+
+const vsaqTypedResponse = ref("Clear and add your VSAQ response here");
+const saqTypedResponse = ref("Clear and add your SAQ response here");
+const leqTypedResponse = ref("Clear and add your LEQ response here");
 
 const showSAQUploader = ref(false);
 const showSAQEditor = ref(false);
@@ -659,6 +756,148 @@ const saveETFResponse = () => {
   flattenAnswers();
   // Handle saving the response (e.g., send to server)
   console.log("Submitted ETF String:", flattenedETFAnswers.value);
+};
+// auto
+
+// Save function
+const autoSave = async (type, value) => {
+  switch (type) {
+    case "VSAQ":
+      vsaqTypedResponse.value = value;
+      vsaqTypedResponseMini.value = value;
+      vsaqSaved.value = true;
+      break;
+    case "SAQ":
+      saqTypedResponse.value = value;
+      saqTypedResponseMini.value = value;
+
+      saqSaved.value = true;
+      break;
+    case "LEQ":
+      leqTypedResponse.value = value;
+      leqTypedResponseMini.value = value;
+
+      leqSaved.value = true;
+      break;
+    default:
+      console.error("Invalid response type provided:", type);
+      return; // Exit if the type is invalid
+  }
+
+  // Example: Call an API to save the response
+  // axios.post('/api/save-response', { response: value }).then(() => {
+  const bodyJSON = JSON.stringify({
+    questionType: type,
+    questionResponse: value,
+    savedDate: Date.now(),
+  });
+
+  const url = `${apiUrl}/resources/uploads/exam/text?userId=${encodeURIComponent(userId.value)}&sessionId=${encodeURIComponent(sessionId.value)}`;
+
+  try {
+    uploading.value = true;
+    uploadProgress.value = 0;
+    const response = await axios.post(url, bodyJSON, {
+      headers: {
+        "Content-Type": "application/json", // Ensure the content type is JSON
+      },
+      onUploadProgress: (progressEvent) => {
+        const total = progressEvent.total || 1; // Fallback to 1 to avoid division by zero
+        uploadProgress.value = Math.round((progressEvent.loaded * 100) / total);
+      },
+    });
+
+    if (response.status === 200) {
+      isUploadSuccessful.value = true;
+      error.value = null;
+    }
+  } catch (err) {
+    error.value = "Failed to upload files. Please try again.";
+    console.error("Error uploading files:", err);
+  } finally {
+    uploading.value = false;
+  }
+  //   saved.value = true;
+  // });
+};
+
+// Function to handle saving after debounce
+const createDebouncedWatcher = (typedResponseRef, savedRef, type) => {
+  let saveTimeout = null;
+
+  watch(typedResponseRef, (newVal) => {
+    clearTimeout(saveTimeout); // Clear any previous timeout
+
+    // Set up a new timeout to auto-save after 3.6 seconds
+    saveTimeout = setTimeout(() => {
+      autoSave(type, newVal);
+    }, 5600); // 3600 milliseconds = 3.6 seconds
+  });
+};
+
+// Create debounced watchers for each typed response
+createDebouncedWatcher(vsaqTypedResponseMini, vsaqSaved, "VSAQ");
+createDebouncedWatcher(saqTypedResponseMini, saqSaved, "SAQ");
+createDebouncedWatcher(leqTypedResponseMini, leqSaved, "LEQ");
+
+createDebouncedWatcher(vsaqTypedResponse, vsaqSaved, "VSAQ");
+createDebouncedWatcher(saqTypedResponse, saqSaved, "SAQ");
+createDebouncedWatcher(leqTypedResponse, leqSaved, "LEQ");
+
+const saveAnswer = async (data, type) => {
+  // Handle saving the response (e.g., send to server)
+  console.log("Submitted Section B response:", data, type);
+
+  // Set the analogous typed responses based on the `type`
+  switch (type) {
+    case "VSAQ":
+      vsaqTypedResponse.value = data;
+      vsaqTypedResponseMini.value = data;
+      break;
+    case "SAQ":
+      saqTypedResponse.value = data;
+      saqTypedResponseMini.value = data;
+      break;
+    case "LEQ":
+      leqTypedResponse.value = data;
+      leqTypedResponseMini.value = data;
+      break;
+    default:
+      console.error("Invalid response type provided:", type);
+      return; // Exit if the type is invalid
+  }
+
+  const bodyJSON = JSON.stringify({
+    questionType: type,
+    questionResponse: data,
+    savedDate: Date.now(),
+  });
+
+  const url = `${apiUrl}/resources/uploads/exam/text?userId=${encodeURIComponent(userId.value)}&sessionId=${encodeURIComponent(sessionId.value)}`;
+
+  try {
+    uploading.value = true;
+    uploadProgress.value = 0;
+    const response = await axios.post(url, bodyJSON, {
+      headers: {
+        "Content-Type": "application/json", // Ensure the content type is JSON
+      },
+      onUploadProgress: (progressEvent) => {
+        const total = progressEvent.total || 1; // Fallback to 1 to avoid division by zero
+        uploadProgress.value = Math.round((progressEvent.loaded * 100) / total);
+      },
+    });
+
+    if (response.status === 200) {
+      isUploadSuccessful.value = true;
+      error.value = null;
+    }
+  } catch (err) {
+    error.value = "Failed to upload files. Please try again.";
+    console.error("Error uploading files:", err);
+  } finally {
+    uploading.value = false;
+  }
 };
 
 onMounted(() => {
@@ -778,22 +1017,30 @@ watch(
 );
 
 // Submit all answers to the database when the exam session ends
+const allAnswersSaved = computed(() => {
+  return (
+    scqSaved.value &&
+    mcqSaved.value &&
+    atfSaved.value &&
+    etfSaved.value &&
+    vsaqSaved.value &&
+    saqSaved.value &&
+    leqSaved.value
+  );
+});
 const submitAllAnswers = async () => {
   try {
-    const payload = {
-      sessionId: sessionId.value,
-      userId: userId.value,
-      answers: userAnswers.value,
-      files: userFiles.value,
-    };
+    // Your submit logic here, if any
+    // For example, await sending data to the server
 
-    const response = await axios.post(`${apiUrl}/submitExam`, payload);
-    if (response.status === 200) {
-      alert("Exam submitted successfully!");
-    }
+    // Clear local storage
+    localStorage.clear();
+
+    // Navigate to '/' and force a full page reload
+    window.location.href = "/";
   } catch (error) {
-    console.error("Error submitting exam:", error);
-    alert("There was an error submitting your exam.");
+    console.error("Error submitting answers:", error);
+    // Handle errors if necessary
   }
 };
 </script>

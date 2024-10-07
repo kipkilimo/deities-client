@@ -66,6 +66,7 @@ declare module 'vue-router/auto/routes' {
     '/dashboard/poster/': RouteRecordInfo<'/dashboard/poster/', '/dashboard/poster', Record<never, never>, Record<never, never>>,
     '/dashboard/programming/': RouteRecordInfo<'/dashboard/programming/', '/dashboard/programming', Record<never, never>, Record<never, never>>,
     '/dashboard/settings/': RouteRecordInfo<'/dashboard/settings/', '/dashboard/settings', Record<never, never>, Record<never, never>>,
+    '/dashboard/task/': RouteRecordInfo<'/dashboard/task/', '/dashboard/task', Record<never, never>, Record<never, never>>,
     '/dashboard/tasks/': RouteRecordInfo<'/dashboard/tasks/', '/dashboard/tasks', Record<never, never>, Record<never, never>>,
     '/exam/participant/': RouteRecordInfo<'/exam/participant/', '/exam/participant', Record<never, never>, Record<never, never>>,
     '/exam/presenter/': RouteRecordInfo<'/exam/presenter/', '/exam/presenter', Record<never, never>, Record<never, never>>,

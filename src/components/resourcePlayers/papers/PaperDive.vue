@@ -1,5 +1,5 @@
 <template>
-  <v-card flat auto-height>
+  <v-card flat height="99.9vh" full-width>
     <!-- Loading Indicator -->
     <!-- PDF Container --><v-row>
       <v-col cols="9">
@@ -35,7 +35,7 @@
             <v-icon>mdi-star-box-multiple-outline</v-icon>Page
             {{ currentPage }} of {{ totalPages }}
           </v-btn>
-          <v-btn 
+          <v-btn
             variant="text"
             color="grey"
             flat
@@ -205,7 +205,7 @@
               class="mr-2"
               style="background-color: rgba(255, 255, 255, 0)"
               @click="rotatePage"
-              ><v-icon>mdi-file-rotate-right-outline</v-icon>nnn</v-btn
+              ><v-icon>mdi-file-rotate-right-outline</v-icon></v-btn
             >
           </v-toolbar>
         </div>
@@ -223,60 +223,55 @@
             <h5>No discussion comments.</h5>
           </div>
 
-          <div id="draggableComments">
-            <v-row style="">
-              <v-col
-                v-for="(comment, index) in reorderedComments"
-                :key="index"
-                :id="'card-' + index"
+          <v-row class="overflow-y-auto" style="height: 81vh">
+            <v-col
+              v-for="(comment, index) in reorderedComments"
+              :key="index"
+              cols="12"
+            >
+              <v-card
+                flat
+                max-width="27rem"
+                @mouseover="
+                  (showTooltip = index),
+                    (hoverIndex = index),
+                    moveActiveCardToSecondPosition(comment.id),
+                    handleDraggableCardClick(hoverIndex)
+                "
+                @mouseleave="
+                  (showTooltip = null),
+                    (activeComment = null),
+                    (hoverIndex = null),
+                    moveActiveCardToSecondPosition(null)
+                "
+                @click="handleDraggableCardClick(index)"
+                color="#e7f2fb"
+                v-bind="attrs"
+                v-on="on"
+                :style="computedCardStyle(index)"
+                class="tooltip-card custom-tooltip mt-1 mb-1 mr-2"
+                style="
+                  border: 1px solid #ccc;
+                  border-bottom: 1px solid #ccc;
+                  box-shadow: 0 1px 0 #ccc;
+                  z-index: 10;
+                "
               >
-                <v-card
-                  full-width
-                  flat
-                  @mouseover="
-                    (showTooltip = index),
-                      (hoverIndex = index),
-                      moveActiveCardToSecondPosition(comment.id),
-                      handleDraggableCardClick(hoverIndex)
-                  "
-                  @mouseleave="
-                    (showTooltip = null),
-                      (activeComment = null),
-                      (hoverIndex = null),
-                      moveActiveCardToSecondPosition(null)
-                  "
-                  @click="handleDraggableCardClick(index)"
-                  color="#e7f2fb"
-                  v-bind="attrs"
-                  v-on="on"
-                  :style="computedCardStyle(index)"
-                  style="
-                    width: 24rem;
-                    border: 1px solid #ccc;
-                    border-bottom: 1px solid #ccc;
-                    box-shadow: 0 1px 0 #ccc;
-                    z-index: 10;
-                  "
-                  class="tooltip-card custom-tooltip"
-                >
-                  <div class="ma-4 text-h6">{{ comment.title }}</div>
-                  <div class="ma-4 text-h7">
-                    <i>{{ comment.text }}</i>
-                  </div>
-                  <v-divider />
-                  <v-card-actions>
-                    <v-card-subtitle>
-                      Added
-                      {{ reactiveTimeAgo(Number(comment.timestamp)) }} by
-                      {{ comment.author }}
-                    </v-card-subtitle>
-                  </v-card-actions>
-                  <v-divider />
-                </v-card>
-                <br />
-              </v-col>
-            </v-row>
-          </div>
+                <div class="ma-4 text-h6">{{ comment.title }}</div>
+                <div class="ma-4 text-h7">
+                  <i>{{ comment.text }}</i>
+                </div>
+                <v-divider />
+                <v-card-actions>
+                  <v-card-subtitle>
+                    Added {{ reactiveTimeAgo(Number(comment.timestamp)) }} by
+                    {{ comment.author }}
+                  </v-card-subtitle>
+                </v-card-actions>
+                <v-divider />
+              </v-card>
+            </v-col>
+          </v-row>
         </v-card-text>
       </v-col>
     </v-row>
@@ -770,8 +765,13 @@ const moveActiveCardToSecondPosition = (activeCardId) => {
 const reorderedComments = computed(() => {
   const comments = filteredSideComments.value;
 
+  // Handle the case where there are no comments
+  if (comments.length === 0) {
+    return [];
+  }
+
+  // If activeComment is null, return the entire comments array as is
   if (activeComment.value === null) {
-    // If activeComment is null, return the entire comments array as is
     return comments;
   }
 
@@ -780,17 +780,23 @@ const reorderedComments = computed(() => {
     (comment) => comment.id === activeComment.value
   );
 
-  if (activeIndex > -1) {
-    // Determine the start and end indices to include four elements
-    const start = Math.max(0, activeIndex - 2); // Start 2 elements before the active one
-    const end = Math.min(comments.length, activeIndex + 4); // End 2 elements after the active one
-
-    // Return the subarray containing the active comment and its neighbors
-    return comments.slice(start, end);
+  // If activeComment is not found, return the entire comments array
+  if (activeIndex === -1) {
+    return comments;
   }
 
-  // If activeComment not found, return the original comments array
-  return comments;
+  // We want to show the active comment and up to 4 others, which means
+  // 2 before and 2 after the active comment (total 5 comments max).
+  let start = Math.max(0, activeIndex - 2); // Start 2 elements before the active one
+  let end = Math.min(comments.length, start + 5); // Show up to 5 comments
+
+  // Adjust the start if we're too close to the end
+  if (end - start < 5) {
+    start = Math.max(0, end - 5);
+  }
+
+  // Return the subarray containing the active comment and its neighbors
+  return comments.slice(start, end);
 });
 
 // Optional: Wrap in a computed to make it reactive (Vue-specific)

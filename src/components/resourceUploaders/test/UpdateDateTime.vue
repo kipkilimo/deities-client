@@ -70,7 +70,15 @@
           </p>
           <v-divider />
           <v-card-actions>
-            <v-btn @click="calculateEndTime">Set End Time</v-btn>
+            <v-btn @click="calculateEndTime">Set End Time</v-btn><v-spacer />
+            <v-switch
+              :color="clearParticipants ? 'orange' : '0'"
+              v-model="clearParticipants"
+              :label="`Clear Participants: ${clearParticipants ? 'Yes' : 'No'}`"
+              hide-details
+              inset
+            ></v-switch
+            ><v-spacer />
           </v-card-actions>
         </v-form>
       </v-stepper-step>
@@ -117,6 +125,7 @@ import axios from "axios";
 import { useResourceStore } from "@/stores/resources";
 const success = ref(null);
 const errorMessage = ref(null);
+const clearParticipants = ref(false);
 
 const resourceStore = useResourceStore();
 const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -217,6 +226,8 @@ async function saveExamDetail() {
       examStartTime: `${examStartTime.value} ${timeZoneAbbreviation}`,
       examDuration: examDuration.value,
       examEndTime: examEndTime.value,
+
+      wipeParticipants: `${clearParticipants.value === true ? "Yes" : "No"}`,
     });
 
     try {
