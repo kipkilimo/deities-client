@@ -45,6 +45,7 @@ interface Resource {
   subject: string;
   topic: string;
   rating: string;
+  participants: string;
   sessionId: string;
   accessKey: string;
   keywords: string;
@@ -77,33 +78,7 @@ export const useResourceStore = defineStore("resource", {
     exam: "",
     tasks: "",
     task: "",
-    resource: {
-      id: "",
-      title: "",
-      description: "",
-      content: "",
-      targetRegion: "",
-      targetCountry: "",
-      slug: "",
-      language: "",
-      contentType: "",
-      viewsNumber: 0,
-      likesNumber: 0,
-      sharesNumber: 0,
-      subject: "",
-      topic: "",
-      rating: "",
-      sessionId: "",
-      accessKey: "",
-      keywords: "",
-      coverImage: "",
-      isPublished: false,
-      averageRating: 0,
-      reviews: "",
-      createdBy: "",
-      createdAt: "",
-      updatedAt: "",
-    } as Resource,
+    resource: {} as Resource,
     resourceIsComputing: false,
     resources: [] as Resource[],
     filteredResources: [] as Resource[],

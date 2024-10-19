@@ -71,6 +71,19 @@
               <template v-slot:activator="{ props }">
                 <v-btn
                   v-bind="props"
+                  color="red"
+                  v-if="hasExamLapsed(item.examMetaInfo.examStartTime, item.examMetaInfo.examDuration)"
+                  icon="mdi-note-check-outline"
+                  size="large"
+                  @click="showExamGrader=true"
+                ></v-btn>
+              </template>
+              <span>Grade submitted responses</span>
+            </v-tooltip>
+            <v-tooltip location="top">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  v-bind="props"
                   color=""
                   icon="mdi-clipboard-text-clock-outline"
                   size="large"
@@ -283,6 +296,7 @@ import { useResourceStore } from "@/stores/resources";
 const resourceStore = useResourceStore();
 const getLinkDialog = ref(false);
 const showEditDialog = ref(false);
+const showExamGrader = ref(false);
 const manageExamParticipantsDialog = ref(false);
 const qrCodeUrl = ref("");
 const parsedExams = ref([]);
@@ -303,6 +317,42 @@ function setPapericipants(item) {
     (p) => p.requestStatus === "PENDING"
   );
 }
+
+import { DateTime, Duration } from "luxon";
+
+// Function to determine if the exam has lapsed
+function hasExamLapsed(startTimeStr, durationStr) {
+  // Step 1: Parse the start time and timezone from the string '09:00 EAT'
+  const [startTime, timezone] = startTimeStr.split(" ");
+  const [startHour, startMinute] = startTime.split(":").map(Number);
+
+  // Step 2: Parse the duration string '3 hrs : 0 mins'
+  const durationMatch = durationStr.match(/(\d+)\s*hrs\s*:\s*(\d+)\s*mins/);
+  const durationHours = parseInt(durationMatch[1], 10);
+  const durationMinutes = parseInt(durationMatch[2], 10);
+
+  // Step 3: Create start time using Luxon with dynamic timezone
+  const startDateTime = DateTime.fromObject(
+    { hour: startHour, minute: startMinute },
+    { zone: timezone }
+  );
+
+  // Step 4: Create the exam duration
+  const examDuration = Duration.fromObject({
+    hours: durationHours,
+    minutes: durationMinutes,
+  });
+
+  // Step 5: Calculate the end time by adding the duration to the start time
+  const endDateTime = startDateTime.plus(examDuration);
+
+  // Step 6: Get the current time in the same timezone
+  const currentTime = DateTime.now().setZone(timezone);
+
+  // Step 7: Determine if the exam has lapsed
+  return currentTime > endDateTime;
+}
+
 const saveLink = () => {
   const padding = 4;
   const lineThickness = 0.1;

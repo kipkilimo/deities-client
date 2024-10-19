@@ -1,5 +1,5 @@
 <template>
-  <v-app full-height>
+  <v-app full-height v-if="readyView===true">
     <v-layout full-height>
       <v-app-bar class="!fixed">
         <router-link to="/welcome" class="px-8 flex items-center w-64">
@@ -7,7 +7,7 @@
             src="https://a2z-v0.s3.eu-central-1.amazonaws.com/NEMBio+Logo+wide.png"
             :width="120"
             :height="70"
-          /> 
+          />
         </router-link>
 
         <v-btn icon @click="drawer = !drawer">
@@ -60,11 +60,23 @@
             </template>
             <span> Manage my exams</span>
           </v-tooltip>
+          <v-tooltip location="top">
+            <template v-slot:activator="{ props }">
+              <v-btn
+                v-bind="props"
+                icon
+                rounded
+                class="ml-2"
+                density="comfortable"
+                @click="goToMyAccount"
+              >
+                <v-icon>mdi-account-file-text-outline</v-icon>
+              </v-btn>
+            </template>
+            <span>My account</span>
+          </v-tooltip>
         </v-col>
 
-        <v-btn icon variant="text" color="inherit">
-          <span class="i-iconoir-bell text-2xl"></span>
-        </v-btn>
         <LocaleToggler />
         <ThemeToggler />
       </v-app-bar>
@@ -90,9 +102,9 @@
         <v-list density="compact" nav>
           <v-list-item
             height="100"
-            :prepend-avatar="`https://ui-avatars.com/api/?name=${user.personalInfo.username}&background=0D8ABC&color=fff`"
-            :title="user.personalInfo.username"
-            :subtitle="obfuscateEmail(user.personalInfo.email)"
+            :prepend-avatar="`https://ui-avatars.com/api/?name=${userStore.user.personalInfo.username}&background=0D8ABC&color=fff`"
+            :title="userStore.user.personalInfo.username"
+            :subtitle="obfuscateEmail(userStore.user.personalInfo.email)"
             class="me-4"
           ></v-list-item>
 
@@ -205,6 +217,24 @@ import PublisherExams from "@/components/resourcePlayers/test/PublisherExams.vue
 
 import PublisherAssignments from "@/components/resourcePlayers/tasks/PublisherAssignments.vue";
 import { useResourceStore } from "@/stores/resources";
+const isComputingRoute = ref(false);
+const route = useRoute();
+const readyView=ref(false)
+// Method to check if the current route includes 'dashboard/computing'
+const checkRoute = () => {
+  if (route.path.includes("dashboard/computing")) {
+    isComputingRoute.value = true;
+    drawer.value = false;
+  } else {
+    isComputingRoute.value = false;
+  }
+};
+
+// Optionally, watch for route changes to automatically toggle
+watch(route, (newRoute) => {
+  checkRoute();
+  isComputingRoute.value = newRoute.path.includes("dashboard/computing");
+});
 const resourceStore = useResourceStore();
 const addingComputing = ref(false);
 const topicTitle = localStorage.getItem("articleTopic");
@@ -220,6 +250,7 @@ onBeforeMount(async () => {
     if (storedUser) {
       try {
         await userStore.getCurrentUser(storedUser);
+        readyView.value=true
       } catch (error) {
         router.push("/auth/login");
       }
@@ -236,8 +267,7 @@ const userStore = useUserStore();
 const drawer = ref(true);
 const rail = ref(false);
 const isRTL = computed(() => locale.value === "ar");
-
-const user = computed(() => userStore.user);
+ 
 
 const evalPollPath = ref("/poll/participant");
 
@@ -267,6 +297,20 @@ const sidebarItems = computed(() => [
     path: "/dashboard/overview",
   },
   {
+    title: t("dashboard.sidebar.library"),
+    tooltip: "Access the digital library",
+    value: "library",
+    iconClass: "mdi-bookshelf me-4 text-xl",
+    path: "/dashboard/library",
+  },
+  {
+    title: t("dashboard.sidebar.tasks"),
+    tooltip: "Manage and track your assignments",
+    value: "tasks",
+    iconClass: "i-iconoir-doc-star me-4 text-xl",
+    path: "/dashboard/tasks",
+  },
+  {
     title: t("dashboard.sidebar.papers"),
     tooltip: "Read and participate in interactive journal papers discussion",
     value: "papers",
@@ -288,26 +332,13 @@ const sidebarItems = computed(() => [
     path: evalPollPath.value, // Use the dynamic path here
   },
   {
-    title: t("dashboard.sidebar.tasks"),
-    tooltip: "Manage and track your assignments",
-    value: "tasks",
-    iconClass: "i-iconoir-doc-star me-4 text-xl",
-    path: "/dashboard/tasks",
-  },
-  {
     title: t("dashboard.sidebar.events"),
     tooltip: "View and schedule events",
     value: "events",
     iconClass: "mdi-calendar-multiple-check me-4 text-xl",
     path: "/dashboard/events",
   },
-  {
-    title: t("dashboard.sidebar.library"),
-    tooltip: "Access the digital library",
-    value: "library",
-    iconClass: "mdi-bookshelf me-4 text-xl",
-    path: "/dashboard/library",
-  },
+
   {
     title: t("dashboard.sidebar.programming"),
     tooltip: "Learn and practice programming",
@@ -330,7 +361,6 @@ const sidebarItems = computed(() => [
     path: "/dashboard/analysis",
   },
 ]);
-
 
 function obfuscateEmail(email: string) {
   const [localPart, domainPart] = email.split("@");
@@ -401,6 +431,9 @@ function logout() {
     console.error("Logout failed:", error);
   }
 }
+const goToMyAccount = () => {
+  router.push("my-account"); // Navigates to /my-account
+};
 </script>
 
 <style scoped>

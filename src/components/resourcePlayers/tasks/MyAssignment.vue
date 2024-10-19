@@ -119,6 +119,26 @@
             <template v-slot:activator="{ props }">
               <v-btn
                 v-bind="props"
+                color="red"
+                v-if="
+                  !(
+                    timeLeft.days > 0 ||
+                    timeLeft.hours > 0 ||
+                    timeLeft.minutes > 0 ||
+                    timeLeft.seconds > 0
+                  )
+                "
+                icon="mdi-note-check-outline"
+                size="large"
+                @click="showExamGrader = true"
+              ></v-btn>
+            </template>
+            <span>Grade submitted responses</span>
+          </v-tooltip>
+          <v-tooltip location="top">
+            <template v-slot:activator="{ props }">
+              <v-btn
+                v-bind="props"
                 size="medium"
                 class="mb-0"
                 variant="outlined"
@@ -177,6 +197,26 @@
         <v-divider />
         <v-card-actions>
           <v-spacer />
+          <v-tooltip location="top">
+            <template v-slot:activator="{ props }">
+              <v-btn
+                v-bind="props"
+                color="red"
+                v-if="
+                  !(
+                    timeLeft.days > 0 ||
+                    timeLeft.hours > 0 ||
+                    timeLeft.minutes > 0 ||
+                    timeLeft.seconds > 0
+                  )
+                "
+                icon="mdi-note-check-outline"
+                size="large"
+                @click="showExamGrader = true"
+              ></v-btn>
+            </template>
+            <span>Grade submitted responses</span>
+          </v-tooltip>
           <v-btn
             class="ms-2"
             size="small"
@@ -497,8 +537,8 @@ const viewPdf = (url) => {
 };
 
 // Handle PDF errors
-const handlePdfError = (error) => {
-  alert("Error loading PDF. Please try again later.");
+const handlePdfError =  (error) => {
+  alert("Error loading PDF. Please try again later.",error);
 };
 
 // Save Assignment Details

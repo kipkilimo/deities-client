@@ -1,218 +1,114 @@
 <template>
-  <v-container>
-    <v-divider class="mb-2" />
-    <v-row class="mt-2">
-      <v-col cols="12">
-        <v-text-field
-          v-model="formData.title"
-          label="Title"
-          :disabled="formData.resourceType === 'COMPUTING'"
-          :rules="[rules.required]"
-        />
-      </v-col>
-    </v-row>
+  <v-container max-width="720" persistent>
+    <!-- <v-card title="Publication Credits Required.">
+        <v-card-text>
+          <p class="pb-4">
+            NEMBio requires publishers to purchase publication credits in
+            advance.
+          </p>
 
-    <v-row>
-      <v-col cols="12" sm="6">
-        <v-textarea
-          v-model="formData.description"
-          label="Description"
-          counter="350"
-          :rules="[rules.required]"
-        />
-      </v-col>
-      <v-col cols="12" sm="6">
-        <v-select
-          :items="resourceEnums"
-          :disabled="formData.resourceType === 'COMPUTING'"
-          label="Resource Type"
-          v-model="formData.resourceType"
-          :rules="[rules.required]"
-        />
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="4">
-        <v-select
-          v-model="selectedSubject"
-          :items="subjects"
-          label="Select Subject"
-          :disabled="formData.resourceType === 'COMPUTING'"
-          @change="resetLevelAndTopics"
-        ></v-select>
-      </v-col>
-      <v-col cols="4">
-        <v-select
-          v-model="selectedLevel"
-          :items="complexityLevels"
-          label="Select Level of Complexity"
-          :disabled="!selectedSubject || formData.resourceType === 'COMPUTING'"
-          @change="resetTopics"
-        ></v-select>
-      </v-col>
-      <v-col cols="4">
-        <v-select
-          v-model="selectedTopic"
-          :items="filteredTopics"
-          label="Select Topic"
-          :disabled="!selectedLevel || formData.resourceType === 'COMPUTING'"
-        ></v-select>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="12" sm="6">
-        <v-select
-          :items="regions"
-          label="Resource Target Region"
-          v-model="formData.targetRegion"
-        />
-      </v-col>
-
-      <v-col cols="12" sm="6">
-        <v-select
-          :items="countriesList"
-          label="Resource Target Country"
-          v-model="formData.targetCountry"
-        />
-      </v-col>
-      <v-col cols="12" sm="6">
-        <v-select
-          :items="languageRegions"
-          label="Language Region Base"
-          v-model="formData.targetLanguageRegion"
-        />
-      </v-col>
-      <v-col cols="12" sm="6">
-        <v-select
-          :items="languagesList"
-          label="Selected Language"
-          v-model="formData.language"
-          :disabled="!formData.targetLanguageRegion"
-        />
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="12">
-        <v-combobox
-          label="Keywords"
-          v-model="formData.keywords"
-          multiple
-          chips
-          deletable-chips
-        />
-      </v-col>
-    </v-row>
-
-    <v-card-actions>
-      <v-spacer />
-      <v-btn color="primary" @click="createResource" variant="outlined"
-        >Create Resource</v-btn
-      >
-      <v-spacer />
-      <v-btn
-        variant="text"
-        color="red"
-        @click="resourceStore.showCreateResourceDialog = false"
-        >CLOSE</v-btn
-      >
-    </v-card-actions>
-    <!-- {{ useUserStore().user.personalInfo }} -->
-    <v-dialog v-model="creditBalanceDialog" max-width="54rem" persistent>
-      <v-card class="mx-auto" min-width="720" border flat>
-        <v-list-item class="px-6" height="88">
-          <template v-slot:prepend>
-            <v-avatar color="surface-light" size="36">🧾</v-avatar>
-          </template>
-
-          <template v-slot:title> NEMBio publication credits </template>
-
-
-        </v-list-item>
-
-        <v-divider></v-divider>
-
-        <v-card-text class="text-medium-emphasis pa-3">
-          <div class="text-h5 font-weight-black mb-2">
-            My publication credits:
-            {{ useUserStore().user.personalInfo.publication_credits }}
-          </div>
-
-          <v-progress-linear
-            bg-color="surface-variant"
-            class="mb-6"
-            color="primary"
-            height="10"
-            :model-value="useUserStore().user.personalInfo.publication_credits"
-            rounded="pill"
-          ></v-progress-linear>
-
-          <v-row>
-            <v-col
-              v-for="(publication, index) in publication_credit_charges"
-              :key="index"
-              cols="12"
-              sm="6"
-              md="4"
-            >
-              <v-card
-                class="pa-1"
-                :style="{
-                  border:
-                    publication.type === formData.resourceType
-                      ? '0.0025em solid #0098d6'
-                      : 'none',
-                }"
-              >
-                <v-card-subtitle>{{ publication.type }}</v-card-subtitle>
-                <v-card-text
-                  >Credit charge: {{ publication.credits }}</v-card-text
-                >
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <v-alert border="top" class="ml-2 mb-1" width="98%" variant="outlined">
-          <v-card-text class="text-h6 py-1" color="#0098d6"
-            ><v-icon class="mr-2">mdi-information-outline</v-icon> USD 1 earns
-            100 NEMBio Publication Credits spent as shown above.</v-card-text
+          <v-list-subheader class="font-weight-black text-high-emphasis"
+            >{{ formData.resourceType }}:
+            {{ getCreditsByType(formData.resourceType) }}
+            Publication Credits</v-list-subheader
           >
-        </v-alert>
-        <v-divider></v-divider>
 
-        <v-card-actions class="justify-center px-2 py-1">
-          <v-btn
-            class="flex-grow-1 text-none"
-            color="blue-darken-4"
-            rounded="0"
-            variant="plain"
-            @click="creditBalanceDialog = false"
+          <p class="mb-4">You currently have</p>
+
+          <v-list-subheader class="font-weight-black text-high-emphasis"
+            >{{
+              useUserStore().user.personalInfo.publication_credits || "0"
+            }}
+            Publication Credits</v-list-subheader
           >
-            Cancel Publication Process
-          </v-btn>
+        </v-card-text> -->
+    <v-card class="mx-auto" min-width="720" border flat>
+      <v-list-item class="px-6" height="88">
+        <template v-slot:prepend>
+          <v-avatar color="surface-light" size="36">🧾</v-avatar>
+        </template>
 
-          <v-btn
-            class="text-white flex-grow-1 text-none"
-            color="pink"
-            rounded="4"
-            variant="flat"
-            @click="(creditBalanceDialog = false), (paypalDialog = true)"
+        <template v-slot:title> NEMBio publication credits </template>
+
+        <template v-slot:append>
+          <v-tooltip
+            text="You can add materials for your discussion groups for FREE on NEMBio."
+            location="left"
           >
-            <v-icon class="mr-6">mdi-wallet-giftcard</v-icon> Purchase
-            Publication Credits
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="paypalDialog" max-width="75rem" persistent>
-      <v-card min-width="75rem">
-        <paypal />
-      </v-card>
-    </v-dialog>
+            <template v-slot:activator="{ props }"
+              ><v-btn
+                class="text-none"
+                v-bind="props"
+                color="primary"
+                text="Request waiver"
+                variant="text"
+                slim
+              ></v-btn>
+            </template>
+          </v-tooltip>
+        </template>
+      </v-list-item>
 
- 
+      <v-divider></v-divider>
+
+      <v-card-text class="text-medium-emphasis pa-3">
+        <div class="text-h5 font-weight-black mb-2">
+          My publication credits:
+          {{ useUserStore().user.personalInfo.publication_credits }}
+        </div>
+
+        <v-progress-linear
+          bg-color="surface-variant"
+          class="mb-6"
+          color="primary"
+          height="10"
+          :model-value="useUserStore().user.personalInfo.publication_credits"
+          rounded="pill"
+        ></v-progress-linear>
+
+        <v-card-title class="ml-0">
+          USD 1 for 100 NEMBio publication credits used as follows:
+        </v-card-title>
+        <v-row>
+          <v-col
+            v-for="(publication, index) in publication_credit_charges"
+            :key="index"
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-card>
+              <v-card-subtitle>{{ publication.type }}</v-card-subtitle>
+              <v-card-text>Credit cost: {{ publication.credits }}</v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-card-text>
+      <v-divider></v-divider>
+
+      <v-card-actions class="justify-center px-6 py-3">
+        <v-btn
+          class="flex-grow-1 text-none"
+          color="blue-darken-4"
+          rounded="0"
+          variant="plain"
+          @click="creditBalanceDialog = false"
+        >
+          Cancel Publication Process
+        </v-btn>
+
+        <v-btn
+          class="text-white flex-grow-1 text-none"
+          color="blue-darken-4"
+          rounded="0"
+          variant="flat"
+          @click="creditBalanceDialog = false"
+        >
+          <v-icon class="mr-6">mdi-wallet-giftcard</v-icon> Purchase Publication
+          Credits
+        </v-btn>
+      </v-card-actions>
+    </v-card>
   </v-container>
 </template>
 
@@ -221,8 +117,6 @@ import { ref, computed, onBeforeMount, watch } from "vue";
 import { useResourceStore } from "../../stores/resources"; // Replace with actual path
 const userId = ref(localStorage.getItem("sessionId")); // Retrieve userId from local storage
 const creditBalanceDialog = ref(false);
-const paypalDialog = ref(false);
-
 import { useUserStore } from "@/stores/users";
 const resourceStore = useResourceStore();
 import worldRegions from "../../data/languages";

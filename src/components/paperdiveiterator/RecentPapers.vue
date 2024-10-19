@@ -53,12 +53,12 @@
           :disabled="loading"
           max-width="48rem"
           min-width="48rem"
-          height="18rem"
+          height="21rem"
           :loading="loading"
           class="mx-auto my-3"
           color="#f9f3b9"
           style="
-            background-image: url(&quot;https://png.pngtree.com/background/20211215/original/pngtree-mathematics-tutoring-mathematics-background-picture-image_1473414.jpg&quot;);
+            background-image: url(&quot;https://t3.ftcdn.net/jpg/02/81/21/10/360_F_281211036_24KPea5poawt4mXYlEjRUwsCgomtjoVc.jpg&quot;);
             background-size: cover;
             background-position: center;
           "
@@ -73,6 +73,14 @@
           </template>
 
           <v-card-item class="ma-2">
+            <h6 class="text-h6 font-weight-black" color="#55565a">
+              <span class="" color="#55565a">
+                {{ paper.title }}
+                <br />
+              </span>
+            </h6>
+
+            <!-- 
             <h5
               style="
                 white-space: transparent;
@@ -89,7 +97,7 @@
                 }}
                 <span v-if="paper.title.length <= 125"><br /></span>
               </h5>
-            </h5>
+            </h5> -->
 
             <v-divider />
             <v-card-text>
@@ -159,17 +167,22 @@
               <v-btn color="#EB7082" text :href="paper.url" target="_blank">
                 Read Paper
               </v-btn>
-            </div>
-
-            <v-spacer />
-
-            <div style="display: flex; align-items: center">
-              <v-btn variant="text" @click="submitPaperData(paper)"
+              <v-spacer />
+              <v-btn
+                variant="text"
+                style="display: flex; color: #003c7b; align-items: center"
+                color="#003c7b"
+                @click="submitPaperData(paper)"
                 >DISCUSS PAPER</v-btn
               >
+            </div>
 
+            <v-spacer /> 
+
+            <div style="display: flex; align-items: center" 
+                v-if="userId === paper.createdBy.id">
               <v-btn
-                color="#6a808b"
+                color="#0e234f"
                 class="mr-4"
                 v-if="userId === paper.createdBy.id"
                 variant="outlined"

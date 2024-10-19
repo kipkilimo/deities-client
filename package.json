@@ -39,6 +39,7 @@
     "chartjs-chart-wordcloud": "^4.4.1",
     "ckeditor5": "^43.1.0",
     "cropperjs": "^1.6.2",
+    "crypto-js": "^4.2.0",
     "echarts": "^5.4.3",
     "graphql": "^16.9.0",
     "html2canvas": "^1.4.1",

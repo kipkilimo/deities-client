@@ -45,6 +45,34 @@
 
     <!-- Bottom Row: Two Column Layout -->
     <v-row>
+      <!-- Right Column: Selected Resource -->
+      <v-col cols="10">
+        <v-card
+          fluid
+          v-if="!resourceComponent"
+          @click="selectResource(resourceStore.resources[0])"
+          height="63vh"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 5px 5px 0px 0px !important;
+          "
+        >
+          <v-img
+            height="21vh"
+            class="mt-24 ma-4"
+            style="cursor: pointer"
+            src="https://cdn-icons-png.flaticon.com/512/907/907805.png"
+          ></v-img>
+        </v-card>
+
+        <v-container fluid v-if="selectedResource && showMedia">
+          <!-- Dynamic Resource Renderer -->
+          <component :is="resourceComponent" :resource="selectedResource" />
+        </v-container>
+      </v-col>
       <!-- Left Column: Resource Iterator Cards -->
       <v-col cols="2" class="pr-2">
         <!-- Container for vertical scrolling -->
@@ -83,35 +111,6 @@
             </v-card>
           </v-col>
         </v-row>
-      </v-col>
-
-      <!-- Right Column: Selected Resource -->
-      <v-col cols="10">
-        <v-card
-          fluid
-          v-if="!resourceComponent"
-          @click="selectResource(resourceStore.resources[0])"
-          height="63vh"
-          style="
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border-radius: 5px 5px 0px 0px !important;
-          "
-        >
-          <v-img
-            height="21vh"
-            class="mt-24 ma-4"
-            style="cursor: pointer"
-            src="https://cdn-icons-png.flaticon.com/512/907/907805.png"
-          ></v-img>
-        </v-card>
-
-        <v-container fluid v-if="selectedResource && showMedia">
-          <!-- Dynamic Resource Renderer -->
-          <component :is="resourceComponent" :resource="selectedResource" />
-        </v-container>
       </v-col>
     </v-row>
   </v-container>

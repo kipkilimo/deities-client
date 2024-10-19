@@ -31,7 +31,7 @@
           >
             <v-icon>mdi-menu-left</v-icon> Previous Page
           </v-btn>
-          <v-btn color="grey" flat class="mr-2">
+          <v-btn variant="outlined" color="grey" flat class="mr-2">
             <v-icon>mdi-star-box-multiple-outline</v-icon>Page
             {{ currentPage }} of {{ totalPages }}
           </v-btn>

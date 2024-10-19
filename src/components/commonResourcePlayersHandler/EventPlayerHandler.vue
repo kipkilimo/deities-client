@@ -1,5 +1,7 @@
 <template>
-  <v-container style="font-family: 'Inter', 'Noto Sans', sans-serif;">
+  <v-container
+    style="font-family: &quot;Inter&quot;, &quot;Noto Sans&quot;, sans-serif"
+  >
     <!-- Top Row: Sort, Filter, Search Strip -->
     <v-row>
       <v-col cols="12">
@@ -11,7 +13,10 @@
               :items="sortOptions"
               label="Sort by"
               dense
-              style="max-height: 67%; font-family: 'Inter', sans-serif;"
+              style="
+                max-height: 67%;
+                font-family: &quot;Inter&quot;, sans-serif;
+              "
             ></v-select>
           </v-col>
 
@@ -22,7 +27,10 @@
               :items="filterOptions"
               label="Filter by"
               dense
-              style="max-height: 67%; font-family: 'Inter', sans-serif;"
+              style="
+                max-height: 67%;
+                font-family: &quot;Inter&quot;, sans-serif;
+              "
             ></v-select>
           </v-col>
 
@@ -34,7 +42,10 @@
               clearable
               dense
               prepend-inner-icon="mdi-file-search"
-              style="max-height: 67%; font-family: 'Inter', sans-serif;"
+              style="
+                max-height: 67%;
+                font-family: &quot;Inter&quot;, sans-serif;
+              "
             ></v-text-field>
           </v-col>
         </v-row>
@@ -45,6 +56,35 @@
 
     <!-- Bottom Row: Two Column Layout -->
     <v-row>
+      <!-- Right Column: Selected Resource -->
+      <v-col cols="10">
+        <v-card
+          fluid
+          v-if="!resourceComponent"
+          @click="selectResource(resourceStore.resources[0])"
+          height="63vh"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 5px 5px 0px 0px !important;
+            font-family: &quot;Noto Sans&quot;, sans-serif;
+          "
+        >
+          <v-img
+            height="21vh"
+            class="mt-24 ma-4"
+            style="cursor: pointer"
+            src="https://cdn-icons-png.flaticon.com/512/907/907805.png"
+          ></v-img>
+        </v-card>
+
+        <v-container fluid v-if="selectedResource && showMedia">
+          <!-- Dynamic Resource Renderer -->
+          <component :is="resourceComponent" :resource="selectedResource" />
+        </v-container>
+      </v-col>
       <!-- Left Column: Resource Iterator Cards -->
       <v-col cols="2">
         <!-- Container for vertical scrolling -->
@@ -62,7 +102,7 @@
               class="mb-2"
               height="4.5rem"
               @click="selectResource(resource)"
-              style="font-family: 'Noto Sans', sans-serif;"
+              style="font-family: &quot;Noto Sans&quot;, sans-serif"
             >
               <v-row no-gutters>
                 <!-- Left Column: Image -->
@@ -72,13 +112,13 @@
 
                 <!-- Right Column: Details -->
                 <v-col cols="8">
-                  <v-card-title style="font-weight: 700;">
+                  <v-card-title style="font-weight: 700">
                     {{ resource.title }}
                   </v-card-title>
-                  <v-card-subtitle style="font-weight: 400;">
+                  <v-card-subtitle style="font-weight: 400">
                     {{ resource.subject }} - {{ resource.topic }}
                   </v-card-subtitle>
-                  <v-card-text style="font-weight: 400;">
+                  <v-card-text style="font-weight: 400">
                     {{ truncateText(resource.description, 50) }}
                   </v-card-text>
                 </v-col>
@@ -87,40 +127,9 @@
           </v-col>
         </v-row>
       </v-col>
-
-      <!-- Right Column: Selected Resource -->
-      <v-col cols="10">
-        <v-card
-          fluid
-          v-if="!resourceComponent"
-          @click="selectResource(resourceStore.resources[0])"
-          height="63vh"
-          style="
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border-radius: 5px 5px 0px 0px !important;
-            font-family: 'Noto Sans', sans-serif;
-          "
-        >
-          <v-img
-            height="21vh"
-            class="mt-24 ma-4"
-            style="cursor: pointer"
-            src="https://cdn-icons-png.flaticon.com/512/907/907805.png"
-          ></v-img>
-        </v-card>
-
-        <v-container fluid v-if="selectedResource && showMedia">
-          <!-- Dynamic Resource Renderer -->
-          <component :is="resourceComponent" :resource="selectedResource" />
-        </v-container>
-      </v-col>
     </v-row>
   </v-container>
 </template>
-
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeMount } from "vue";
@@ -268,22 +277,24 @@ onBeforeMount(async () => {
 });
 </script>
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans:wght@400;700&display=swap");
 
 .v-container {
-  font-family: 'Inter', 'Noto Sans', sans-serif;
+  font-family: "Inter", "Noto Sans", sans-serif;
 }
 
-.v-select, .v-text-field, .v-card {
-  font-family: 'Inter', sans-serif;
+.v-select,
+.v-text-field,
+.v-card {
+  font-family: "Inter", sans-serif;
 }
 
 .v-card-title {
   font-weight: 700;
 }
 
-.v-card-subtitle, .v-card-text {
+.v-card-subtitle,
+.v-card-text {
   font-weight: 400;
 }
 </style>
-

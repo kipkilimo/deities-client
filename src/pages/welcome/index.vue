@@ -15,7 +15,7 @@
                   NEMB<span class="io-text"><i>io</i></span>
                 </h1>
                 <h2 class="headline mb-4 subtitle-text">
-                  Advancing Life Sciences Research through Collaboration
+                  Advancing Life Sciences Research in Africa
                 </h2>
 
                 <v-row class="text-center">
@@ -86,14 +86,18 @@
                 and Global Health.
                 <br />
                 <br />
-                Become part of NEMBio's vibrant community and engage in
-                collaborative research that explores the complex interplay
-                between disease patterns, exposures, and health outcomes.
-                Develop advanced biostatistical techniques and benefit from our
-                comprehensive cloud based utilities, designed to support your
-                academic and professional growth. Join us and be at the
-                forefront of the next generation of health sciences scholaly
-              </p>
+                This app is particularly useful for medical researchers who have
+                little training in statistics and need a refresher on essential
+                statistical tools and concepts. It offers accessible
+                explanations of key statistical methods without being burdened
+                by unnecessary formulas, equations, symbols, or technical
+                jargon. Within these pages, researchers will find
+                straightforward access to fundamental tools that are commonly
+                applied in medical research with graded complexity. This easy
+                access allows better understanding of statistical analyses and
+                fostering accurate interpretation of research results.
+              
+                <br /></p>
             </v-col>
           </v-row>
         </v-card>
@@ -343,5 +347,4 @@ const scrollToTop = () => {
     transform: translateX(-100%);
   }
 }
-
 </style>

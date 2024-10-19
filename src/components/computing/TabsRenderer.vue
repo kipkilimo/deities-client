@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container fluid class="no-margin-top">
     <v-row>
       <!-- Sidebar Column -->
       <v-col cols="3">
@@ -9,7 +9,9 @@
             <template v-slot:title>
               <h2>Computational Methods in Epidemiology and Biostatistics</h2>
             </template>
-            <template v-slot:subtitle>Resources by NEMBio Contributors</template>
+            <template v-slot:subtitle
+              >Resources by NEMBio Contributors</template
+            >
           </v-list-item>
         </v-app-bar>
 
@@ -49,8 +51,14 @@
       </v-col>
 
       <!-- Content Column -->
-      <v-col cols="12">
-        <v-tabs v-model="selectedLanguage" background-color="primary" dark grow>
+      <v-col cols="12"  class="no-margin-top">
+        <v-tabs
+          v-model="selectedLanguage"
+          background-color="primary"
+          dark
+          grow
+          class="no-margin-top"
+        >
           <v-tab v-for="lang in languages" :key="lang">
             <img
               :src="getIconForLanguage(lang)"
@@ -65,7 +73,7 @@
         <v-tabs-items v-model="selectedLanguage">
           <v-tab-item v-for="lang in languages" :key="lang">
             <!-- Card for Selected Subtopic -->
-            <v-card v-if="selectedSubtopic" outlined class="mt-4">
+            <v-card v-if="selectedSubtopic" outlined class="">
               <v-card-title class="text-h5">{{
                 selectedSubtopic
               }}</v-card-title>
@@ -142,4 +150,8 @@ pre {
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+.no-margin-top {
+  margin-top: 0 !important;
+}
+
 </style>

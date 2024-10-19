@@ -1,7 +1,7 @@
 <template>
-  <v-container fluid>
+  <v-container fluid  class="no-margin-top">
     <v-row>
-      <v-col cols="12" md="3">
+      <v-col cols="12" md="3"  class="no-margin-top">
         <v-app-bar color="white" flat>
           <v-list-item class="text-h6 ml-2">
             <template v-slot:title>

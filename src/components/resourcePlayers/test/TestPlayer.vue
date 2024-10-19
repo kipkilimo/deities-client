@@ -646,9 +646,17 @@ const richTextRules = [
   (v) => v.length <= 5000 || "Maximum 5000 characters allowed.",
 ];
 
+// createDebouncedWatcher(vsaqTypedResponse, vsaqSaved, "VSAQ");
+// createDebouncedWatcher(saqTypedResponse, saqSaved, "SAQ");
+// createDebouncedWatcher(leqTypedResponse, leqSaved, "LEQ");
 // Computed property to check if the input is valid
 const isFormValid = computed(() => {
-  return richTextRules.every((rule) => rule(typedTaskResponse.value) === true);
+  return richTextRules.every(
+    (rule) =>
+      rule(vsaqTypedResponse.value) === true ||
+      saqTypedResponse.value === true ||
+      leqTypedResponse.value === true
+  );
 });
 // Use Pinia store
 const answersStore = useAnswersStore();
@@ -836,13 +844,13 @@ const createDebouncedWatcher = (typedResponseRef, savedRef, type) => {
 };
 
 // Create debounced watchers for each typed response
-createDebouncedWatcher(vsaqTypedResponseMini, vsaqSaved, "VSAQ");
-createDebouncedWatcher(saqTypedResponseMini, saqSaved, "SAQ");
-createDebouncedWatcher(leqTypedResponseMini, leqSaved, "LEQ");
+// createDebouncedWatcher(vsaqTypedResponseMini, vsaqSaved, "VSAQ");
+// createDebouncedWatcher(saqTypedResponseMini, saqSaved, "SAQ");
+// createDebouncedWatcher(leqTypedResponseMini, leqSaved, "LEQ");
 
-createDebouncedWatcher(vsaqTypedResponse, vsaqSaved, "VSAQ");
-createDebouncedWatcher(saqTypedResponse, saqSaved, "SAQ");
-createDebouncedWatcher(leqTypedResponse, leqSaved, "LEQ");
+// createDebouncedWatcher(vsaqTypedResponse, vsaqSaved, "VSAQ");
+// createDebouncedWatcher(saqTypedResponse, saqSaved, "SAQ");
+// createDebouncedWatcher(leqTypedResponse, leqSaved, "LEQ");
 
 const saveAnswer = async (data, type) => {
   // Handle saving the response (e.g., send to server)

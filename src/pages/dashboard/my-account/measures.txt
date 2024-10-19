@@ -1,0 +1,6 @@
+1. # of Registred users
+2. # of Resources created
+3. # of Seminars/ Talks held
+4. # of Journal club sessions conducted
+5. # of Publication papers/ Posters in   NEMBio
+6. # of Community engagements by   NEMBio
