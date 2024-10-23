@@ -1,12 +1,12 @@
 <template>
-  <v-app full-height v-if="readyView===true">
+  <v-app full-height v-if="readyView === true">
     <v-layout full-height>
       <v-app-bar class="!fixed">
         <router-link to="/welcome" class="px-8 flex items-center w-64">
           <v-img
-            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/NEMBio+Logo+wide.png"
-            :width="120"
-            :height="70"
+            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png"
+            width="180"
+            height="120"
           />
         </router-link>
 
@@ -133,12 +133,21 @@
               </v-tooltip>
             </v-list-item>
             <v-divider class="mt-2" />
-            <h3 color="#55565a" class="text-h10 mb-4">Partners</h3>
-            <v-img
-              class="mt-3"
-              style="border-radius: 0px 0px 5px 5px"
-              src="https://assets.bizclikmedia.net/580/d07c504f4f85d8f6a3c308c34edb7b93:b4ee3e25d34286c263ca95017d7fb60d/bro-3186903594-boehringeringelheim-dec2022.jpg"
-            ></v-img>
+            <h3 color="#777777" class="ml-2 mt-2 mb-2 text-left">
+              {{ titlize(currentPartner.partnerType) }} Partner
+            </h3>
+
+            <v-divider class="mt-1" /> 
+              <v-img
+                class="bg-white ma-4 d-flex justify-left"
+                :src="currentPartner.logo"
+                max-width="85%"
+                contain
+                max-height="27.5vh"
+                cover
+              ></v-img> 
+
+            <v-divider/>
           </v-list-item-group>
         </v-list>
 
@@ -215,11 +224,13 @@ import { useUserStore } from "@/stores/users";
 import { useRouter } from "vue-router";
 import PublisherExams from "@/components/resourcePlayers/test/PublisherExams.vue";
 
+import partners from "@/data/partnersSponsors";
+
 import PublisherAssignments from "@/components/resourcePlayers/tasks/PublisherAssignments.vue";
 import { useResourceStore } from "@/stores/resources";
 const isComputingRoute = ref(false);
 const route = useRoute();
-const readyView=ref(false)
+const readyView = ref(false);
 // Method to check if the current route includes 'dashboard/computing'
 const checkRoute = () => {
   if (route.path.includes("dashboard/computing")) {
@@ -229,7 +240,41 @@ const checkRoute = () => {
     isComputingRoute.value = false;
   }
 };
+const currentIndex = ref(Math.floor(Math.random() * partners.length));
 
+// Set the current partner and event based on the random index
+const currentPartner = ref(partners[currentIndex.value]);
+function changePartner() {
+  let newIndex = currentIndex.value;
+
+  // Ensure the new index is different from the current one
+  while (newIndex === currentIndex.value) {
+    newIndex = Math.floor(Math.random() * partners.length);
+  }
+
+  // Update the currentIndex and currentPartner
+  currentIndex.value = newIndex;
+  currentPartner.value = partners[newIndex];
+}
+
+function titlize(str: string) {
+  return str
+    .toLowerCase() // Convert the whole string to lowercase first
+    .split(" ") // Split the string into an array of words
+    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(" "); // Join the array back into a single string
+}
+
+onMounted(() => {
+  // Set an interval to change the partner and event every 12 seconds
+  const intervalId = setInterval(() => {
+    changePartner();
+  }, 45000);
+
+  onBeforeUnmount(() => {
+    clearInterval(intervalId);
+  });
+});
 // Optionally, watch for route changes to automatically toggle
 watch(route, (newRoute) => {
   checkRoute();
@@ -250,7 +295,7 @@ onBeforeMount(async () => {
     if (storedUser) {
       try {
         await userStore.getCurrentUser(storedUser);
-        readyView.value=true
+        readyView.value = true;
       } catch (error) {
         router.push("/auth/login");
       }
@@ -267,7 +312,6 @@ const userStore = useUserStore();
 const drawer = ref(true);
 const rail = ref(false);
 const isRTL = computed(() => locale.value === "ar");
- 
 
 const evalPollPath = ref("/poll/participant");
 

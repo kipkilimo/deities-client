@@ -42,7 +42,7 @@
     </v-row>
 
     <v-row ref="callToAction" class="call-to-action">
-      <v-col cols="12" md="12" class="text-center">
+      <v-col cols="12" md="12" class="text-left">
         <v-card max-height="28rem">
           <v-row>
             <v-col cols="12" md="4">
@@ -52,11 +52,11 @@
             </v-col>
             <v-col cols="12" md="8">
               <v-card-title>
-                <h1 class="title">
+                <h1 class="title text-center">
                   About NEMB<span class="io-text"><i>io</i></span>
                 </h1>
               </v-card-title>
-              <v-card-subtitle class="subheading">
+              <v-card-subtitle class="subheading text-center">
                 Epidemiology | Biostatistics | Research Methods | Seminar Series
                 | Colloquia and Talks | Test Yourself | Fun Activities
               </v-card-subtitle>
@@ -96,14 +96,46 @@
                 applied in medical research with graded complexity. This easy
                 access allows better understanding of statistical analyses and
                 fostering accurate interpretation of research results.
-              
-                <br /></p>
+
+                <br />
+              </p>
             </v-col>
           </v-row>
         </v-card>
       </v-col>
     </v-row>
     <!-- Cards Section -->
+    <v-divider></v-divider>
+    <v-card>
+      <v-row>
+        <v-img
+          src="https://t3.ftcdn.net/jpg/08/15/66/88/360_F_815668853_eK0a2dGY6OEbDD5joOPUD4GuYVGGiLj1.jpg"
+        ></v-img>
+        <v-divider vertical></v-divider>
+        <v-col cols="12" md="8">
+          <v-list density="compact" no-action>
+            <v-toolbar-title
+              color="#3d7187"
+              class="mb-1 font-weight-black text-left"
+              >Objectives of the NEMBio Platform</v-toolbar-title
+            >
+            <v-list-item
+              no-action
+              v-for="(item, i) in objectives"
+              :key="i"
+              :value="item"
+              color="primary"
+            >
+              <template v-slot:prepend>
+                <v-icon :icon="item.icon"></v-icon>
+              </template>
+
+              <v-list-item-title v-text="item.text"></v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-col>
+      </v-row>
+    </v-card>
     <v-card
       class="mx-auto d-flex flex-column align-center justify-center"
       prepend-icon="mdi-bookmark-box-multiple-outline"
@@ -246,6 +278,28 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import partners from "../../data/partnersSponsors";
 import { researchCards } from "@/data/researchCards";
+const objectives = [
+  {
+    text: "To develop foundational skills in the independent design, planning, management, and conduct of epidemiological studies.",
+    icon: "mdi-book-open-variant",
+  },
+  {
+    text: "To gain a solid understanding of basic epidemiological and statistical methods for critical review of epidemiological papers.",
+    icon: "mdi-chart-bar",
+  },
+  {
+    text: "To contribute to addressing key knowledge gaps in introductory biostatistical methods, epidemiological and life sciences research.",
+    icon: "mdi-brain",
+  },
+  {
+    text: "To acquire the ability to present preliminary results and methods of epidemiological research at conferences and in academic publications.",
+    icon: "mdi-presentation",
+  },
+  {
+    text: "To promote a foundational understanding of Good Epidemiological Practice (GEP) in the context of beginner-level life sciences research projects.",
+    icon: "mdi-school",
+  },
+];
 
 const buttonBgColor = "#fcfcfc";
 const currentYear = ref(new Date().getFullYear());
@@ -254,7 +308,7 @@ const router = useRouter();
 const scrollToCallToAction = () => {
   const session = localStorage.getItem("sessionId");
   if (session) {
-    router.push("/dashboard/overview");
+    router.push("/dashboard/library");
   } else {
     router.push("/auth/login");
   }

@@ -3,12 +3,15 @@
     <div v-if="loginError">
       <v-alert :text="loginError" title="Login error" type="error"></v-alert>
     </div>
-    <h3 class="mt-4 mr-11 ml-2" style="color: #777777">NEMBio Learning Login</h3>
-    <v-divider/>
+    <h3 class="mt-4 mr-11 ml-2" style="color: #777777">
+      NEMBio Learning Login
+    </h3>
+    <v-divider />
     <v-card-title class="text-center mb-2">
       <v-img
-        style="max-height: 7.5rem"
-        src="https://a2z-v0.s3.eu-central-1.amazonaws.com/NEMBio+Logo+wide.png"
+        @click="goHome"
+        style="height: 12rem; cursor: pointer"
+        src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png"
       />
     </v-card-title>
     <v-card-text>
@@ -141,13 +144,6 @@
         </v-card>
       </v-form>
     </v-card-text>
-    <v-divider class="mt-2" />
-    <h3 color="#777777" class="ml-2 mt-2 mb-2">Partners</h3>
-    <v-img
-      class="mt-3"
-      style="border-radius: 0px 0px 5px 5px"
-      src="https://assets.bizclikmedia.net/580/d07c504f4f85d8f6a3c308c34edb7b93:b4ee3e25d34286c263ca95017d7fb60d/bro-3186903594-boehringeringelheim-dec2022.jpg"
-    ></v-img>
   </v-card>
 </template>
 
@@ -173,7 +169,9 @@ const showPassword = ref(false);
 const togglePassword = () => {
   showPassword.value = !showPassword.value;
 };
-
+function goHome() {
+  router.push("/welcome");
+}
 // Computed property to validate email format
 const isEmailValid = computed(() => {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -195,6 +193,7 @@ const sendOneTimeSignInKey = async () => {
   loginLoading.value = true; // Indicate login in progress
   try {
     await userStore.singleSignInRequest(email.value);
+    //@ts-ignore
     if (userStore.user.personalInfo.activatedAccount === false) {
       router.push("/auth/activate");
       return;
@@ -227,7 +226,7 @@ const sendOneTimeSignInKey = async () => {
     loginError.value = errorMessage;
     setTimeout(() => {
       window.location.reload();
-    }, 81);
+    }, 8100);
   }
 };
 
@@ -242,6 +241,7 @@ const submitSingleSigninLogin = async () => {
   loginLoading.value = true; // Indicate login in progress
   try {
     await userStore.singleSigninLogin(accessKey.value);
+    //@ts-ignore
     if (userStore.user.personalInfo.activatedAccount === false) {
       router.push("/auth/activate");
       return;
@@ -284,13 +284,14 @@ const submitSingleSigninLogin = async () => {
     loginError.value = errorMessage;
     setTimeout(() => {
       window.location.reload();
-    }, 42000);
+    }, 4200);
   }
 };
 const orcIDAuthenticate = async () => {
   loginLoading.value = true; // Indicate login in progress
   try {
     await userStore.login(email.value, password.value);
+    //@ts-ignore
     if (userStore.user.personalInfo.activatedAccount === false) {
       router.push("/auth/activate");
       return;
@@ -333,6 +334,7 @@ const submitLogin = async () => {
   loginLoading.value = true; // Indicate login in progress
   try {
     await userStore.login(email.value, password.value);
+    //@ts-ignore
     if (userStore.user.personalInfo.activatedAccount === false) {
       router.push("/auth/activate");
       return;

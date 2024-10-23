@@ -2,8 +2,8 @@
   <v-card class="reset-card mt-4 ml-2" elevation="4" outlined rounded>
     <v-card-title class="text-center">
       <v-img
-        style="max-height:7.5rem;"
-        src="https://a2z-v0.s3.eu-central-1.amazonaws.com/NEMBio+Logo+wide.png"
+        style="height: 12rem"
+        src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png"
       />
       <h3 class="mt-4 mr-11" style="color: #777777">Password Reset</h3>
     </v-card-title>
@@ -110,7 +110,7 @@ const submitReset = async () => {
 
   try {
     await userStore.resetPassword(activationToken.value, password.value);
-    if (userStore.user.activatedAccount === false) {
+    if (userStore.user?.personalInfo.activatedAccount === false) {
       router.push("/auth/activate");
     } else {
       router.push("/dashboard/overview");

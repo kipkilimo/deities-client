@@ -33,7 +33,7 @@
 
                         <v-col cols="4" class="align-right justify-end">
 
-                            <v-img src="https://a2z-v0.s3.eu-central-1.amazonaws.com/NEMBio+Logo+wide.png" />
+                            <v-img src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png" />
 
                         </v-col>
 

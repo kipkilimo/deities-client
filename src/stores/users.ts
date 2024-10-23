@@ -56,6 +56,7 @@ interface User {
 interface UserState {
   isLoggedIn: boolean;
   token?: string;
+  username: string;
   userStrObj: string;
   user?: User;
 }
@@ -65,52 +66,61 @@ export const useUserStore = defineStore("login", {
     isLoggedIn: false,
     token: undefined,
     userStrObj: "",
+    username: "",
     user: undefined,
   }),
 
   actions: {
-    async resetPassword(activationToken: string, password: string) {
-      const RESET_PASSWORD = gql`
-        mutation resetPassword($activationToken: String!, $password: String!) {
-          resetPassword(
-            activationToken: $activationToken
+    async register(
+      email: string,
+      username: string,
+      fullName: string,
+      password: string
+    ) {
+      const CREATE_NEW_USER = gql`
+        mutation createUser(
+          $username: String!
+          $fullName: String!
+          $email: String!
+          $password: String!
+        ) {
+          createUser(
+            email: $email
+            username: $username
+            fullName: $fullName
             password: $password
           ) {
-            accessToken
-            user {
-              id
-              personalInfo {
-                username
-                email
-                activatedAccount
-                fullName
-                publication_credits
-              }
-              role
+            id
+            personalInfo {
+              username
+              email
+              activatedAccount
+              fullName
+              publication_credits
             }
+            role
           }
         }
       `;
 
       try {
         const response = await client.mutate({
-          mutation: RESET_PASSWORD,
-          variables: { activationToken, password },
+          mutation: CREATE_NEW_USER,
+          variables: { email, username, fullName, password },
         });
 
-        const user = response.data?.resetPassword?.user;
-        const accessToken = response.data?.resetPassword?.accessToken;
+        const user = response.data.createUser;
 
-        if (user && accessToken) {
-          this.isLoggedIn = true;
-          this.token = accessToken;
+        if (user) {
           this.user = user;
-        } else {
-          throw new Error("Reset failed");
+          console.log({ user });
+
+          // Navigate to login
         }
+        window.location = "/auth/activate";
       } catch (error) {
-        console.error("Reset password error:", error);
-        throw new Error("Reset failed");
+        console.error("Error registering user:", error);
+        throw new Error("Registration error");
       }
     },
 
@@ -156,7 +166,240 @@ export const useUserStore = defineStore("login", {
         throw new Error("Login failed");
       }
     },
+    async activate(activationToken: string) {
+      const ACTIVATE_ACCOUNT = gql`
+        mutation ActivateAccount($activationToken: String!) {
+          activate(activationToken: $activationToken) {
+            accessToken
+            user {
+              id
+              personalInfo {
+                username
+                email
+                activatedAccount
+                fullName
+                publication_credits
+              }
+              role
+            }
+          }
+        }
+      `;
 
+      try {
+        const response = await client.mutate({
+          mutation: ACTIVATE_ACCOUNT,
+          variables: { activationToken },
+        });
+
+        const user = response.data?.activate?.user;
+        const accessToken = response.data?.activate?.accessToken;
+
+        if (user && accessToken) {
+          this.isLoggedIn = true;
+          this.token = accessToken;
+          this.user = user;
+          localStorage.setItem("sessionId", user.id);
+        } else {
+          throw new Error("Invalid activation token");
+        }
+      } catch (error) {
+        console.error("Activation error:", error);
+        throw new Error("Account activation failed");
+      }
+    },
+    async deleteUserByScholarId(scholarId: string) {
+      const DELETE_USER_BY_SCHOLAR_ID = gql`
+        mutation DeleteUserByScholarId($scholarId: String!) {
+          deleteUserByScholarId(scholarId: $scholarId) {
+            id
+            personalInfo {
+              username
+              email
+              activatedAccount
+              fullName
+              publication_credits
+            }
+          }
+        }
+      `;
+
+      try {
+        const response = await client.mutate({
+          mutation: DELETE_USER_BY_SCHOLAR_ID,
+          variables: { scholarId },
+        });
+
+        const user = response.data?.deleteUserByScholarId;
+
+        if (user) {
+          this.user = user;
+          return user; // Return deleted user information if needed
+        } else {
+          throw new Error("User not found or deletion failed");
+        }
+      } catch (error) {
+        console.error("Delete user by scholar ID error:", error);
+        throw new Error("User deletion failed");
+      }
+    },
+    async singleSigninLogin(accessKey: string) {
+      const SINGLE_SIGNIN_LOGIN = gql`
+        mutation SingleSigninLogin($accessKey: String!) {
+          singleSigninLogin(accessKey: $accessKey) {
+            accessToken
+            user {
+              id
+              personalInfo {
+                username
+                email
+                activatedAccount
+                fullName
+                publication_credits
+              }
+              role
+            }
+          }
+        }
+      `;
+
+      try {
+        const response = await client.mutate({
+          mutation: SINGLE_SIGNIN_LOGIN,
+          variables: { accessKey },
+        });
+
+        const user = response.data?.singleSigninLogin?.user;
+        const accessToken = response.data?.singleSigninLogin?.accessToken;
+
+        if (user && accessToken) {
+          this.isLoggedIn = true;
+          this.token = accessToken;
+          this.user = user;
+          localStorage.setItem("sessionId", user.id);
+        } else {
+          throw new Error("Invalid access key");
+        }
+      } catch (error) {
+        console.error("Single sign-in login error:", error);
+        throw new Error("Single sign-in login failed");
+      }
+    },
+    async singleSignInRequest(email: string) {
+      const SINGLE_SIGNIN_REQUEST = gql`
+        mutation SingleSignInRequest($email: String!) {
+          singleSignInRequest(email: $email) {
+            id
+            personalInfo {
+              username
+              email
+              activatedAccount
+              fullName
+              publication_credits
+            }
+          }
+        }
+      `;
+
+      try {
+        const response = await client.mutate({
+          mutation: SINGLE_SIGNIN_REQUEST,
+          variables: { email },
+        });
+
+        const user = response.data?.singleSignInRequest;
+
+        if (user) {
+          this.user = user;
+          return user; // Return user information if needed
+        } else {
+          throw new Error("Single sign-in request failed or invalid email");
+        }
+      } catch (error) {
+        console.error("Single sign-in request error:", error);
+        throw new Error("Single sign-in request failed");
+      }
+    },
+    async requestPasswordReset(email: string) {
+      const REQUEST_PASSWORD_RESET = gql`
+        mutation RequestPasswordReset($email: String!) {
+          requestPasswordReset(email: $email) {
+            id
+            personalInfo {
+              username
+              email
+              activatedAccount
+              fullName
+              publication_credits
+            }
+          }
+        }
+      `;
+
+      try {
+        const response = await client.mutate({
+          mutation: REQUEST_PASSWORD_RESET,
+          variables: { email },
+        });
+
+        const user = response.data?.requestPasswordReset;
+
+        if (user) {
+          this.user = user;
+          return user; // Return user information if needed
+        } else {
+          throw new Error("User not found or invalid email");
+        }
+      } catch (error) {
+        console.error("Password reset request error:", error);
+        throw new Error("Password reset request failed");
+      }
+    },
+    async resetPassword(activationToken: string, password: string) {
+      const RESET_PASSWORD = gql`
+        mutation ResetPassword($activationToken: String!, $password: String!) {
+          resetPassword(
+            activationToken: $activationToken
+            password: $password
+          ) {
+            accessToken
+            user {
+              id
+              personalInfo {
+                username
+                email
+                activatedAccount
+                fullName
+                publication_credits
+              }
+              role
+            }
+          }
+        }
+      `;
+
+      try {
+        const response = await client.mutate({
+          mutation: RESET_PASSWORD,
+          variables: { activationToken, password },
+        });
+
+        const user = response.data?.resetPassword?.user;
+        const accessToken = response.data?.resetPassword?.accessToken;
+
+        if (user && accessToken) {
+          this.isLoggedIn = true;
+          this.token = accessToken;
+          this.user = user;
+          localStorage.setItem("sessionId", user.id);
+        } else {
+          throw new Error("Invalid reset token or password");
+        }
+      } catch (error) {
+        console.error("Reset password error:", error);
+        throw new Error("Password reset failed");
+      }
+    },
     async getCurrentUser(sessionId: string) {
       const GET_CURRENT_USER = gql`
         query getCurrentUser($sessionId: String!) {
@@ -174,11 +417,32 @@ export const useUserStore = defineStore("login", {
               id
               discussionGroupId
               name
+              members {
+                role
+                personalInfo {
+                  email
+                  fullName
+                }
+              }
             }
             departments {
               id
               departmentId
               name
+              faculty {
+                role
+                personalInfo {
+                  email
+                  fullName
+                }
+              }
+              students {
+                role
+                personalInfo {
+                  email
+                  fullName
+                }
+              }
             }
             favorite_resources {
               id

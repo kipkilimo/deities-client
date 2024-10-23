@@ -39,17 +39,15 @@ export const usePaymentsStore = defineStore("paymentStore", {
         });
         console.log(result);
         setTimeout(() => {
-          localStorage.removeItem("currentUser");
-          const router = useRouter();
-          window.location.href = "/auth/login";
-        }, 180000);
+          window.location.href = "/dashboard/my-account";
+        }, 1800);
       } catch (error) {
         console.error("MPESA Payment error: ", error);
         setTimeout(() => {
           localStorage.removeItem("currentUser");
           const router = useRouter();
-          window.location.href = "/auth/login";
-        }, 180000);
+          window.location.href = "/dashboard/my-account";
+        }, 1800);
       }
     },
     async handlePublicationCreditsPaymentViaMpesa(vals: {
@@ -88,7 +86,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
           mutation: ACCESS_TOKEN_CHECKOUT_MPESA,
           variables: {
             userId: vals.userId,
-            paidAmount: vals.paidAmount,
+            paidAmount: String(vals.paidAmount),
             transactionReferenceNumber: vals.transactionReferenceNumber,
             paymentPhoneNumber: vals.paymentPhoneNumber, // Ensure this matches vals
 
@@ -98,9 +96,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
         });
         console.log(result);
         setTimeout(() => {
-          localStorage.removeItem("currentUser");
-          const router = useRouter();
-          window.location.href = "/auth/login";
+          window.location.href = "/dashboard/my-account";
         }, 1800);
       } catch (error) {
         console.error("MPESA Payment error: ", error);
@@ -141,16 +137,14 @@ export const usePaymentsStore = defineStore("paymentStore", {
           variables: {
             userId: vals.userId,
             transactionReferenceNumber: vals.transactionReferenceNumber, // Make sure this field is present in vals
-            paidAmount: vals.paidAmount,
+            paidAmount: String(vals.paidAmount),
             transactionEntity: vals.transactionEntity, // Ensure this is present too
             departmentId: vals.departmentId,
           },
         });
         console.log(result);
         setTimeout(() => {
-          localStorage.removeItem("currentUser");
-          const router = useRouter();
-          window.location.href = "/auth/login";
+          window.location.href = "/dashboard/my-account";
         }, 1800);
       } catch (error) {
         console.error("PayPal Payment error: ", error);

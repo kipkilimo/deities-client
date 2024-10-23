@@ -48,7 +48,13 @@
       </v-col>
       <v-col
         align-right
-        cols="5" v-if="useUserStore().user.discussion_groups[0].discussionGroupId.length === 12"
+        cols="5"
+        v-if="
+          useUserStore().user.role === 'STUDENT' &&
+          useUserStore().user.discussion_groups &&
+          useUserStore().user.discussion_groups[0].discussionGroupId.length ===
+            12
+        "
         style="text-align: right !important; margin-left: 5px"
       >
         <v-chip variant="outlined" class="ma-1" rounded="2">
@@ -72,6 +78,31 @@
         </v-chip>
         <br />
       </v-col>
+      <v-col
+        align-right
+        cols="5"
+        v-if="
+          useUserStore().user.role === 'FACULTY' &&
+          useUserStore().user.departments &&
+          useUserStore().user.departments[0].departmentId.length === 12
+        "
+        style="text-align: right !important; margin-left: 5px"
+      >
+        <v-chip variant="outlined" class="ma-1" rounded="2">
+          <v-tooltip
+            text="You can add resources for your discussion groups for FREE on NEMBio."
+            location="top"
+          >
+            <template v-slot:activator="{ props }"
+              ><v-chip rounded="2" v-bind="props" variant="rounded" slim>
+                My Department ID:
+                {{ useUserStore().user.departments[0].departmentId }}
+              </v-chip>
+            </template>
+          </v-tooltip>
+        </v-chip>
+        <br />
+      </v-col>
     </v-row>
 
     <v-divider></v-divider>
@@ -86,7 +117,7 @@
                 :hint="`Credit USD ${selectedAmount}.00`"
                 :items="selectItems"
                 :rules="nameRules"
-                :disabled="sliderActive == true || departmentId.length === 11"
+                :disabled="sliderActive == true || departmentId.length === 12"
                 ref="selectNow"
                 @input="onSelectChange"
                 item-title="state"
@@ -106,7 +137,7 @@
                 @input="onSliderChange"
                 @click="onSliderChange"
                 track-color="grey"
-                :min="`${departmentId.length === 11 ? '250' : '1'}`"
+                :min="`${departmentId.length === 12 ? '250' : '1'}`"
                 max="2000"
                 hide-details
                 step="1"
@@ -134,7 +165,7 @@
               <v-spacer></v-spacer>
               <p>
                 {{
-                  departmentId.length === 11
+                  departmentId.length === 12
                     ? "Annual subscription fee"
                     : "Custom amount"
                 }}:<strong>{{ `$ ${selectedAmount}` }}.00</strong>
@@ -155,7 +186,7 @@
                 disabled
                 label="Payment type"
                 :prepend-inner-icon="
-                  departmentId.length === 11
+                  departmentId.length === 12
                     ? 'mdi-account-multiple-check-outline'
                     : 'mdi-account-check-outline'
                 "
@@ -183,7 +214,7 @@
           {{
             transactionEntity.length > 1 ? transactionEntity : "Not added yet"
           }}. <strong>Department ID</strong>:
-          {{ departmentId.length === 11 ? departmentId : "Not added" }}.
+          {{ departmentId.length === 12 ? departmentId : "Not added" }}.
           <br /><strong>Amount (USD) </strong>:
           {{ activeOption == 0 ? selectedAmount : selectedAmount }} |
           <strong>Publication Credits </strong>:
@@ -228,13 +259,13 @@
             alt="M-Pesa"
           ></v-img>
 
-          <v-img
+          <!--<v-img
             max-height="7.2rem"
             style="cursor: pointer"
             @click="mockPaypal"
             src="https://elfsight.com/wp-content/uploads/2023/09/PayPal-Button-Example-1.jpg"
             alt="M-Pesa"
-          ></v-img>
+          ></v-img> -->
         </v-col>
         <v-col cols="3" class="d-flex justify-space-between">
           <v-container
@@ -253,8 +284,8 @@
       <MPESAInput />
     </v-dialog>
 
-    <v-dialog v-model="requestDGWaiverDialog" max-width="75rem" persistent> 
-        <FeeWaiver /> 
+    <v-dialog v-model="requestDGWaiverDialog" max-width="75rem" persistent>
+      <FeeWaiver />
     </v-dialog>
   </v-container>
 </template>
@@ -264,7 +295,6 @@
 import { ref, onMounted, nextTick, reactive, watch } from "vue";
 import { usePaymentsStore } from "@/stores/payments";
 // import axios from "axios";
-
 
 import { useUserStore } from "@/stores/users";
 const requestDGWaiverDialog = ref(false);
@@ -296,7 +326,7 @@ const uuidRules = [
   (value) => {
     if (!value) return true; // If no value is provided, it's valid (optional)
     return (
-      /^[A-Za-z0-9]{11}$/.test(value) ||
+      /^[A-Za-z0-9]{12}$/.test(value) ||
       "Department ID must be a valid identifier."
     );
   },
@@ -308,7 +338,7 @@ const emailRules = [
 ];
 // const savedItem = ref(localStorage.getItem('item') || '');
 watch(departmentId, (newValue) => {
-  if (newValue.length === 11) {
+  if (newValue.length === 12) {
     transactionEntity.value = "DEPARTMENT";
     selectedAmount.value = "250";
   } else {
@@ -458,9 +488,10 @@ onMounted(async () => {
               this.paymentComplete = true;
               store
                 .handleMakeAccessPaymentViaPaypal({
-                  departmentId: departmentId,
-                  transactionEntity: transactionEntity,
-                  paidAmount: argParams.amount,
+                  userId: userId,
+                  departmentId: departmentId.value,
+                  transactionEntity: transactionEntity.value,
+                  paidAmount: selectedAmount.value,
                   transactionReferenceNumber: argParams.txnReference,
                 }) // eslint-disable-next-line
                 .then((response) => {

@@ -42,7 +42,7 @@
       <v-col cols="3" class="text-left mb-4">
         <router-link to="/dashboard/overview" class="flex items-center">
           <v-img
-            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/NEMBio+Logo+wide.png"
+            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png"
             :width="100"
             :height="40"
           />

@@ -1,5 +1,10 @@
 <template>
   <v-container class="my-5">
+    <v-progress-linear
+      color="#212121"
+      v-if="resourceFilterOptionsSelected"
+      indeterminate
+    ></v-progress-linear>
     <v-row>
       <v-col
         v-for="(resource, index) in updatedResources"

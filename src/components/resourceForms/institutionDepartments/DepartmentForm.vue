@@ -1,196 +1,205 @@
 <template>
   <v-card
-    prepend-icon="mdi-office-building"
-    title="Create Department"
+    prepend-icon="mdi-account-group"
+    title="Create a Department"
+    class="ma-2"
+    flat
   >
+    <v-divider />
     <v-card-text>
       <v-row dense>
-        <!-- Department Name -->
-        <v-col
-          cols="12"
-          md="6"
-        >
+        <v-col cols="12" md="5">
           <v-text-field
-            label="Department Name*"
+            class="ma-1"
             v-model="form.name"
+            :rules="nameRules"
+            label="Department Name"
             required
           ></v-text-field>
         </v-col>
 
-        <!-- Department ID -->
-        <v-col
-          cols="12"
-          md="6"
-        >
+        <v-col cols="12" md="7">
           <v-text-field
-            label="Department ID*"
-            v-model="form.departmentId"
-            required
-          ></v-text-field>
-        </v-col>
-
-        <!-- Parent Institution -->
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-text-field
-            label="Parent Institution*"
+            class="ma-1"
             v-model="form.parent_institution"
+            :rules="nameRules"
+            label="Parent Institution"
             required
           ></v-text-field>
         </v-col>
 
-        <!-- Phone Number -->
-        <v-col
-          cols="12"
-          md="6"
-        >
+        <v-col cols="12" md="5">
           <v-text-field
-            label="Phone Number*"
+            class="ma-1"
             v-model="form.phone_number"
+            :rules="phoneRules"
+            label="Phone Number"
             required
           ></v-text-field>
         </v-col>
 
-        <!-- Email Address -->
-        <v-col
-          cols="12"
-          md="6"
-        >
+        <v-col cols="12" md="7">
           <v-text-field
-            label="Email Address*"
+            class="ma-1"
             v-model="form.email_address"
+            :rules="emailValidationRules"
+            label="Email Address"
             required
-            type="email"
           ></v-text-field>
         </v-col>
-
-        <!-- Faculty Members (Autocomplete for existing users) -->
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-autocomplete
-            label="Add Faculty*"
-            :items="userOptions"
-            v-model="form.faculty"
-            item-text="name"
-            item-value="id"
+        <v-col cols="12" md="12">
+          <v-textarea
+            class="ma-1"
+            label="Add faculty members (comma-separated emails), up to 20 pax*"
+            v-model="form.members"
+            item-text="email"
             multiple
             chips
             required
-            hint="Select faculty members"
+            :rules="[emailValidation]"
+            hint="Add faculty members (comma-separated emails), up to 20 pax"
             persistent-hint
-          ></v-autocomplete>
+          ></v-textarea>
         </v-col>
 
-        <!-- Programs (Autocomplete for existing programs) -->
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-autocomplete
-            label="Add Programs*"
-            :items="programOptions"
-            v-model="form.programs"
-            item-text="name"
-            item-value="id"
-            multiple
-            chips
-            required
-            hint="Select programs offered by the department"
-            persistent-hint
-          ></v-autocomplete>
-        </v-col>
-
-        <!-- Students (Autocomplete for existing users) -->
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-autocomplete
-            label="Add Students*"
-            :items="userOptions"
-            v-model="form.students"
-            item-text="name"
-            item-value="id"
-            multiple
-            chips
-            required
-            hint="Select students enrolled in the department"
-            persistent-hint
-          ></v-autocomplete>
-        </v-col>
+        <small class="text-caption text-medium-emphasis">
+          *indicates required field
+        </small>
       </v-row>
-
-      <small class="text-caption text-medium-emphasis">*indicates required field</small>
     </v-card-text>
 
-    <v-divider></v-divider>
-
+    <v-divider />
     <v-card-actions>
-      <v-spacer></v-spacer>
-
+      <v-spacer />
       <v-btn
-        text="Close"
-        variant="plain"
-        @click="dialog.value = false"
-      ></v-btn>
-
-      <v-btn
-        color="primary"
-        text="Save"
-        variant="tonal"
         @click="saveDepartment"
-      ></v-btn>
+        variant="outlined"
+        color="primary"
+        prepend-icon="mdi-content-save-check-outline"
+        :disabled="!isFormValid"
+      >
+        Save Department
+      </v-btn>
+      <v-spacer />
     </v-card-actions>
   </v-card>
 </template>
 
-<script>
-import { ref, reactive } from 'vue';
+<script setup>
+import { ref, computed } from "vue";
+import { useDepartmentStore } from "@/stores/departments"; // Assuming store is set up
 
-export default {
-  setup() {
-    const dialog = ref(false);
+const createdBy = localStorage.getItem("sessionId"); // Retrieve user ID or session ID from storage
 
-    const form = reactive({
-      departmentId: '',
-      name: '',
-      parent_institution: '',
-      phone_number: '',
-      email_address: '',
-      faculty: [],
-      programs: [],
-      students: []
+const emailValidation = (value) => {
+  if (!value) return "Emails are required";
+
+  const emailArray = value.split(",").map((email) => email.trim());
+
+  if (emailArray.length < 2) return "At least 2 emails are required";
+  if (emailArray.length > 20) return "A maximum of 20 emails are allowed";
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  for (const email of emailArray) {
+    if (!emailRegex.test(email)) return `${email} is not a valid email`;
+  }
+
+  return true;
+};
+
+const emailValidationRules = [
+  (v) => !!v || "Email is required",
+  (v) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(v) || "Email must be valid";
+  },
+];
+
+const nameRules = [
+  (v) => !!v || "Name is required",
+  (v) => (v && v.length >= 5) || "Name must be at least 5 characters",
+  (v) => (v && v.length <= 355) || "Name must be less than 355 characters",
+];
+
+const phoneRules = [
+  (v) => !!v || "Phone number is required",
+  (v) => /^\+?[0-9\s-]+$/.test(v) || "Phone number must be valid",
+];
+
+const form = ref({
+  name: "",
+  parent_institution: "",
+  phone_number: "",
+  email_address: "",
+  members: "",
+});
+
+// Computed property to check form validity
+const isFormValid = computed(() => {
+  return (
+    nameRules.every((rule) => rule(form.value.name) === true) &&
+    nameRules.every((rule) => rule(form.value.parent_institution) === true) &&
+    phoneRules.every((rule) => rule(form.value.phone_number) === true) &&
+    emailValidationRules.every(
+      (rule) => rule(form.value.email_address) === true
+    ) &&
+    emailValidation(form.value.members) === true
+  );
+});
+
+const saveDepartment = async () => {
+  trimInputs();
+  try {
+    function validateEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    function processEmails(emailString) {
+      return emailString
+        .split(/[,\s]+/)
+        .map((email) => email.trim())
+        .filter((email) => email.length > 0 && validateEmail(email));
+    }
+
+    const validEmails = processEmails(form.value.members);
+
+    const store = useDepartmentStore();
+    await store.handleDepartmentCreate({
+      createdBy,
+      departmentId: generateUniqueCode(12),
+      name: form.value.name,
+      parent_institution: form.value.parent_institution,
+      phone_number: form.value.phone_number,
+      email_address: form.value.email_address,
+      members: validEmails,
     });
-
-    const userOptions = ref([
-      { id: 1, name: 'John Doe' },
-      { id: 2, name: 'Jane Smith' },
-      { id: 3, name: 'Samuel Green' }
-    ]);
-
-    const programOptions = ref([
-      { id: 1, name: 'Computer Science' },
-      { id: 2, name: 'Mathematics' },
-      { id: 3, name: 'Physics' }
-    ]);
-
-    const saveDepartment = () => {
-      console.log('Saved Department:', form);
-      // Implement the actual save logic (e.g., API call)
-      dialog.value = false;
-    };
-
-    return {
-      dialog,
-      form,
-      userOptions,
-      programOptions,
-      saveDepartment
-    };
+  } catch (error) {
+    console.error("Failed to create department:", error);
   }
 };
+const trimInputs = () => {
+  form.value.name = form.value.name.trim();
+  form.value.parent_institution = form.value.parent_institution.trim();
+  form.value.phone_number = form.value.phone_number.trim();
+  form.value.email_address = form.value.email_address.trim();
+  form.value.members = form.value.members.trim();
+};
+
+function generateUniqueCode(length) {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters[randomIndex];
+  }
+
+  return result;
+}
 </script>
+
+<style scoped>
+/* Add any styles you need for the component here */
+</style>

@@ -44,7 +44,7 @@
               'male-card': figure.gender === 'Male',
               'female-card': figure.gender === 'Female',
             }"
-            @click="handleChipClick(figure)"
+            @click="handleChipClick(figure),$emit('closeScientists')"
             height="9.6rem"
             :style="{
               border: ` ${figure.gender === 'Male' ? '1px' : '1.5px'} solid ${figure.gender === 'Male' ? '#01cdfe' : '#fc3468'}`,
@@ -73,10 +73,11 @@ import { ref, onBeforeMount, computed, watch } from "vue";
 // Import the array of notableFigures
 import notableFigures from "@/data/scientists";
 import { useUserStore } from "@/stores/users";
+import { emit } from "process";
 
 const userStore = useUserStore();
 function handleChipClick(scientist) {
-  userStore.username = scientist.name;
+  userStore.username = scientist.name; 
 }
 // Filters and sort options
 const filters = ref({

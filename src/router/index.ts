@@ -35,6 +35,7 @@ router.beforeEach((to, from, next) => {
   // For all other routes, check if token is valid
   if (token) {
     try {
+      // @ts-ignore
       const decodedToken = jwtDecode(token);
       const currentTime = Date.now() / 1000;
       // @ts-ignore

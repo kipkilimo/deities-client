@@ -2,8 +2,8 @@
   <v-card class="login-card mt-4 ml-2" elevation="4" outlined rounded>
     <v-card-title class="text-center">
       <v-img
-        style="max-height: 7.5rem"
-        src="https://a2z-v0.s3.eu-central-1.amazonaws.com/NEMBio+Logo+wide.png"
+        style="height: 12rem"
+        src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png"
       />
       <h5 class="mt-4 mr-11" style="color: #777777">
         Create NEMBio Learning Account
@@ -77,10 +77,12 @@
               size="x-small"
               @click="(agreeToTermsDialog = true), (agreeToTerms = false)"
             >
-            <v-icon class="mr-2">mdi-note-check</v-icon>  NEMBio Terms of Use and Privacy Statement</v-btn
+              <v-icon class="mr-2">mdi-note-check</v-icon> NEMBio Terms of Use
+              and Privacy Statement</v-btn
             >
           </v-col>
         </v-row>
+        <v-divider />
         <div class="d-flex justify-space-between mt-2">
           <v-card-actions
             ><v-spacer />
@@ -126,7 +128,7 @@
       ></v-alert>
     </div>
     <v-dialog max-width="75%" auto-height v-model="selectIcon">
-      <Scientists />
+      <Scientists @closeScientists="closeScientists()" />
     </v-dialog>
 
     <v-dialog max-width="700" persistent v-model="agreeToTermsDialog"
@@ -160,14 +162,18 @@ const userStore = useUserStore();
 import { useRouter } from "vue-router";
 import Scientists from "@/utilities/scientists.vue";
 const selectIcon = ref(false);
+const username = ref(userStore.username);
 const agreeToTerms = ref(false); // agreeToTermsDialog
 const agreeToTermsDialog = ref(false);
 // Watch for changes in filters or sortOption
+function closeScientists() {
+  selectIcon.value = false;
+}
 watch(
   userStore,
   () => {
     // Trigger recomputation of filteredAndSortedFigures
-    if (userStore.username.length > 1) {
+    if (username.value.length > 1) {
       selectIcon.value = false;
     }
   },
@@ -186,7 +192,6 @@ const passwordRules = [
   (v: string | any[]) =>
     v.length <= 12 || "Password must be at most 12 characters long",
 ];
-const username = ref("");
 const firstName = ref("");
 const lastName = ref("");
 
@@ -208,27 +213,26 @@ const togglePassword = () => {
   showPassword.value = !showPassword.value;
 };
 const submitRegister = async () => {
-  const fullName = `${firstName.value} ${lastName.value}`; 
+  const fullName = `${firstName.value} ${lastName.value}`;
   registerLoading.value = true; // Indicate login in progress
-  if (userStore.username === "") {
-    userStore.username = fullName;
+  if (username.value === "") {
+    username.value = fullName;
   }
   try {
     await userStore.register(
-      userStore.username,
+      username.value,
       fullName,
       email.value,
       password.value
     );
     // Handle successful login (e.g., redirect to home page)
-    router.push("/auth/activate");
-
+  
     // You can use a router or state management solution like Vuex
   } catch (error) {
     loginError.value = "Failed to register new user."; // Set error message
     setTimeout(() => {
       window.location.reload();
-    }, 42000);
+    }, 420000);
   }
 };
 function leavePage() {

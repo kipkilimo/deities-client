@@ -6,22 +6,21 @@
       <v-col cols="12" md="6">
         <v-card>
           <v-row>
-            <v-col cols="4">
-              <v-avatar size="56" class="ma-3"
-                ><img :src="`${generateMD5Hash()}`"
-              /></v-avatar>
+            <v-col cols="2">
+              <div class="avatar-wrapper ma-1 mt-4 ml-4">
+                <v-avatar size="63">
+                  <img :src="`${generateMD5Hash()}`" />
+                </v-avatar>
+              </div>
             </v-col>
 
             <v-col class="ma-1" cols="7">
               <v-card-title class="text-h5"
-                >{{
-                  useUserStore().user.personalInfo.fullName
-                }}
-                Profile</v-card-title
+                >{{ useUserStore().user.personalInfo.fullName }}
+              </v-card-title>
+              <v-card-title class="text-overline"
+                >ROLE: {{ useUserStore().user.role }}</v-card-title
               >
-              <v-card-title class="text-overline">{{
-                useUserStore().user.role
-              }}</v-card-title>
             </v-col>
           </v-row>
 
@@ -215,30 +214,40 @@
           <v-card-title class="text-h5">
             <v-card-actions
               >My Department<v-spacer /><v-spacer /><v-spacer />
-              <template v-slot:prepend>
-                <v-avatar
-                  @click="manageDepartmentDialog = true"
-                  color="surface-light"
-                  size="32"
-                  >📝</v-avatar
-                >
-              </template>
+              <v-tooltip text="Manage department">
+                <template v-slot:activator="{ props }">
+                  <v-avatar
+                    v-bind="props"
+                    class="ma-1"
+                    @click="manageDepartmentDialog = true"
+                    color="surface-light"
+                    style="cursor: pointer"
+                    size="24"
+                    >📝</v-avatar
+                  >
+                </template>
+              </v-tooltip>
             </v-card-actions></v-card-title
           >
 
           <v-divider></v-divider>
 
-          <v-card-text v-if="useUserStore().user.department">
-            {{ useUserStore().user.department.departmentId }}
+          <v-card-text v-if="useUserStore().user.departments.length >= 1">
+            <p>{{ useUserStore().user.departments[0].name }}</p>
+            <v-divider class="mb-1"></v-divider>
+            <v-chip variant="outlined" rounded="2">
+              ID:
+              {{ useUserStore().user.departments[0].departmentId }}</v-chip
+            >
           </v-card-text>
-          <v-card-text v-if="!useUserStore().user.department">
+          <v-card-text v-if="useUserStore().user.departments.length === 0">
             <v-card-actions>
               <v-btn
                 width="100%"
                 color="primary"
                 variant="tonal"
                 @click="addDepartmentDialog = true"
-                >Add a department</v-btn
+                ><v-icon class="mr-1">mdi-plus</v-icon> department</v-btn
               >
             </v-card-actions>
           </v-card-text>
@@ -251,25 +260,38 @@
           <v-card-title class="text-h5">
             <v-card-actions
               >My DG<v-spacer /><v-spacer /><v-spacer />
-              <template v-slot:prepend>
-                <v-avatar
-                  @click="manageDiscussionGroupDialog = true"
-                  color="surface-light"
-                  size="32"
-                  >📝</v-avatar
-                >
-              </template>
+
+              <v-tooltip text="Manage discussion group">
+                <template v-slot:activator="{ props }">
+                  <v-avatar
+                    v-bind="props"
+                    class="ma-1"
+                    @click="manageDiscussionGroupDialog = true"
+                    color="surface-light"
+                    style="cursor: pointer"
+                    size="24"
+                    >📝</v-avatar
+                  >
+                </template>
+              </v-tooltip>
             </v-card-actions></v-card-title
           >
 
           <v-divider></v-divider>
 
-          <v-card-text v-if="useUserStore().user.discussion_groups.length >=1">
-          <p> {{ useUserStore().user.discussion_groups[0].name }}</p>
-          <v-divider class="mb-1"></v-divider>
-           <v-chip variant="outlined" rounded="2"> ID: {{ useUserStore().user.discussion_groups[0].discussionGroupId }}</v-chip>
+          <v-card-text v-if="useUserStore().user.discussion_groups.length >= 1">
+            <p>{{ useUserStore().user.discussion_groups[0].name }}</p>
+            <v-divider class="mb-1"></v-divider>
+            <v-chip variant="outlined" rounded="2">
+              ID:
+              {{
+                useUserStore().user.discussion_groups[0].discussionGroupId
+              }}</v-chip
+            >
           </v-card-text>
-          <v-card-text v-if="useUserStore().user.discussion_groups.length === 0">
+          <v-card-text
+            v-if="useUserStore().user.discussion_groups.length === 0"
+          >
             <v-card-actions>
               <v-btn
                 width="100%"
@@ -292,7 +314,7 @@
 
     <v-dialog max-width="720" v-model="addDepartmentDialog">
       <v-card>
-        <DepartmentForm />
+        <DepartmentForm  @closeDialog="closeDialog()"  />
       </v-card>
     </v-dialog>
 
@@ -302,9 +324,9 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog max-width="720" v-model="manageDepartmentDialog">
+    <v-dialog max-width="63rem" v-model="manageDepartmentDialog">
       <v-card>
-        <ManageDepartmentForm />
+        <ManageDepartmentForm  @closeDialog="closeDialog()"  />
       </v-card>
     </v-dialog>
   </v-container>
@@ -328,7 +350,11 @@ onBeforeMount(async () => {
   await userStore.getCurrentUser(userId.value || "");
 });
 function closeDialog() {
+  console.log('Closing dialog...')
   addDiscussionGroupDialog.value = false;
+  manageDiscussionGroupDialog.value = false;
+  addDepartmentDialog.value = false;
+  manageDepartmentDialog.value = false;
 }
 const user = useUserStore().user;
 // Import the CryptoJS library2222222
@@ -342,7 +368,9 @@ function generateMD5Hash(size = 200) {
   const emailHash = CryptoJS.MD5(useUserStore().user.personalInfo.email);
 
   // Construct the Gravatar URL
-  const gravatarUrl = `https://www.gravatar.com/avatar/${emailHash}?s=${size}&d=identicon`;
+  // https://www.gravatar.com/avatar/${emailHash}?s=${size}&d=identicon
+
+  const gravatarUrl = `https://www.gravatar.com/avatar/${emailHash}?s=36&d=identicon&r=PG`;
 
   return gravatarUrl;
 }
@@ -381,5 +409,22 @@ const logout = () => {
 <style scoped>
 .text-h5 {
   font-weight: 500;
+}
+</style>
+<style scoped>
+.avatar-wrapper {
+  display: inline-block;
+  padding: 1px; /* Adjust padding to create a 2px border */
+  background: conic-gradient(
+    from 45deg,
+    #faf9f8,
+    #dfe5ee,
+    #3366c5,
+    #5e0ff0,
+    #05deee,
+    #047beb,
+    #eeedec
+  );
+  border-radius: 50%; /* Circle shape */
 }
 </style>
