@@ -1,1 +1,0 @@
-const r=function(e){const t=new Date(e);return t.setHours(t.getHours()+3),t.toLocaleString("en-GB",{timeZone:"Africa/Nairobi",weekday:"short",year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:!1})};export{r as t};

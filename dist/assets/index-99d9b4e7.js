@@ -1,1 +1,0 @@
-import{b as e}from"./route-block-83d24a4e.js";import{_ as t}from"./_plugin-vue_export-helper-c27b6911.js";import{o as c,d as n,e as r}from"./index-29b1d87f.js";const o={},s=r("h1",null,"Dashboard Help (TODO)",-1),a=[s];function _(f,i){return c(),n("div",null,a)}typeof e=="function"&&e(o);const p=t(o,[["render",_]]);export{p as default};
