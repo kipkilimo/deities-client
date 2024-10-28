@@ -1,11 +1,11 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <!-- Top Row: Sort, Filter, Search Strip -->
     <v-row>
       <v-col cols="12">
-        <v-row align="center">
+        <v-row align="center" justify="space-between">
           <!-- Sort Dropdown -->
-          <v-col cols="4">
+          <v-col cols="12" md="4">
             <v-select
               v-model="sortOption"
               :items="sortOptions"
@@ -16,7 +16,7 @@
           </v-col>
 
           <!-- Filter Dropdown -->
-          <v-col cols="4">
+          <v-col cols="12" md="4">
             <v-select
               v-model="filterOption"
               :items="filterOptions"
@@ -27,7 +27,7 @@
           </v-col>
 
           <!-- Search Field -->
-          <v-col cols="4">
+          <v-col cols="12" md="4">
             <v-text-field
               v-model="searchQuery"
               label="Search"
@@ -45,22 +45,15 @@
 
     <!-- Bottom Row: Two Column Layout -->
     <v-row>
-      <!-- Left Column: Resource Iterator Cards -->
-
-      <!-- Right Column: Selected Resource -->
-      <v-col cols="10">
+      <!-- Left Column: Selected Resource -->
+      <v-col cols="12" md="10">
         <v-card
           fluid
           v-if="!resourceComponent"
           @click="selectResource(resourceStore.resources[0])"
           height="63vh"
-          style="
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border-radius: 5px 5px 0px 0px !important;
-          "
+          class="d-flex align-center justify-center"
+          style="cursor: pointer; border-radius: 5px 5px 0px 0px !important;"
         >
           <v-img
             height="21vh"
@@ -76,7 +69,7 @@
         </v-container>
       </v-col>
 
-      <v-col cols="2" class="pr-2">
+      <v-col cols="12" md="2" class="pr-2">
         <!-- Container for vertical scrolling -->
         <v-row
           class="overflow-y-auto mt-1"
@@ -264,3 +257,22 @@ onBeforeMount(async () => {
   selectResource(resourceStore.resources[0]);
 });
 </script>
+
+<style scoped>
+.v-row {
+  padding: 0 10px;
+}
+.v-card {
+  transition: transform 0.3s;
+}
+
+.v-card:hover {
+  transform: scale(1.02);
+}
+
+.text-caption {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+</style>

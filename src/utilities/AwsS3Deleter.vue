@@ -54,7 +54,7 @@ const deleteResource = async (resource) => {
     const fileUrls = [resource.coverImage, ...parsedContent(resource.content)];
 
     // Make POST request to backend API
-    const response = await axios.post('http://localhost:4000/delete-files', { fileUrls });
+    const response = await axios.post('https://nem.bio:4000/delete-files', { fileUrls });
     
     // Update response message
     responseMessage.value = response.data;

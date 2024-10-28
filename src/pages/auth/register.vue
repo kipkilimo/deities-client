@@ -90,9 +90,9 @@
               :disabled="
                 isButtonDisabled1 || (isButtonDisabled2 && !agreeToTerms)
               "
-              style="width: 9rem"
-              type="submit"
-              color="primary"
+                          type="submit"
+            color="primary"
+              style="width: 13.5rem;background-color: #8fc0c5;" 
               :loading="registerLoading"
             >
               <v-icon class="mr-sm">mdi-location-enter</v-icon> Register
@@ -104,6 +104,7 @@
                 <v-btn
                   color="primary"
                   icon
+                  class="ml-7"
                   height="30"
                   variant="outlined"
                   v-bind="props"

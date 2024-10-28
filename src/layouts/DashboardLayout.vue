@@ -298,6 +298,9 @@ onBeforeMount(async () => {
         readyView.value = true;
       } catch (error) {
         router.push("/auth/login");
+      //  setTimeout(() => {
+         
+      //  }, 60000*5);
       }
     }
   }

@@ -1,10 +1,10 @@
 <template>
   <div>
-    <ExamPlayer/>
+    <Task/>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
-import ExamPlayer from '../../../components/resourcePlayers/polls/ExamPlayerPresenter.vue'
+import Task from '../../../components/resourcePlayers/tasks/AssignmentTaskPlayer.vue'
 </script>

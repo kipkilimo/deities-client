@@ -19,22 +19,23 @@
         <v-text-field
           variant="outlined"
           color="primary"
-          style="width: 90%"
           v-model="email"
           label="Registration email"
           required
           autofocus
+          append-inner-icon="mdi-email-lock-outline"
         />
+
         <v-text-field
           variant="outlined"
           v-model="password"
           :type="showPassword ? 'text' : 'password'"
           label="Password"
           v-if="usingPassword"
-          :append-icon="
+          :append-inner-icon="
             showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
           "
-          @click:append="togglePassword"
+          @click:append-inner="togglePassword"
           required
         />
 
@@ -44,18 +45,18 @@
           :type="showPassword ? 'text' : 'password'"
           label="Access Pin"
           hint="Enter access pin emailed to you."
-          :append-icon="
+          v-if="!usingPassword"
+          :append-inner-icon="
             showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
           "
-          v-if="!usingPassword"
-          @click:append="togglePassword"
+          @click:append-inner="togglePassword"
           required
         />
 
         <div class="d-flex justify-space-between mt-4">
           <v-btn
             :disabled="!canLogin"
-            style="width: 7.5rem"
+            style="width: 12rem"
             type="submit"
             color="primary"
             :loading="loginLoading"
@@ -284,7 +285,7 @@ const submitSingleSigninLogin = async () => {
     loginError.value = errorMessage;
     setTimeout(() => {
       window.location.reload();
-    }, 4200);
+    }, 420000);
   }
 };
 const orcIDAuthenticate = async () => {
@@ -327,7 +328,7 @@ const orcIDAuthenticate = async () => {
     loginError.value = errorMessage;
     setTimeout(() => {
       window.location.reload();
-    }, 4200);
+    }, 420000);
   }
 };
 const submitLogin = async () => {
@@ -370,7 +371,7 @@ const submitLogin = async () => {
     loginError.value = errorMessage;
     setTimeout(() => {
       window.location.reload();
-    }, 4200);
+    }, 420000);
   }
 };
 </script>

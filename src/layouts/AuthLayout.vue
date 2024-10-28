@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <v-col cols="3">
+    <v-col cols="12" md="4">
       <div><router-view /></div>
 
       <h3 color="#777777" class="ml-2 mt-2 mb-2 text-left">
@@ -24,7 +24,7 @@
       </p>
     </v-col>
 
-    <v-col cols="9">
+    <v-col cols="12" md="8">
       <v-img
         class="ma-sm"
         :src="currentEvent.posterUrl"
@@ -41,6 +41,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import partners from "@/data/partnersSponsors";
+
 const currentEvents = [
   {
     posterUrl:
@@ -68,6 +69,7 @@ const currentEvents = [
     organizerName: "British Association of Black Surgeons",
   },
 ];
+
 // Initialize currentIndex and currentEventIndex to a random value
 const currentEventIndex = ref(Math.floor(Math.random() * currentEvents.length));
 const currentIndex = ref(Math.floor(Math.random() * partners.length));
@@ -75,42 +77,34 @@ const currentIndex = ref(Math.floor(Math.random() * partners.length));
 // Set the current partner and event based on the random index
 const currentPartner = ref(partners[currentIndex.value]);
 const currentEvent = ref(currentEvents[currentEventIndex.value]);
+
 function changePartner() {
   let newIndex = currentIndex.value;
-
-  // Ensure the new index is different from the current one
   while (newIndex === currentIndex.value) {
     newIndex = Math.floor(Math.random() * partners.length);
   }
-
-  // Update the currentIndex and currentPartner
   currentIndex.value = newIndex;
   currentPartner.value = partners[newIndex];
 }
 
 function changeEvent() {
   let newIndex = currentEventIndex.value;
-
-  // Ensure the new index is different from the current one
   while (newIndex === currentEventIndex.value) {
     newIndex = Math.floor(Math.random() * currentEvents.length);
   }
-
-  // Update the currentEventIndex and currentEvent
   currentEvent.value = currentEvents[newIndex];
   currentEventIndex.value = newIndex;
 }
 
 function titlize(str: string) {
   return str
-    .toLowerCase() // Convert the whole string to lowercase first
-    .split(" ") // Split the string into an array of words
-    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
-    .join(" "); // Join the array back into a single string
+    .toLowerCase()
+    .split(" ")
+    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 onMounted(() => {
-  // Set an interval to change the partner and event every 12 seconds
   const intervalId = setInterval(() => {
     changePartner();
   }, 5000);
@@ -126,4 +120,6 @@ onMounted(() => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+/* Additional mobile-specific styles can go here */
+</style>

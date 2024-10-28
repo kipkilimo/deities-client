@@ -210,10 +210,11 @@ function getRandomAvatarUrl() {
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap");
-
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 .v-card {
   max-width: 800px;
   margin: auto;
+  padding: 16px; /* Add padding for better spacing */
 }
 
 .v-img {
@@ -227,7 +228,7 @@ function getRandomAvatarUrl() {
 
 .bbc-title {
   font-family: "Cormorant Garamond", serif;
-  font-size: 52px;
+  font-size: 3rem; /* Responsive font size */
   font-weight: 700;
   line-height: 1.3;
   color: #222;
@@ -236,25 +237,41 @@ function getRandomAvatarUrl() {
 
 .bbc-subtitle {
   font-family: "Cormorant Garamond", serif;
-  font-size: 21px;
+  font-size: 2rem; /* Responsive font size */
   color: #3f3d3d;
   margin-bottom: 1rem;
 }
 
 .bbc-meta {
   font-family: "Cormorant Garamond", serif;
-  font-size: 14px;
+  font-size: 1rem; /* Responsive font size */
   color: #3f3d3d;
-  margin-right: 1.5rem;
+  margin-right: 0.5rem;
 }
 
 .bbc-content {
   font-family: "Cormorant Garamond", serif;
-  font-size: 24px;
+  font-size: 1.75rem; /* Responsive font size */
   line-height: 1.6;
   color: #242424;
   font-weight: 500; /* Slightly increased font weight */
 }
+
+@media (max-width: 85%) {
+  .bbc-title {
+    font-size: 2rem; /* Smaller font size on small screens */
+  }
+  .bbc-subtitle {
+    font-size: 1.25rem; /* Smaller font size on small screens */
+  }
+  .bbc-meta {
+    font-size: 0.9rem; /* Smaller font size on small screens */
+  }
+  .bbc-content {
+    font-size: 1rem; /* Smaller font size on small screens */
+  }
+}
+
 .confetti {
   position: absolute;
   width: 5px;
@@ -275,3 +292,4 @@ function getRandomAvatarUrl() {
   }
 }
 </style>
+

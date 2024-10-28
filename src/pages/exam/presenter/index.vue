@@ -6,5 +6,5 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import ExamPlayer from '../../../components/resourcePlayers/polls/ExamPlayerPresenter.vue'
+import ExamPlayer from '@/components/resourcePlayers/test/TestPlayer.vue'
 </script>

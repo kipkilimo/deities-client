@@ -1,0 +1,1 @@
+import{b as o}from"./route-block-83d24a4e.js";import{_ as t}from"./_plugin-vue_export-helper-c27b6911.js";import{o as s,d as c,e as r}from"./index-29b1d87f.js";const e={},n=r("h1",null,"Dashboard customers (TODO)",-1),a=[n];function _(f,i){return s(),c("div",null,a)}typeof o=="function"&&o(e);const p=t(e,[["render",_]]);export{p as default};

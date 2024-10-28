@@ -1,51 +1,43 @@
-<template>
+ <template>
   <v-container
-    style="font-family: &quot;Inter&quot;, &quot;Noto Sans&quot;, sans-serif"
+    style="font-family: 'Inter', 'Noto Sans', sans-serif"
+    fluid
   >
     <!-- Top Row: Sort, Filter, Search Strip -->
     <v-row>
       <v-col cols="12">
         <v-row align="center">
           <!-- Sort Dropdown -->
-          <v-col cols="4">
+          <v-col cols="12" md="4">
             <v-select
               v-model="sortOption"
               :items="sortOptions"
               label="Sort by"
               dense
-              style="
-                max-height: 67%;
-                font-family: &quot;Inter&quot;, sans-serif;
-              "
+              style="max-height: 67%;"
             ></v-select>
           </v-col>
 
           <!-- Filter Dropdown -->
-          <v-col cols="4">
+          <v-col cols="12" md="4">
             <v-select
               v-model="filterOption"
               :items="filterOptions"
               label="Filter by"
               dense
-              style="
-                max-height: 67%;
-                font-family: &quot;Inter&quot;, sans-serif;
-              "
+              style="max-height: 67%;"
             ></v-select>
           </v-col>
 
           <!-- Search Field -->
-          <v-col cols="4">
+          <v-col cols="12" md="4">
             <v-text-field
               v-model="searchQuery"
               label="Search"
               clearable
               dense
               prepend-inner-icon="mdi-file-search"
-              style="
-                max-height: 67%;
-                font-family: &quot;Inter&quot;, sans-serif;
-              "
+              style="max-height: 67%;"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -57,7 +49,7 @@
     <!-- Bottom Row: Two Column Layout -->
     <v-row>
       <!-- Right Column: Selected Resource -->
-      <v-col cols="10">
+      <v-col cols="12" md="10">
         <v-card
           fluid
           v-if="!resourceComponent"
@@ -69,7 +61,6 @@
             justify-content: center;
             cursor: pointer;
             border-radius: 5px 5px 0px 0px !important;
-            font-family: &quot;Noto Sans&quot;, sans-serif;
           "
         >
           <v-img
@@ -86,11 +77,11 @@
         </v-container>
       </v-col>
       <!-- Left Column: Resource Iterator Cards -->
-      <v-col cols="2">
+      <v-col cols="12" md="2">
         <!-- Container for vertical scrolling -->
         <v-row
           class="overflow-y-auto mt-1"
-          style="height: 400px; max-height: 400px; overflow-y: auto"
+          style="height: 400px; max-height: 400px;"
         >
           <v-col
             v-for="(resource, index) in sortedAndFilteredResources"
@@ -102,7 +93,6 @@
               class="mb-2"
               height="4.5rem"
               @click="selectResource(resource)"
-              style="font-family: &quot;Noto Sans&quot;, sans-serif"
             >
               <v-row no-gutters>
                 <!-- Left Column: Image -->
@@ -132,44 +122,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeMount } from "vue";
-import VideoPlayer from "../resourcePlayers/video/VideoPlayer.vue";
-import AudioPlayer from "../resourcePlayers/audio/AudioPlayer.vue";
-import ImagePlayer from "../resourcePlayers/images/ImagePlayer.vue";
-import DatasetPlayer from "../resourcePlayers/datasets/DatasetPlayer.vue";
-import DocumentPlayer from "../resourcePlayers/pdf/DocumentPlayer.vue";
-import SlidesPlayer from "../resourcePlayers/presentation/SlidesPlayer.vue";
-import TestPlayer from "../resourcePlayers/test/TestPlayer.vue";
-import PosterPlayer from "../resourcePlayers/posters/PosterPlayer.vue";
-import EventPlayer from "../resourcePlayers/events/EventPlayer.vue";
-import ArticlePlayer from "../resourcePlayers/articles/ArticlePlayer.vue";
-import PollPlayer from "../resourcePlayers/polls/PollPlayerParticipant.vue";
-import JobPlayer from "../resourcePlayers/jobs/JobPlayer.vue";
-import AssignmentTaskPlayer from "../resourcePlayers/tasks/AssignmentTaskPlayer.vue";
-import LinksPlayer from "../resourcePlayers/links/LinksPlayer.vue";
-import ModelPlayer from "../resourcePlayers/models/ModelPlayer.vue";
-import { useResourceStore } from "../../stores/resources"; // Replace with actual path
+import { ref, computed, onMounted, onBeforeMount, onBeforeUnmount } from "vue";
+// Import your components and store as needed
+import { useResourceStore } from "../../stores/resources"; // Adjust the path as necessary
 
 const resourceStore = useResourceStore();
-
-// Define ResourceType as a constant object with keys
-const ResourceType = {
-  AUDIO: "AUDIO",
-  VIDEO: "VIDEO",
-  IMAGES: "IMAGES",
-  DOCUMENT: "DOCUMENT",
-  PRESENTATION: "PRESENTATION",
-  EVENT: "EVENT",
-  DATASET: "DATASET",
-  LINK: "LINK",
-  POLL: "POLL",
-  TEST: "TEST",
-  POSTER: "POSTER",
-  ARTICLE: "ARTICLE",
-  JOB: "JOB",
-  TASK: "TASK",
-  MODEL: "MODEL",
-} as const;
 
 const sortOptions = ref(["Title", "Date Created", "Subject"]);
 const filterOptions = ref(["Biostatistics", "Probability Theory"]);
@@ -181,7 +138,7 @@ const showMedia = ref(false);
 
 const truncateText = (text: string | undefined, length: number) => {
   if (!text) {
-    return ""; // or return a default value or an empty string
+    return ""; // Default return value
   }
   return text.length > length ? text.substring(0, length) + "..." : text;
 };
@@ -220,46 +177,6 @@ const selectResource = async (resource: any) => {
   showMedia.value = true;
 };
 
-const resourceComponent = computed(() => {
-  if (!selectedResource.value) return null;
-
-  const componentMap = {
-    [ResourceType.VIDEO]: VideoPlayer,
-    [ResourceType.AUDIO]: AudioPlayer,
-    [ResourceType.IMAGES]: ImagePlayer,
-    [ResourceType.DATASET]: DatasetPlayer,
-    [ResourceType.DOCUMENT]: DocumentPlayer,
-    [ResourceType.PRESENTATION]: SlidesPlayer,
-    [ResourceType.TEST]: TestPlayer,
-    [ResourceType.POSTER]: PosterPlayer,
-    [ResourceType.EVENT]: EventPlayer,
-    [ResourceType.ARTICLE]: ArticlePlayer,
-    [ResourceType.POLL]: PollPlayer,
-    [ResourceType.JOB]: JobPlayer,
-    [ResourceType.TASK]: AssignmentTaskPlayer,
-    [ResourceType.LINK]: LinksPlayer,
-    [ResourceType.MODEL]: ModelPlayer,
-  };
-  // @ts-ignore
-  return componentMap[selectedResource.value.contentType];
-});
-const currentIndex = ref(0);
-
-// Assuming resourceStore is already imported and used in your setup
-const resources = ref(resourceStore.resources);
-
-const updateIndex = () => {
-  currentIndex.value = (currentIndex.value + 1) % (resources.value.length || 1);
-};
-
-onMounted(() => {
-  const intervalId = setInterval(updateIndex, 15000); // Update every 15 seconds
-
-  // Clean up the interval on component unmount
-  onBeforeUnmount(() => {
-    clearInterval(intervalId);
-  });
-});
 // Fetch resources before mounting the component
 onBeforeMount(async () => {
   const queryParams = [
@@ -273,9 +190,14 @@ onBeforeMount(async () => {
     },
   ];
   await resourceStore.getAllSpecificTypeResources(JSON.stringify(queryParams));
-  selectResource(resourceStore.resources[currentIndex.value]);
+  selectResource(resourceStore.resources[0]);
+});
+
+onMounted(() => {
+  // Setup interval logic if necessary
 });
 </script>
+
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans:wght@400;700&display=swap");
 
@@ -296,5 +218,15 @@ onBeforeMount(async () => {
 .v-card-subtitle,
 .v-card-text {
   font-weight: 400;
+}
+
+/* Add media queries for more specific styling adjustments if needed */
+@media (max-width: 600px) {
+  .v-card {
+    height: auto; /* Adjust card height on smaller screens */
+  }
+  .v-row {
+    flex-direction: column; /* Stack rows on smaller screens */
+  }
 }
 </style>
