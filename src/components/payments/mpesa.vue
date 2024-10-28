@@ -117,7 +117,6 @@ const success = ref(null);
 const error = ref(null);
 const isLoading = ref(false);
 const isFormValid = ref(true);
-
 const handlePublicationCreditsPaymentViaMpesa = async () => {
   const paymentsStore = usePaymentsStore();
   isLoading.value = true;
@@ -125,20 +124,30 @@ const handlePublicationCreditsPaymentViaMpesa = async () => {
     const retrievedPurchaseDetails = JSON.parse(
       localStorage.getItem("creditPurchaseDetails") || "{}"
     );
+    console.log({ retrievedPurchaseDetails });
     var lastNine = phone_number.value.slice(-9);
     const phone_number_full = `254${lastNine}`;
     const vals = {
-      payment_phone_number: phone_number_full,
+      userId: userId,
+      paymentPhoneNumber: phone_number_full,
       paidAmount: String(
         Number(retrievedPurchaseDetails.paidAmount) * DOLLAR_RATE
       ),
-      paying_entity_email_address: retrievedPurchaseDetails.donorEmail,
-      paying_entity: retrievedPurchaseDetails.donorName,
+      departmentId: retrievedPurchaseDetails.departmentId,
+      transactionEntity: retrievedPurchaseDetails.payersName,
     };
 
-    await paymentsStore.publicationCreditsPaymentViaMpesa(vals);
-    success.value = "Purchase successfully sent. Thank you!";
-    isLoading.value = false;
+    const response =
+      await paymentsStore.publicationCreditsPaymentViaMpesa(vals);
+    console.log({ paymentResponse: response });
+    if (response.transactionReferenceNumber.length === 12) {
+      success.value = "Success. Publication credits have been updated.";
+    }
+    setTimeout(() => {
+      isLoading.value = false;
+      window.location.href = "/dashboard/my-account";
+      success.value = null
+    }, 4200);
   } catch (err) {
     error.value = err.message.replace("GraphQL error:", "").trim();
     isLoading.value = false;

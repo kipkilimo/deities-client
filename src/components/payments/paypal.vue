@@ -357,6 +357,7 @@ const saveItems = () => {
     payersName: transactionEntity.value,
     payersEmail: departmentId.value,
     paidAmount: paidAmount,
+    departmentId:departmentId.value,
   };
   localStorage.setItem("creditPurchaseDetails", JSON.stringify(itemsObject));
 };

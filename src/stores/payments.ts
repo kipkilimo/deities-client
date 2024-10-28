@@ -50,7 +50,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
         }, 1800);
       }
     },
-    async handlePublicationCreditsPaymentViaMpesa(vals: {
+    async publicationCreditsPaymentViaMpesa(vals: {
       userId: string;
       transactionReferenceNumber: string; // Ensure this field is present in vals
       paidAmount: string;
@@ -61,12 +61,13 @@ export const usePaymentsStore = defineStore("paymentStore", {
     }) {
       const ACCESS_TOKEN_CHECKOUT_MPESA = gql`
         mutation publicationCreditsPaymentViaMpesa(
-          $userId: ID!
+          $userId: String!
           $paidAmount: String!
           $transactionReferenceNumber: String
           $paymentPhoneNumber: String!
           $transactionEntity: String!
           $departmentId: String
+          $discussionGroupId: String
         ) {
           publicationCreditsPaymentViaMpesa(
             userId: $userId
@@ -75,6 +76,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
             paymentPhoneNumber: $paymentPhoneNumber
             transactionEntity: $transactionEntity
             departmentId: $departmentId
+            discussionGroupId: $discussionGroupId
           ) {
             _id
           }
@@ -92,12 +94,11 @@ export const usePaymentsStore = defineStore("paymentStore", {
 
             transactionEntity: vals.transactionEntity,
             departmentId: vals.departmentId,
+            discussionGroupId: vals.discussionGroupId,
           },
         });
         console.log(result);
-        setTimeout(() => {
-          window.location.href = "/dashboard/my-account";
-        }, 1800);
+        return result;
       } catch (error) {
         console.error("MPESA Payment error: ", error);
       }
@@ -118,6 +119,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
           $paidAmount: String!
           $transactionEntity: String!
           $departmentId: String
+          $discussionGroupId: String
         ) {
           publicationCreditsPaymentViaPaypal(
             userId: $userId
@@ -125,6 +127,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
             paidAmount: $paidAmount
             transactionEntity: $transactionEntity
             departmentId: $departmentId
+            discussionGroupId: $discussionGroupId
           ) {
             _id
           }
@@ -140,6 +143,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
             paidAmount: String(vals.paidAmount),
             transactionEntity: vals.transactionEntity, // Ensure this is present too
             departmentId: vals.departmentId,
+            discussionGroupId: vals.discussionGroupId,
           },
         });
         console.log(result);
