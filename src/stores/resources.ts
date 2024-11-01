@@ -283,6 +283,63 @@ export const useResourceStore = defineStore("resource", {
         console.error("Error fetching resources:", error);
       }
     },
+    async getAllMockExams(resourceType: string) {
+      const GET_MOCK_EXAMS = gql`
+        query ($resourceType: String!) {
+          getAllMockExams(resourceType: $resourceType) {
+            id
+            title
+            description
+            examMetaInfo {
+              examDate
+              examStartTime
+              examDuration
+              examQuestionsSet
+              # examAnswersKey
+              examEndTime
+              selectedTypes
+              numberOfQuestions {
+                SCQ
+                MCQ
+                ATF
+                ETF
+                VSAQ
+                SAQ
+                LEQ
+              }
+              testMeta {
+                testType
+                numberOfQuestions
+              }
+            }
+            subject
+            topic
+            createdBy {
+              id
+            }
+            createdAt
+            sessionId
+            accessKey
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: GET_MOCK_EXAMS,
+          variables: { resourceType },
+        });
+
+        const exams = response.data.getAllMockExams;
+        if (exams) {
+          this.exams = JSON.stringify(exams);
+        } else {
+          throw new Error("Failed to fetch resource");
+        }
+      } catch (error) {
+        console.error("Error fetching resource:", error);
+      }
+    },
     async getAllSpecificTypeResources(resourceType: string) {
       const SPECIFIC_RESOURCE_TYPE = gql`
         query ($resourceType: String!) {
@@ -292,6 +349,7 @@ export const useResourceStore = defineStore("resource", {
             contentType
             viewsNumber
             likesNumber
+            content
             sharesNumber
             subject
             topic
@@ -306,12 +364,8 @@ export const useResourceStore = defineStore("resource", {
           query: SPECIFIC_RESOURCE_TYPE,
           variables: { resourceType },
         });
-        const resources = response.data?.getAllSpecificTypeResources;
-        if (resources) {
-          this.resources = resources;
-        } else {
-          throw new Error("Failed to fetch resources");
-        }
+        const resources = response.data.getAllSpecificTypeResources;
+        this.resources = resources;
       } catch (error) {
         console.error("Error fetching resources:", error);
       }
@@ -409,10 +463,10 @@ export const useResourceStore = defineStore("resource", {
         console.error("Error fetching resource:", error);
       }
     },
-    async getCurrentExam(sessionId: string) {
+    async getCurrentExam(sessionId: string, examType: string) {
       const GET_CURRENT_EXAM = gql`
-        query ($sessionId: String!) {
-          getCurrentExam(sessionId: $sessionId) {
+        query ($sessionId: String!, $examType: String) {
+          getCurrentExam(sessionId: $sessionId, examType: $examType) {
             id
             title
             participants
@@ -454,7 +508,7 @@ export const useResourceStore = defineStore("resource", {
       try {
         const response = await client.query({
           query: GET_CURRENT_EXAM,
-          variables: { sessionId },
+          variables: { sessionId, examType },
         });
 
         const exam = response.data.getCurrentExam;
@@ -466,6 +520,12 @@ export const useResourceStore = defineStore("resource", {
       } catch (error) {
         console.error("Error fetching resource:", error);
       }
+    },
+    setCurrentExam(exam: any) {
+      this.exam = JSON.stringify(exam);
+    },
+    setCurrentExams(exams: any) {
+      this.exams = JSON.stringify(exams);
     },
     async getPublisherLatestExams(userId: string) {
       const GET_LATEST_EXAMS = gql`

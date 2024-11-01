@@ -1,6 +1,6 @@
- <template>
+<template>
   <v-container
-    style="font-family: 'Inter', 'Noto Sans', sans-serif"
+    style="font-family: &quot;Inter&quot;, &quot;Noto Sans&quot;, sans-serif"
     fluid
   >
     <!-- Top Row: Sort, Filter, Search Strip -->
@@ -14,7 +14,7 @@
               :items="sortOptions"
               label="Sort by"
               dense
-              style="max-height: 67%;"
+              style="max-height: 67%"
             ></v-select>
           </v-col>
 
@@ -25,7 +25,7 @@
               :items="filterOptions"
               label="Filter by"
               dense
-              style="max-height: 67%;"
+              style="max-height: 67%"
             ></v-select>
           </v-col>
 
@@ -37,7 +37,7 @@
               clearable
               dense
               prepend-inner-icon="mdi-file-search"
-              style="max-height: 67%;"
+              style="max-height: 67%"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -51,8 +51,8 @@
       <!-- Right Column: Selected Resource -->
       <v-col cols="12" md="10">
         <v-card
+          v-if="!currentEvent"
           fluid
-          v-if="!resourceComponent"
           @click="selectResource(resourceStore.resources[0])"
           height="63vh"
           style="
@@ -71,9 +71,9 @@
           ></v-img>
         </v-card>
 
-        <v-container fluid v-if="selectedResource && showMedia">
+        <v-container fluid v-if="currentEvent && showMedia">
           <!-- Dynamic Resource Renderer -->
-          <component :is="resourceComponent" :resource="selectedResource" />
+          <EventPlayer />
         </v-container>
       </v-col>
       <!-- Left Column: Resource Iterator Cards -->
@@ -81,7 +81,7 @@
         <!-- Container for vertical scrolling -->
         <v-row
           class="overflow-y-auto mt-1"
-          style="height: 400px; max-height: 400px;"
+          style="height: 400px; max-height: 400px"
         >
           <v-col
             v-for="(resource, index) in sortedAndFilteredResources"
@@ -125,8 +125,15 @@
 import { ref, computed, onMounted, onBeforeMount, onBeforeUnmount } from "vue";
 // Import your components and store as needed
 import { useResourceStore } from "../../stores/resources"; // Adjust the path as necessary
-
 const resourceStore = useResourceStore();
+const retrievedParamsRaw = resourceStore.resource.content;
+
+// Sort the URLs
+// Assuming you have retrieved paramsObjRaw from storage or API
+const retrievedParams = retrievedParamsRaw
+  ? JSON.parse(retrievedParamsRaw)
+  : [];
+const currentEvent = retrievedParams[0];
 
 const sortOptions = ref(["Title", "Date Created", "Subject"]);
 const filterOptions = ref(["Biostatistics", "Probability Theory"]);

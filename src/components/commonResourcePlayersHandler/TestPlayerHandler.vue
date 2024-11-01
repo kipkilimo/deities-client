@@ -1,45 +1,7 @@
 <template>
   <v-container>
     <!-- Top Row: Sort, Filter, Search Strip -->
-    <v-row>
-      <v-col cols="12">
-        <v-row align="center">
-          <!-- Sort Dropdown -->
-          <v-col cols="4">
-            <v-select
-              v-model="sortOption"
-              :items="sortOptions"
-              label="Sort by"
-              dense
-              style="max-height: 67%"
-            ></v-select>
-          </v-col>
-
-          <!-- Filter Dropdown -->
-          <v-col cols="4">
-            <v-select
-              v-model="filterOption"
-              :items="filterOptions"
-              label="Filter by"
-              dense
-              style="max-height: 67%"
-            ></v-select>
-          </v-col>
-
-          <!-- Search Field -->
-          <v-col cols="4">
-            <v-text-field
-              v-model="searchQuery"
-              label="Search"
-              clearable
-              dense
-              prepend-inner-icon="mdi-file-search"
-              style="max-height: 67%"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
+ 
 
     <v-divider class="mb-2" />
 

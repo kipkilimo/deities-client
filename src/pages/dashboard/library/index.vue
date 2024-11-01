@@ -294,6 +294,12 @@ function goToResourceRenderer(resource: { type: string }) {
     },
   ];
   localStorage.setItem("queryParams", JSON.stringify(fetchParams));
+  if (resource.type === "TEST") {
+    router.push("/exam/mocks");
+
+    resourceFilterOptionsSelected.value = false;
+    return;
+  }
   router.push("/dashboard/player");
   resourceFilterOptionsSelected.value = false;
 }

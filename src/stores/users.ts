@@ -113,10 +113,10 @@ export const useUserStore = defineStore("login", {
 
         if (user) {
           this.user = user;
-          console.log({ user });
 
           // Navigate to login
         }
+        // @ts-ignore
         window.location = "/auth/activate";
       } catch (error) {
         console.error("Error registering user:", error);

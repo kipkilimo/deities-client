@@ -128,8 +128,6 @@
           </template>
 
           <template v-slot:title> NEMBio publication credits </template>
-
-
         </v-list-item>
 
         <v-divider></v-divider>
@@ -211,13 +209,11 @@
         <paypal />
       </v-card>
     </v-dialog>
-
- 
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onBeforeMount, watch } from "vue";
+import { ref, computed, onMounted, onBeforeMount, watch } from "vue";
 import { useResourceStore } from "../../stores/resources"; // Replace with actual path
 const userId = ref(localStorage.getItem("sessionId")); // Retrieve userId from local storage
 const creditBalanceDialog = ref(false);
@@ -267,9 +263,8 @@ onBeforeMount(async () => {
 });
 // Define the form data
 const formData = ref({
-  title: "Poisson distribution",
-  description:
-    "In probability theory and statistics, the Poisson distribution is a discrete probability distribution that expresses the probability of a given number of events occurring in a fixed interval of time if these events occur with a known constant mean rate and independently of the time since the last event.",
+  title: "",
+  description:   "",
   subject: "",
   topic: "",
   targetRegion: "",
@@ -277,13 +272,25 @@ const formData = ref({
   targetCountry: "",
   language: "",
   resourceType: "",
-  keywords: ["poisson", "model", "distributions", "probability"] as string[],
-  createdBy: "user-id", // Replace with dynamic user ID
+  keywords: ["", "", "", ""] as string[],
+  createdBy: "", // Replace with dynamic user ID
 });
 const user_credits = ref(
   // @ts-ignore
   Number(useUserStore().user.personalInfo.publication_credits)
 );
+//
+onMounted(() => {
+  // Run the same logic directly in `onMounted`
+
+  const required_credits = 5;
+
+  if (user_credits.value < required_credits) {
+    creditBalanceDialog.value = true;
+  } else {
+    creditBalanceDialog.value = false;
+  }
+});
 // Watch for changes in resourceType
 watch(
   () => formData.value.resourceType,
@@ -297,21 +304,11 @@ watch(
 
     // Check if the user has enough credits
     if (user_credits.value < required_credits) {
-      console.log(
-        "Insufficient credits to publish this resource.",
-        required_credits,
-        user_credits.value
-      );
       creditBalanceDialog.value = true;
       return false;
     } else {
       creditBalanceDialog.value = false;
 
-      console.log(
-        "User has sufficient credits to publish this resource.",
-        required_credits,
-        user_credits.value
-      );
       return true;
     }
   }

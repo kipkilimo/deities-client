@@ -1,7 +1,8 @@
 <template>
   <v-container>
     <v-row>
-      <!-- Event Cover Image -->
+      <!-- Event Cover Image 
+      {{ currentEvent }}-->
       <v-col cols="12">
         <v-card
           flat

@@ -258,7 +258,7 @@ const submitSingleSigninLogin = async () => {
     // @ts-ignore
     Cookies.set("authToken", token, { expires: expirationDate });
 
-    router.push("/dashboard/overview");
+    router.push("/dashboard/library");
   } catch (error) {
     loginError.value = "Check your credentials."; // Set error message
     let errorMessage = loginError.value;
@@ -301,7 +301,7 @@ const orcIDAuthenticate = async () => {
     // @ts-ignore
     Cookies.set("authToken", token, { expires: 7 }); // Expires in 7 days
 
-    router.push("/dashboard/overview");
+    router.push("/dashboard/library");
   } catch (error) {
     loginError.value = "Check your credentials."; // Set error message
     let errorMessage = loginError.value;
@@ -344,7 +344,7 @@ const submitLogin = async () => {
     // @ts-ignore
     Cookies.set("authToken", token, { expires: 7 }); // Expires in 7 days
 
-    router.push("/dashboard/overview");
+    router.push("/dashboard/library");
   } catch (error) {
     loginError.value = "Check your credentials."; // Set error message
     let errorMessage = loginError.value;

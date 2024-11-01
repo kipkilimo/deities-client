@@ -97,6 +97,12 @@
   </div>
 </template>
 
+
+
+
+
+
+
 <script setup>
 import { ref, computed, watch } from "vue";
 import { useResourceStore } from "../../../stores/resources";

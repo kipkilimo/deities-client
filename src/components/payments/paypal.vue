@@ -496,7 +496,7 @@ onMounted(async () => {
                   transactionReferenceNumber: argParams.txnReference,
                 }) // eslint-disable-next-line
                 .then((response) => {
-                  window.location.href = "https://countysquare.co.ke/dashboard";
+                  window.location.href = "https://nem.bio/dashboard";
                 })
                 // eslint-disable-next-line
                 .catch((error) => {

@@ -5,125 +5,174 @@
       <v-col cols="12">
         <v-row align="center" justify="space-between">
           <!-- Sort Dropdown -->
-          <v-col cols="12" md="4">
+          <v-col :cols="isMobile ? 12 : 4">
             <v-select
               v-model="sortOption"
               :items="sortOptions"
               label="Sort by"
               dense
-              style="max-height: 67%"
+              class="sort-filter-select"
             ></v-select>
           </v-col>
 
           <!-- Filter Dropdown -->
-          <v-col cols="12" md="4">
+          <v-col :cols="isMobile ? 12 : 4">
             <v-select
               v-model="filterOption"
               :items="filterOptions"
               label="Filter by"
               dense
-              style="max-height: 67%"
+              class="sort-filter-select"
             ></v-select>
           </v-col>
 
           <!-- Search Field -->
-          <v-col cols="12" md="4">
+          <v-col :cols="isMobile ? 12 : 4">
             <v-text-field
               v-model="searchQuery"
               label="Search"
               clearable
               dense
               prepend-inner-icon="mdi-file-search"
-              style="max-height: 67%"
+              class="sort-filter-select"
             ></v-text-field>
           </v-col>
         </v-row>
       </v-col>
     </v-row>
 
-    <v-divider class="mb-2" />
+    <v-divider class="my-2" />
 
-    <!-- Bottom Row: Two Column Layout -->
+    <!-- Resource List and Selected Resource Display -->
     <v-row>
-      <!-- Left Column: Selected Resource -->
-      <v-col cols="12" md="10">
-        <v-card
-          fluid
-          v-if="!resourceComponent"
-          @click="selectResource(resourceStore.resources[0])"
-          height="63vh"
-          class="d-flex align-center justify-center"
-          style="cursor: pointer; border-radius: 5px 5px 0px 0px !important;"
-        >
-          <v-img
-            height="21vh"
-            class="mt-24 ma-4"
-            style="cursor: pointer"
-            src="https://cdn-icons-png.flaticon.com/512/907/907805.png"
-          ></v-img>
-        </v-card>
-
-        <v-container fluid v-if="selectedResource && showMedia">
-          <!-- Dynamic Resource Renderer -->
-          <component :is="resourceComponent" :resource="selectedResource" />
-        </v-container>
-      </v-col>
-
-      <v-col cols="12" md="2" class="pr-2">
-        <!-- Container for vertical scrolling -->
-        <v-row
-          class="overflow-y-auto mt-1"
-          style="height: 400px; max-height: 400px; overflow-y: auto"
-        >
-          <v-col
-            v-for="(resource, index) in sortedAndFilteredResources"
-            :key="resource.id"
-            class="pa-0"
+      <!-- For mobile, display only resource list -->
+      <template v-if="isMobile">
+        <v-col cols="12" class="pr-2">
+          <v-row
+            class="overflow-y-auto mt-1"
+            style="max-height: 70vh; overflow-y: auto"
           >
-            <v-card
-              class="mb-2 px-2 py-2"
-              height="8rem"
-              @click="selectResource(resource)"
-              elevation="2"
+            <v-col
+              v-for="(resource, index) in sortedAndFilteredResources"
+              :key="resource.id"
+              class="pa-0"
             >
-              <v-row no-gutters>
-                <v-col cols="3">
-                  <v-img
-                    height="4rem"
-                    width="4rem"
-                    :src="resource.coverImage"
-                    class="rounded"
-                  ></v-img>
-                </v-col>
+              <v-card
+                class="mb-2 px-2 py-2"
+                height="8rem"
+                @click="selectResource(resource)"
+                elevation="2"
+              >
+                <v-row no-gutters>
+                  <v-col cols="3">
+                    <v-img
+                      height="4rem"
+                      width="4rem"
+                      :src="resource.coverImage"
+                      class="rounded"
+                    ></v-img>
+                  </v-col>
 
-                <v-col cols="9" class="pl-2">
-                  <v-card-title
-                    class="text-body-1 font-weight-medium mb-1"
-                    style="font-size: 1rem"
-                  >
-                    {{ resource.title }}
-                  </v-card-title>
+                  <v-col cols="9" class="pl-2">
+                    <v-card-title
+                      class="text-body-1 font-weight-medium mb-1"
+                      style="font-size: 1rem"
+                    >
+                      {{ resource.title }}
+                    </v-card-title>
+                    <p class="text-caption font-weight-light">
+                      {{ truncateText(resource.description, 50) }}
+                    </p>
+                  </v-col>
+                </v-row>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-col>
+      </template>
 
-                  <h11 class="text-caption h7 font-weight-light mb-1">
-                    <span>{{ resource.subject }}</span> |
-                    <span>{{ resource.topic }}</span>
-                  </h11>
+      <!-- For desktop, show selected resource on left and resource list on right -->
+      <template v-else>
+        <v-col cols="10">
+          <v-card
+            v-if="!resourceComponent"
+            @click="selectResource(resourceStore.resources[0])"
+            class="d-flex align-center justify-center resource-placeholder"
+          >
+            <v-img
+              height="21vh"
+              class="mt-24 ma-4"
+              src="https://cdn-icons-png.flaticon.com/512/907/907805.png"
+            ></v-img>
+          </v-card>
 
-                  <p
-                    class="text-caption font-weight-light"
-                    style="font-size: 0.8rem"
-                  >
-                    {{ truncateText(resource.description, 50) }}
-                  </p>
-                </v-col>
-              </v-row>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-col>
+          <v-container fluid v-if="selectedResource && showMedia">
+            <!-- Dynamic Resource Renderer -->
+            <component :is="resourceComponent" :resource="selectedResource" />
+          </v-container>
+        </v-col>
+
+        <v-col cols="2" class="pr-2">
+          <v-row
+            class="overflow-y-auto mt-1"
+            style="height: 400px; max-height: 400px; overflow-y: auto"
+          >
+            <v-col
+              v-for="(resource, index) in sortedAndFilteredResources"
+              :key="resource.id"
+              class="pa-0"
+            >
+              <v-card
+                class="mb-2 px-2 py-2"
+                height="8rem"
+                @click="selectResource(resource)"
+                elevation="2"
+              >
+                <v-row no-gutters>
+                  <v-col cols="3">
+                    <v-img
+                      height="4rem"
+                      width="4rem"
+                      :src="resource.coverImage"
+                      class="rounded"
+                    ></v-img>
+                  </v-col>
+
+                  <v-col cols="9" class="pl-2">
+                    <v-card-title
+                      class="text-body-1 font-weight-medium mb-1"
+                      style="font-size: 1rem"
+                    >
+                      {{ resource.title }}
+                    </v-card-title>
+                    <p class="text-caption font-weight-light">
+                      {{ truncateText(resource.description, 50) }}
+                    </p>
+                  </v-col>
+                </v-row>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-col>
+      </template>
     </v-row>
   </v-container>
 </template>
+ 
+<style scoped>
+.sort-filter-select {
+  max-height: 67%;
+}
+.resource-placeholder {
+  cursor: pointer;
+  border-radius: 5px 5px 0px 0px !important;
+}
+.text-caption {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+</style>
 
 <script setup lang="ts">
 import { ref, computed, onBeforeMount } from "vue";
