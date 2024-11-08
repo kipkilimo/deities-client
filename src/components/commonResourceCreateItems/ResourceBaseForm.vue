@@ -135,7 +135,7 @@
         <v-card-text class="text-medium-emphasis pa-3">
           <div class="text-h5 font-weight-black mb-2">
             My publication credits:
-            {{ useUserStore().user.personalInfo.publication_credits }}
+            {{ useUserStore().user?.personalInfo.publication_credits }}
           </div>
 
           <v-progress-linear
@@ -143,7 +143,7 @@
             class="mb-6"
             color="primary"
             height="10"
-            :model-value="useUserStore().user.personalInfo.publication_credits"
+            :model-value="useUserStore().user?.personalInfo.publication_credits"
             rounded="pill"
           ></v-progress-linear>
 
@@ -235,7 +235,8 @@ const publication_credit_charges = [
   { type: "🗓️ EVENTS", key: "EVENT", credits: 100 },
   { type: "⛁⛁ DATASETS", key: "DATASET", credits: 20 },
   { type: "🗣️📊 LIVE POLLS", key: "POLL", credits: 50 },
-  { type: "🎴 ABSTRACT POSTERS", key: "POSTER", credits: 200 },
+  { type: "🖥👩🏻‍💻⌨ PROGRAMMING", key: "COMPUTING", credits: 1000 },
+  { type: "🎴 ABSTRACT POSTERS", key: "POSTER", credits: 1000 },
   { type: "📁 WORK STUDY", key: "MIXED", credits: 225 },
   { type: "⛓️ RESOURCE LINKS", key: "LINK", credits: 5 },
   { type: "🎲 CLINICAL MODELS", key: "MODEL", credits: 10 },

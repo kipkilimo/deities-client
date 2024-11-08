@@ -4,45 +4,7 @@
     fluid
   >
     <!-- Top Row: Sort, Filter, Search Strip -->
-    <v-row>
-      <v-col cols="12">
-        <v-row align="center">
-          <!-- Sort Dropdown -->
-          <v-col cols="12" md="4">
-            <v-select
-              v-model="sortOption"
-              :items="sortOptions"
-              label="Sort by"
-              dense
-              style="max-height: 67%"
-            ></v-select>
-          </v-col>
-
-          <!-- Filter Dropdown -->
-          <v-col cols="12" md="4">
-            <v-select
-              v-model="filterOption"
-              :items="filterOptions"
-              label="Filter by"
-              dense
-              style="max-height: 67%"
-            ></v-select>
-          </v-col>
-
-          <!-- Search Field -->
-          <v-col cols="12" md="4">
-            <v-text-field
-              v-model="searchQuery"
-              label="Search"
-              clearable
-              dense
-              prepend-inner-icon="mdi-file-search"
-              style="max-height: 67%"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
+ 
 
     <v-divider class="mb-2" />
 
@@ -80,7 +42,7 @@
       <v-col cols="12" md="2">
         <!-- Container for vertical scrolling -->
         <v-row
-          class="overflow-y-auto mt-1"
+          class="overflow-y-auto mt-9"
           style="height: 400px; max-height: 400px"
         >
           <v-col
@@ -122,7 +84,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeMount, onBeforeUnmount } from "vue";
+import {
+  ref,
+  watch,
+  computed,
+  onMounted,
+  onBeforeMount,
+  onBeforeUnmount,
+} from "vue";
 // Import your components and store as needed
 import { useResourceStore } from "../../stores/resources"; // Adjust the path as necessary
 const resourceStore = useResourceStore();
@@ -181,9 +150,26 @@ const selectResource = async (resource: any) => {
   showMedia.value = false;
   await resourceStore.fetchResource(resource.id);
   selectedResource.value = resourceStore.resource;
+};
+// Function to select the first resource and show media
+const selectFirstResource = () => {
+  selectResource(resourceStore.resources[0]);
   showMedia.value = true;
 };
 
+// Watch for changes in currentEvent
+watch(currentEvent, (newValue) => {
+  if (newValue) {
+    // Add any conditions here based on newValue if needed
+    setTimeout(selectFirstResource, 300); // Delay action by 300ms
+  }
+});
+
+// Run once on component mount
+onMounted(() => {
+  // Initial setup logic if necessary
+  setTimeout(selectFirstResource, 300);
+});
 // Fetch resources before mounting the component
 onBeforeMount(async () => {
   const queryParams = [
@@ -197,11 +183,7 @@ onBeforeMount(async () => {
     },
   ];
   await resourceStore.getAllSpecificTypeResources(JSON.stringify(queryParams));
-  selectResource(resourceStore.resources[0]);
-});
-
-onMounted(() => {
-  // Setup interval logic if necessary
+  //
 });
 </script>
 

@@ -21,9 +21,22 @@ export const topics = {
                 "Classification algorithms in biometrics",
                 "Recognition techniques for biometric systems",
                 "Preprocessing of biometric data for analysis",
-                "Practical exercises using computational tools"
+                "Practical exercises using computational tools",
+                "Understanding and calculating Risk Ratios (RR)",
+                "Understanding and calculating Odds Ratios (OR)",
+                "Understanding and calculating Hazard Ratios (HR)",
+                "Introduction to Probability Distributions in biometrics",
+                "Normal distribution and its applications in biometrics",
+                "Binomial distribution and its relevance to classification",
+                "Poisson distribution in event-counting applications",
+                "Conducting z-tests for large-sample comparisons",
+                "Performing t-tests for comparing means",
+                "Applying chi-square tests for categorical data analysis",
+                "McNemar's test for paired categorical data",
+                "Fisher's exact test for small sample categorical data"
             ]
         },
+
         "Applied Regression Analysis": {
             "condensed": "Applied Regression Analysis",
             "topics": [

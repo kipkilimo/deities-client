@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container> 
     <v-row>
       <!-- Event Cover Image 
       {{ currentEvent }}-->
@@ -63,8 +63,8 @@
           <v-card-text class="text-body-1">
             <v-subheader class="text-h6">Description</v-subheader>
             <p>{{ currentEvent.description }}</p>
- 
-            <v-subheader class=" text-h6">Keynote Speakers</v-subheader>
+
+            <v-subheader class="text-h6">Keynote Speakers</v-subheader>
             <ul>
               <li
                 v-for="(speaker, index) in currentEvent.keynote_speakers"
@@ -76,10 +76,8 @@
                 {{ speaker.affiliation }} ({{ speaker.expertise }})
               </li>
             </ul>
- 
-            <v-subheader class=" text-h6"
-              >Registration & Budget</v-subheader
-            >
+
+            <v-subheader class="text-h6">Registration & Budget</v-subheader>
             <v-card-subtitle class="text-body-2 mb-1">
               <v-icon left small class="mr-1">mdi-cash</v-icon>
               Registration Fee: {{ currentEvent.registration.fee | currency }}
@@ -97,14 +95,14 @@
                 >Register Here</a
               >
             </v-card-subtitle>
- 
+
             <v-subheader class="mb-2 text-h6">Networking Events</v-subheader>
             <v-row>
               <v-chip
                 v-for="(networkEvent, index) in currentEvent.networking_events"
                 :key="index"
                 outlined
-                class="mr-2  mt-3"
+                class="mr-2 mt-3"
               >
                 <v-icon left small class="mr-1">mdi-handshake</v-icon>
                 {{ networkEvent }}
@@ -114,9 +112,7 @@
 
           <!-- Accessibility Features -->
           <v-card-text class="text-body-1">
-            <v-subheader class=" text-h6"
-              >Accessibility Features</v-subheader
-            >
+            <v-subheader class="text-h6">Accessibility Features</v-subheader>
             <v-list dense>
               <v-list-item
                 v-for="(feature, index) in currentEvent.accessibility.features"
@@ -136,14 +132,28 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onBeforeMount } from "vue";
 import { useResourceStore } from "@/stores/resources";
 
 const resourceStore = useResourceStore();
 
 // Slide URLs
 const retrievedParamsRaw = resourceStore.resource.content;
-
+// Fetch resources before mounting the component
+onBeforeMount(async () => {
+  const queryParams = [
+    {
+      resourceType: "EVENT",
+      subject: "",
+      topic: "",
+      country: "",
+      targetRegion: "",
+      language: "",
+    },
+  ];
+  await resourceStore.getAllSpecificTypeResources(JSON.stringify(queryParams));
+  // selectResource(resourceStore.resources[0]);
+});
 // Sort the URLs
 // Assuming you have retrieved paramsObjRaw from storage or API
 const retrievedParams = JSON.parse(retrievedParamsRaw);

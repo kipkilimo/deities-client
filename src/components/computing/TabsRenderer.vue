@@ -7,10 +7,10 @@
         <v-app-bar color="white" flat>
           <v-list-item class="text-h6">
             <template v-slot:title>
-              <h2>Computational Methods in Epidemiology and Biostatistics</h2>
+              <h2>Resources by NEMBio Contributors</h2>
             </template>
             <template v-slot:subtitle
-              >Resources by NEMBio Contributors</template
+              >Computational Methods in Epidemiology and Biostatistics</template
             >
           </v-list-item>
         </v-app-bar>
@@ -51,27 +51,28 @@
       </v-col>
 
       <!-- Content Column -->
-      <v-col cols="12"  class="no-margin-top">
+      <v-col cols="12" class="no-margin-top">
         <v-tabs
-          v-model="selectedLanguage"
+         v-model="selectedLanguage" 
           background-color="primary"
           dark
           grow
           class="no-margin-top"
         >
-          <v-tab v-for="lang in languages" :key="lang">
+          <v-tab 
+          v-model="selectedLanguage" v-for="lang in languages" :key="lang">
             <img
               :src="getIconForLanguage(lang)"
               alt="Language Icon"
-              style="width: 24px; height: 24px; margin-right: 8px"
+              style="width: 36px; height: 33px; margin-right: 8px"
             />
             {{ lang }}
           </v-tab>
         </v-tabs>
 
         <!-- Tab Content -->
-        <v-tabs-items v-model="selectedLanguage">
-          <v-tab-item v-for="lang in languages" :key="lang">
+        <v-tabs-window v-model="selectedLanguage">
+          <v-tabs-window-item v-for="lang in languages" :key="lang">
             <!-- Card for Selected Subtopic -->
             <v-card v-if="selectedSubtopic" outlined class="">
               <v-card-title class="text-h5">{{
@@ -81,8 +82,8 @@
                 <div v-html="topicBlog"></div>
               </v-card-text>
             </v-card>
-          </v-tab-item>
-        </v-tabs-items>
+          </v-tabs-window-item>
+        </v-tabs-window>
       </v-col>
     </v-row>
   </v-container>
@@ -100,15 +101,16 @@ const selectedSubtopic = ref(null);
 const setActiveSubtopic = (subtopic) => {
   selectedSubtopic.value = subtopic;
 };
-const selectedLanguage = ref("");
-const languages = ref(["R", "Python", "Julia"]);
+const selectedLanguage = ref("R");
+const languages = ref(["STATA", "R", "Python"]);
 
 const getIconForLanguage = (lang) => {
   const icons = {
+    STATA:
+      "https://www.insightplatforms.com/wp-content/uploads/2019/09/stata_logo.png",
     R: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/R_logo.svg/724px-R_logo.svg.png",
     Python:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1869px-Python-logo-notext.svg.png",
-    Julia: "https://numfocus.org/wp-content/uploads/2016/07/julia-logo-300.png",
   };
   return icons[lang] || "path/to/default-icon.png"; // Fallback icon
 };
@@ -153,5 +155,4 @@ pre {
 .no-margin-top {
   margin-top: 0 !important;
 }
-
 </style>

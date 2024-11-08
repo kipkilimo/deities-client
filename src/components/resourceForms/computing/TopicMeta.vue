@@ -16,7 +16,7 @@
           <v-row dense>
             <v-col cols="12" sm="6">
               <v-autocomplete
-                :items="['R', 'Python', 'Julia']"
+                :items="['R', 'Python', 'STATA']"
                 label="Interests"
                 auto-select-first
               ></v-autocomplete>

@@ -1,17 +1,17 @@
 <template>
-  <v-container fluid  class="no-margin-top">
+  <v-container fluid class="no-margin-top">
     <v-row>
-      <v-col cols="12" md="3"  class="no-margin-top">
+      <v-col cols="12" md="3" class="no-margin-top">
         <v-app-bar color="white" flat>
           <v-list-item class="text-h6 ml-2">
             <template v-slot:title>
               <h4 class="bbc-subtitle">
-                Computational Methods in Epidemiology and Biostatistics
+                {{ selectedLanguage }}
+                Resources by NEMBio Contributors
               </h4>
-            </template>
-            <template v-slot:subtitle>
-              {{ languages[selectedLanguageIndex] }} Resources by NEMBio
-              Contributors
+              <p class="mb-1" style="cursor:pointer;" @click="showPlaceHolder=true">
+                Computational Methods in Epidemiology and Biostatistics
+              </p>
             </template>
           </v-list-item>
         </v-app-bar>
@@ -42,7 +42,7 @@
                     <v-list-item
                       v-for="topic in topic.topics"
                       :key="topic"
-                      @click="setActiveSubtopic(topic)"
+                      @click="setActiveSubtopic(topic),showPlaceHolder=false"
                       class="text-body-2"
                     >
                       {{ topic }}
@@ -56,11 +56,12 @@
       </v-col>
 
       <v-col cols="12">
-        <v-tabs background-color="primary" grow>
+        <v-tabs v-model="selectedLanguage" background-color="primary" grow>
           <v-tab
             v-for="(lang, index) in languages"
             :key="lang"
             @click="setLanguage(lang, index)"
+            :class="{ 'active-tab': lang === selectedLanguage }"
           >
             <v-img
               max-height="1.2rem"
@@ -77,10 +78,9 @@
           indeterminate
           v-if="showMediaLoading"
         ></v-progress-linear>
-
-        <v-tabs-items v-model="languages[selectedLanguageIndex]">
-          <v-tab-item
-            v-for="lang in fetchedLanguages"
+        <v-tabs-window v-model="selectedLanguage">
+          <v-tabs-window-item
+            v-for="lang in languages"
             :key="lang"
             :value="lang"
           >
@@ -88,7 +88,7 @@
               v-if="
                 (isComputingRoute &&
                   resourceStore.resource.contentType !== 'COMPUTING') ||
-                resourceStore.resource.content.length === ''
+                resourceStore.resource.content.length === '' || showPlaceHolder
               "
               style="
                 max-width: 75%;
@@ -97,15 +97,15 @@
                 background-color: #fff9eb !important;
                 align-items: left;
               "
-              class="bbc-content ml-4"
+              class="bbc-content ml-1mt-2"
             >
               <PlaceHolder />
             </div>
 
             <div
               v-if="
-                lang === languages[selectedLanguageIndex] &&
-                topicBlogLanguage === languages[selectedLanguageIndex]
+                lang === selectedLanguage &&
+                topicBlogLanguage === selectedLanguage && !showPlaceHolder
               "
             >
               <!-- v-html="topicBlogArticle" -->
@@ -133,7 +133,7 @@
                     <v-avatar size="56" class="mr-2 ml-2">
                       <v-img
                         :src="getRandomAvatarUrl()"
-                        :alt="languages[selectedLanguageIndex]"
+                        :alt="selectedLanguage"
                       />
                     </v-avatar>
                     <v-spacer />
@@ -141,7 +141,7 @@
                       variant="outlined"
                       color="grey"
                       @click="publishTopicContent(selectedSubtopic)"
-                      >Publish Chapter in {{ languages[selectedLanguageIndex] }}</v-btn
+                      >Publish Chapter in {{ selectedLanguage }}</v-btn
                     >
                     <v-spacer />
                   </v-card-actions>
@@ -243,8 +243,8 @@
                 </v-card>
               </div>
             </div>
-          </v-tab-item>
-        </v-tabs-items>
+          </v-tabs-window-item>
+        </v-tabs-window>
       </v-col>
     </v-row>
     <v-dialog
@@ -281,7 +281,7 @@
               style="cursor: pointer; transition: elevation 0.2s"
             >
               <v-img
-                max-height="50"
+                height="50px"
                 :src="getIconForLanguage(lang)"
                 alt="Language Icon"
                 class="icon mb-2"
@@ -290,6 +290,57 @@
             </v-card>
           </v-col>
         </v-row>
+      </v-card>
+    </v-dialog>
+    <v-dialog
+      v-model="setInitialLanguage"
+      max-width="450"
+      max-height="15rem"
+      persistent
+      style="overflow: hidden"
+    >
+      <v-card>
+        <v-toolbar
+          dense
+          flat
+          class="bbc-subtitle text-h5 primary pa-2 white--text"
+          style="text-align: center"
+        >
+          Set your programming language
+        </v-toolbar>
+
+        <v-card-actions class="d-flex justify-center">
+          <v-chip
+            v-for="(lang, index) in languages"
+            :key="lang"
+            @click="setInitialLanguageMethod(lang, index),showPlaceHolder=true"
+            :class="['ma-2', lang === selectedLanguage ? 'active-tab' : '']"
+            color="grey lighten-4"
+            outlined
+            size="large"
+            class="d-flex align-center pa-3"
+            style="
+              cursor: pointer;
+              font-size: 0.9rem;
+              border-radius: 24px;
+              transition: all 0.3s ease;
+            "
+          >
+            <v-img
+              :src="getIconForLanguage(lang)"
+              alt="Language Icon"
+              max-height="1.8rem"
+              class="mr-2"
+              style="width: 1.5rem; height: 1.5rem"
+            />
+            <span>{{ lang }}</span>
+          </v-chip>
+        </v-card-actions>
+        <v-divider />
+
+        <p class="text-h5 pa-2" style="cursor: pointer; font-family: 'Fira Code', monospace; font-size: 0.9rem; border-radius: 24px; transition: all 0.3s ease;text-align: center">
+          Happy coding!
+        </p>
       </v-card>
     </v-dialog>
   </v-container>
@@ -301,18 +352,13 @@ import { useResourceStore } from "../../../stores/resources";
 import PlaceHolder from "./PlaceHolder.vue";
 import { useRoute } from "vue-router";
 const isMobile = ref(false);
+const canShowContent = ref(false);
+const showPlaceHolder=ref(false)
+const setInitialLanguage = ref(true);
 const detectMobile = () => {
   isMobile.value = window.innerWidth <= 768;
 };
 
-onMounted(() => {
-  detectMobile(); // Initial check
-  window.addEventListener("resize", detectMobile); // Attach listener
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener("resize", detectMobile); // Clean up on unmount
-});
 const route = useRoute();
 const isComputingRoute = computed(() => route.path.endsWith("/computing"));
 const resourceStore = useResourceStore();
@@ -324,11 +370,39 @@ const topics = ref(biostatTopics);
 const selectedSubtopic = ref(null);
 const selectedLanguageIndex = ref(0); // Use index instead of direct language
 const fetchedLanguages = ref([]);
-const languages = ["R", "Python", "Julia"];
+const languages = ref(["STATA", "R", "Python"]);
 
-const fetchLanguages = async () => {
+const selectedLanguage = ref(languages[0]);
+onMounted(() => {
+  window.removeEventListener("resize", detectMobile); // Clean up on unmount
+  selectedLanguage.value = languages.value[selectedLanguageIndex.value];
+
+  selectedLanguageIndex.value = 0;
+  topicBlogLanguage.value = selectedLanguageIndex.value;
+  setTimeout(() => {
+    console.log({
+      a: selectedLanguage.value,
+
+      b: selectedLanguageIndex.value,
+      c: topicBlogLanguage.value,
+    });
+    canShowContent.value = true;
+  }, 1);
+});
+
+onBeforeUnmount(() => {
+  detectMobile(); // Initial check
+  window.addEventListener("resize", detectMobile); // Attach listener
+  fetchLanguages();
+
+  // localStorage.setItem(
+  //   "articleLanguage",
+  //   languages[selectedLanguageIndex.value]
+  // );
+});
+const fetchLanguages = () => {
   // Fetch languages (example hardcoded)
-  fetchedLanguages.value = ["R", "Python", "Julia"];
+  fetchedLanguages.value = languages.value;
 };
 
 watch(fetchLanguages, () => {}, { immediate: true });
@@ -336,10 +410,11 @@ watch(fetchLanguages, () => {}, { immediate: true });
 // Helper to get the icon for a language
 const getIconForLanguage = (lang) => {
   const icons = {
+    STATA:
+      "https://www.insightplatforms.com/wp-content/uploads/2019/09/stata_logo.png",
     R: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/R_logo.svg/724px-R_logo.svg.png",
     Python:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1869px-Python-logo-notext.svg.png",
-    Julia: "https://numfocus.org/wp-content/uploads/2016/07/julia-logo-300.png",
   };
   return icons[lang];
 };
@@ -358,8 +433,23 @@ function publishTopicContent(selectedSubtopic) {
 const setLanguage = (lang, index) => {
   console.log(lang, index);
   selectedLanguageIndex.value = index;
+
+  selectedLanguage.value = lang;
   topicBlogLanguage.value = lang;
   fetchResourceForLanguage(index);
+
+  setInitialLanguage.value = false;
+};
+const setInitialLanguageMethod = (lang, index) => {
+  console.log(lang, index);
+  selectedLanguageIndex.value = index;
+
+  selectedLanguage.value = lang;
+  topicBlogLanguage.value = lang;
+  selectedSubtopic.value = "Programming syntax for data analysis";
+  fetchResourceForLanguage(index);
+
+  setInitialLanguage.value = false;
 };
 const topicBlogTopic = ref("");
 const topicBlogArticle = ref("");
@@ -371,9 +461,10 @@ const fetchResourceForLanguage = async () => {
   }
   showMediaLoading.value = true;
   const reqParams = {
-    language: languages[selectedLanguageIndex.value],
+    language: selectedLanguage.value,
     topic: selectedSubtopic.value,
   };
+  // console.log({ reqParams });
 
   try {
     await resourceStore.fetchComputingResource(JSON.stringify(reqParams));
@@ -396,7 +487,7 @@ const fetchResourceForLanguage = async () => {
 // Handle subtopic click
 const setActiveSubtopic = async (subtopic) => {
   selectedSubtopic.value = subtopic;
-  fetchResourceForLanguage(selectedLanguageIndex.value);
+  fetchResourceForLanguage(selectedLanguage.value);
 };
 
 import timezoneConverter from "../../../utilities/timezoneConverter";
@@ -543,8 +634,8 @@ pre {
 }
 </style>
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap");
 
 .v-card {
   max-width: 800px;
@@ -564,7 +655,7 @@ pre {
 
 .bbc-title {
   font-family: "Lora", serif;
-  font-size: 54px;
+  font-size: 38px;
   font-weight: 700;
   line-height: 1.3;
   color: #222;
@@ -608,5 +699,12 @@ pre {
     opacity: 0;
     transform: translateY(50px) scale(0);
   }
+}
+</style>
+<style scoped>
+.active-tab {
+  border-bottom: 2px solid #1867c0;
+  max-width: 90%;
+  margin: 0 auto; /* Center the tabs within the container */
 }
 </style>

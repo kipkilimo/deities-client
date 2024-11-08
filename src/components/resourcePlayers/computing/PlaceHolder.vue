@@ -1,309 +1,206 @@
 <template>
-  <v-container fluid>
+  <v-container fluid class="ma-2">
     <v-row>
       <v-col>
         <v-card class="transparent-card" height="75vh" min-width="100%">
-          <v-container style="max-width: 80%; margin-left: 4%">
-            <h1 class="bbc-title">
-              Introduction to R Programming for Epidemiology and Biostatistics
-            </h1>
-            <v-banner
-              color="transparent"
-              min-width="100%"
-              small  
-              icon="mdi-clipboard-text-clock-outline"
-              lines="one"
-            >
-              <template v-slot:text>
-                Last updated on {{ millisToLongDate(1726320314497) }}
-              </template>
-            </v-banner>
-            <p class="bbc-content">
-              Epidemiology and biostatistics are the cornerstones of public
-              health research, providing essential tools for analyzing data and
-              drawing meaningful conclusions about health trends, disease
-              outbreaks, and the effectiveness of interventions. With the rapid
-              expansion of data in health science, the need for advanced
-              statistical analysis has become more critical than ever. Among the
-              many tools available for statistical analysis,
-              <strong>R programming</strong> stands out as one of the most
-              powerful and widely used.
-            </p>
+          <h2 class="bbc-title">
+            An Introduction to Programming for Epidemiology and Biostatistics: Comparing
+            STATA, R, and Python
+          </h2>
+          <v-banner
+            color="transparent"
+            min-width="100%"
+            small
+            icon="mdi-clipboard-text-clock-outline"
+            lines="one"
+          >
+            <template v-slot:text>
+              Last updated on {{ millisToLongDate(1726320314497) }}
+            </template>
+          </v-banner> 
+            <h3 class="bbc-content ml-2">
+              In the fields of epidemiology and biostatistics, data analysis and
+              statistical modeling are critical. Programming allows researchers
+              to process and analyze data more efficiently, test hypotheses, and
+              draw insights that inform public health decisions.
+            </h3> 
 
-            <p class="bbc-content">
-              In this article, we’ll explore the basics of R programming in the
-              context of epidemiology and biostatistics, highlighting how it can
-              be applied to analyze health data, conduct epidemiological
-              studies, and visualize results in a meaningful way.
-            </p>
+          <v-divider></v-divider>
 
-            <h2 class="bbc-subtitle">
-              Why Use R for Epidemiology and Biostatistics?
-            </h2>
+          <!-- Section for STATA -->
+          <v-card class="my-5">
+            <v-card-title>
+              <h3 class="bbc-subtitle">1. STATA</h3>
+            </v-card-title>
+            <v-card-text>
+              <p class="bbc-content">
+                <strong>Overview:</strong> STATA is a powerful tool for data
+                analysis, particularly well-suited for epidemiology and
+                biostatistics due to its extensive library of statistical
+                functions and specialized commands.
+              </p>
+              <h4>Strengths:</h4>
+              <ul class="bbc-subtitle ml-2">
+                <li>
+                  <strong>User-Friendly Interface:</strong> STATA’s graphical
+                  user interface is straightforward, making it easy for
+                  beginners.
+                </li>
+                <li>
+                  <strong>Specialized Statistical Functions:</strong> STATA
+                  includes functions for survival analysis, logistic regression,
+                  etc.
+                </li>
+                <li>
+                  <strong>Reproducibility:</strong> With command-based
+                  scripting, STATA supports reproducibility in research.
+                </li>
+                <li>
+                  <strong>Community and Documentation:</strong> STATA has
+                  excellent documentation and an active community.
+                </li>
+              </ul>
+              <h4>Weaknesses:</h4>
+              <ul class="bbc-subtitle ml-2">
+                <li>
+                  <strong>Limited Flexibility:</strong> STATA is highly
+                  specialized, limiting custom analyses or complex data
+                  manipulation.
+                </li>
+                <li>
+                  <strong>Cost:</strong> STATA is a paid software, and its
+                  licensing can be expensive.
+                </li>
+                <li>
+                  <strong>Limited Integration:</strong> STATA does not integrate
+                  seamlessly with external libraries or APIs.
+                </li>
+              </ul>
+            </v-card-text>
+          </v-card>
 
-            <p class="bbc-content">
-              R is a versatile, open-source programming language specifically
-              designed for statistical computing and data analysis. Its
-              popularity has soared in recent years, not just among
-              statisticians but also among epidemiologists, health scientists,
-              and biostatisticians. Here are some reasons why R is a great tool
-              for professionals in these fields:
-            </p>
+          <v-divider></v-divider>
 
-            <ul class="bbc-content">
-              <li>
-                <strong>Statistical Power:</strong> R is built for statistics.
-                It contains an enormous library of packages (such as
-                <code>survival</code>, <code>epitools</code>, and
-                <code>epiR</code>) that provide tools specifically tailored for
-                epidemiological and biostatistical analysis.
-              </li>
-              <li>
-                <strong>Data Handling:</strong> R excels at managing and
-                manipulating large datasets, which is often necessary when
-                working with health data collected from surveys, trials, or
-                surveillance systems.
-              </li>
-              <li>
-                <strong>Visualization:</strong> R’s ability to produce
-                high-quality, customizable visualizations (with packages like
-                <code>ggplot2</code> and <code>lattice</code>) makes it an
-                invaluable tool for communicating complex data results in an
-                accessible way.
-              </li>
-              <li>
-                <strong>Reproducibility:</strong> R facilitates reproducible
-                research, which is essential in scientific studies. With R
-                Markdown and built-in version control, researchers can ensure
-                that their analyses can be easily shared and replicated by
-                others.
-              </li>
-              <li>
-                <strong>Community Support:</strong> R has a robust and active
-                community of users, contributing to a vast range of packages
-                that extend its functionality for public health research.
-              </li>
-            </ul>
+          <!-- Section for R -->
+          <v-card class="my-5">
+            <v-card-title>
+              <h3 class="bbc-subtitle">2. R</h3>
+            </v-card-title>
+            <v-card-text>
+              <p class="bbc-content">
+                <strong>Overview:</strong> R is a free, open-source programming
+                language designed for statistical computing and graphics.
+              </p>
+              <h4>Strengths:</h4>
+              <ul class="bbc-subtitle ml-2">
+                <li>
+                  <strong>Wide Range of Statistical Packages:</strong> R has an
+                  extensive library of packages covering various aspects of
+                  biostatistics.
+                </li>
+                <li>
+                  <strong>Data Visualization:</strong> R’s libraries, such as
+                  <code>ggplot2</code>, offer powerful data visualization
+                  capabilities.
+                </li>
+                <li>
+                  <strong>Community and Resources:</strong> R has a vibrant
+                  community and ample resources for support.
+                </li>
+                <li>
+                  <strong>Open Source:</strong> R is free and accessible to
+                  researchers with budget constraints.
+                </li>
+              </ul>
+              <h4>Weaknesses:</h4>
+              <ul class="bbc-subtitle ml-2">
+                <li>
+                  <strong>Steep Learning Curve:</strong> R can be challenging
+                  for beginners due to its syntax.
+                </li>
+                <li>
+                  <strong>Memory Management:</strong> R operates mostly in
+                  memory, which can limit its performance with large datasets.
+                </li>
+                <li>
+                  <strong>Speed:</strong> R can be slower compared to other
+                  languages for certain tasks.
+                </li>
+              </ul>
+            </v-card-text>
+          </v-card>
 
-            <h2 class="bbc-subtitle">
-              Core Concepts of R in Epidemiology and Biostatistics
-            </h2>
+          <v-divider></v-divider>
 
-            <p class="bbc-content">
-              To get started with R, it's essential to understand some key
-              concepts that are especially relevant for epidemiologists and
-              biostatisticians.
-            </p>
+          <!-- Section for Python -->
+          <v-card class="my-5">
+            <v-card-title>
+              <h3 class="bbc-subtitle">3. Python</h3>
+            </v-card-title>
+            <v-card-text>
+              <p class="bbc-content">
+                <strong>Overview:</strong> Python is a versatile and
+                beginner-friendly programming language popular in data science
+                and bioinformatics.
+              </p>
+              <h4>Strengths:</h4>
+              <ul class="bbc-subtitle ml-2">
+                <li>
+                  <strong>Ease of Learning and Readability:</strong> Python’s
+                  readable syntax makes it accessible to beginners.
+                </li>
+                <li>
+                  <strong>Extensive Libraries:</strong> Python has libraries
+                  like <code>Pandas</code> and <code>SciPy</code> for data
+                  manipulation and analysis.
+                </li>
+                <li>
+                  <strong>Machine Learning and Integration:</strong> Python
+                  integrates well with APIs, databases, and machine learning
+                  tools.
+                </li>
+                <li>
+                  <strong>Open Source and Free:</strong> Python is free and
+                  widely supported.
+                </li>
+              </ul>
+              <h4>Weaknesses:</h4>
+              <ul class="bbc-subtitle ml-2">
+                <li>
+                  <strong>Statistical Analysis Limitations:</strong> Python has
+                  fewer specialized statistical packages compared to R.
+                </li>
+                <li>
+                  <strong>Less Community Support in Biostatistics:</strong>
+                  Python has a smaller user base in these specific fields.
+                </li>
+                <li>
+                  <strong>Performance:</strong> Python’s interpreted nature can
+                  make it slower without additional optimization.
+                </li>
+              </ul>
+            </v-card-text>
+          </v-card>
 
-            <h3 class="bbc-subtitle">Data Structures</h3>
-            <ul class="bbc-content">
-              <li>
-                <strong>Vectors and Matrices:</strong> Vectors are the simplest
-                data structures in R, representing a sequence of elements.
-                Matrices are two-dimensional arrays where each element is of the
-                same type, often used for representing data tables in
-                epidemiology (e.g., case numbers over time).
-              </li>
-              <li>
-                <strong>Data Frames:</strong> These are essential for
-                epidemiologists, as they allow for a mix of different data types
-                (e.g., numeric and categorical) in rows and columns, much like a
-                traditional spreadsheet. Data frames are commonly used to store
-                datasets, such as disease incidence data, patient demographics,
-                and lab results.
-              </li>
-            </ul>
+          <v-divider></v-divider>
 
-            <h3 class="bbc-subtitle">Descriptive Statistics</h3>
-            <p class="bbc-content">
-              Before any complex modeling, R can be used to summarize and
-              describe data using measures like means, medians, standard
-              deviations, and proportions. The <code>summary()</code> function
-              and packages like <code>psych</code> are handy for quick overviews
-              of the data.
-            </p>
-
-            <h3 class="bbc-subtitle">Probability Distributions</h3>
-            <p class="bbc-content">
-              Epidemiologists often deal with probability distributions to model
-              disease risk, such as the binomial distribution for binary events
-              (e.g., infection or no infection), or the normal distribution for
-              continuous variables (e.g., blood pressure levels). R provides
-              built-in functions to generate and work with these distributions
-              (<code>rbinom()</code>, <code>rnorm()</code>, etc.).
-            </p>
-
-            <h3 class="bbc-subtitle">Hypothesis Testing</h3>
-            <p class="bbc-content">
-              Biostatisticians frequently conduct hypothesis tests to assess the
-              significance of study findings. Common tests include:
-            </p>
-
-            <ul class="bbc-content">
-              <li>
-                <strong>t-tests</strong> for comparing means between two groups
-              </li>
-              <li>
-                <strong>Chi-square tests</strong> for testing independence
-                between categorical variables
-              </li>
-              <li>
-                <strong>ANOVA</strong> for comparing means across multiple
-                groups
-              </li>
-              <li><strong>Logistic regression</strong> for binary outcomes</li>
-            </ul>
-
-            <p class="bbc-content">
-              R's base functions like <code>t.test()</code>,
-              <code>chisq.test()</code>, and <code>aov()</code> allow
-              researchers to perform these tests easily.
-            </p>
-
-            <h3 class="bbc-subtitle">Epidemiological Measures</h3>
-            <p class="bbc-content">
-              Epidemiologists use specific measures like
-              <strong>incidence rates</strong>, <strong>prevalence</strong>,
-              <strong>relative risks</strong>, and <strong>odds ratios</strong>.
-              R packages like <code>epitools</code> and <code>epiR</code> are
-              tailored for calculating these measures directly from health data.
-            </p>
-
-            <h3 class="bbc-subtitle">Survival Analysis</h3>
-            <p class="bbc-content">
-              In clinical research, <strong>survival analysis</strong> plays a
-              critical role in studying time-to-event data, such as the time
-              until death or disease recurrence. R’s
-              <code>survival</code> package provides robust tools to perform
-              <strong>Kaplan-Meier survival estimates</strong>,
-              <strong>Cox proportional hazards modeling</strong>, and more.
-            </p>
-
-            <h2 class="bbc-subtitle">Data Visualization in Epidemiology</h2>
-            <p class="bbc-content">
-              Data visualization is critical in epidemiology for conveying
-              findings to stakeholders, policymakers, or the public. R’s
-              <code>ggplot2</code> package allows for the creation of clean,
-              sophisticated visualizations such as:
-            </p>
-
-            <ul class="bbc-content">
-              <li>
-                <strong>Time-series plots</strong> to show the progression of an
-                epidemic.
-              </li>
-              <li>
-                <strong>Bar plots</strong> and <strong>histograms</strong> to
-                display the distribution of variables like age or disease
-                counts.
-              </li>
-              <li>
-                <strong>Scatterplots</strong> to identify trends or correlations
-                between variables (e.g., smoking rates vs. lung cancer rates).
-              </li>
-              <li>
-                <strong>Heatmaps</strong> to visually represent disease
-                incidence across geographic regions.
-              </li>
-            </ul>
-
-            <h3 class="bbc-subtitle">
-              Example: Creating a Simple Time-Series Plot
-            </h3>
-            <pre><code>
-library(ggplot2)
-data <- data.frame(
-  date = seq(as.Date("2020-01-01"), as.Date("2020-12-31"), by = "month"),
-  cases = c(100, 150, 300, 500, 800, 1200, 2000, 2500, 1800, 1500, 1000, 500)
-)
-
-ggplot(data, aes(x = date, y = cases)) +
-  geom_line(color = "blue") +
-  labs(title = "COVID-19 Cases Over Time", x = "Date", y = "Number of Cases")
-  </code></pre>
-
-            <h2 class="bbc-subtitle">
-              Real-World Applications of R in Epidemiology and Biostatistics
-            </h2>
-
-            <ul class="bbc-content">
-              <li>
-                <strong>Outbreak Investigations:</strong> Epidemiologists use R
-                to quickly analyze outbreak data, model the spread of infectious
-                diseases, and make real-time predictions. For instance, during
-                the COVID-19 pandemic, R was widely used to model infection
-                curves, estimate reproduction numbers (R0), and simulate the
-                impact of different public health interventions.
-              </li>
-              <li>
-                <strong>Clinical Trials:</strong> Biostatisticians use R for
-                designing, monitoring, and analyzing data from clinical trials.
-                Functions for randomization, power analysis, and sample size
-                estimation are built into packages like
-                <code>randomizeR</code> and <code>pwr</code>.
-              </li>
-              <li>
-                <strong>Surveillance Systems:</strong> Public health authorities
-                employ R to maintain and analyze large databases from national
-                health surveillance systems. Tools like
-                <code>EpiEstim</code> are used to estimate the effective
-                reproduction number of infectious diseases from surveillance
-                data.
-              </li>
-              <li>
-                <strong>Health Policy:</strong> R aids in evaluating the
-                effectiveness of health policies by analyzing trends and
-                conducting cost-effectiveness analysis, helping policymakers
-                make data-driven decisions.
-              </li>
-            </ul>
-
-            <h2 class="bbc-subtitle">Getting Started with R</h2>
-            <p class="bbc-content">To start using R, follow these steps:</p>
-
-            <ol class="bbc-content">
-              <li>
-                <strong>Install R and RStudio:</strong> Download and install R
-                from the CRAN website. RStudio is an integrated development
-                environment (IDE) that makes coding in R more accessible and
-                user-friendly.
-              </li>
-              <li>
-                <strong>Learn R Basics:</strong> Familiarize yourself with the
-                basics of R programming through online courses, tutorials, or
-                textbooks. Websites like
-                <a
-                  href="https://www.datacamp.com/courses/free-introduction-to-r"
-                  >DataCamp</a
-                >
-                and <a href="https://swirlstats.com/">Swirl</a> offer
-                interactive learning opportunities.
-              </li>
-              <li>
-                <strong>Explore R Packages:</strong> Explore packages relevant
-                to your field, such as <code>epiR</code>, <code>ggplot2</code>,
-                and <code>survival</code>. Install and load these packages using
-                <code>install.packages()</code> and
-                <code>library()</code> functions.
-              </li>
-              <li>
-                <strong>Practice:</strong> Apply your knowledge to real datasets
-                and case studies. Participate in online forums and communities
-                to seek help and share insights.
-              </li>
-            </ol>
-
-            <h2 class="bbc-subtitle">Conclusion</h2>
-            <p class="bbc-content">
-              R programming offers a wealth of tools and functionalities that
-              are invaluable in epidemiology and biostatistics. Its capability
-              to handle and analyze complex data, along with its powerful
-              visualization options, makes it a critical asset for researchers
-              and practitioners in public health. By mastering R, you can
-              enhance your analytical skills and contribute to more effective
-              public health strategies and interventions.
-            </p>
-          </v-container>
+          <!-- Conclusion -->
+          <v-card class="my-5">
+            <v-card-title>
+              <h3 class="bbc-subtitle">Conclusion</h3>
+            </v-card-title>
+            <v-card-text>
+              <p class="bbc-content">
+                STATA, R, and Python each offer unique strengths for
+                epidemiology and biostatistics. STATA excels in ease of use for
+                statistical tasks, R leads in statistical depth and
+                visualization, and Python is flexible for complex projects. By
+                choosing the right tool, researchers can maximize efficiency,
+                accuracy, and insight, ultimately supporting better research and
+                public health decisions.
+              </p>
+            </v-card-text>
+          </v-card>
         </v-card>
       </v-col>
     </v-row>
@@ -325,7 +222,7 @@ function millisToLongDate(milliseconds) {
     month: "long", // e.g., "September"
     day: "numeric", // e.g., "15"
     hour: "numeric", // e.g., "4"
-    minute: "numeric", // e.g., "48" 
+    minute: "numeric", // e.g., "48"
     hour12: true, // Use 12-hour clock
     timeZone: "Africa/Nairobi", // Time zone
   };
@@ -354,7 +251,7 @@ function millisToLongDate(milliseconds) {
 
 .bbc-title {
   font-family: "Cormorant Garamond", serif;
-  font-size: 52px;
+  font-size: 40px;
   font-weight: 700;
   line-height: 1.3;
   color: #222;

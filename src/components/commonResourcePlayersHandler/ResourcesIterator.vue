@@ -1,10 +1,9 @@
 <template>
   <v-container fluid>
-    <!-- Top Row: Sort, Filter, Search Strip -->
+    <!-- Top Row: Sort, Filter, Search Strip 
     <v-row>
       <v-col cols="12">
-        <v-row align="center" justify="space-between">
-          <!-- Sort Dropdown -->
+        <v-row align="center" justify="space-between"> 
           <v-col :cols="isMobile ? 12 : 4">
             <v-select
               v-model="sortOption"
@@ -13,9 +12,7 @@
               dense
               class="sort-filter-select"
             ></v-select>
-          </v-col>
-
-          <!-- Filter Dropdown -->
+          </v-col> 
           <v-col :cols="isMobile ? 12 : 4">
             <v-select
               v-model="filterOption"
@@ -24,9 +21,7 @@
               dense
               class="sort-filter-select"
             ></v-select>
-          </v-col>
-
-          <!-- Search Field -->
+          </v-col> 
           <v-col :cols="isMobile ? 12 : 4">
             <v-text-field
               v-model="searchQuery"
@@ -40,8 +35,8 @@
         </v-row>
       </v-col>
     </v-row>
-
     <v-divider class="my-2" />
+-->
 
     <!-- Resource List and Selected Resource Display -->
     <v-row>
@@ -124,28 +119,32 @@
             >
               <v-card
                 class="mb-2 px-2 py-2"
-                height="8rem"
                 @click="selectResource(resource)"
                 elevation="2"
               >
-                <v-row no-gutters>
-                  <v-col cols="3">
-                    <v-img
-                      height="4rem"
-                      width="4rem"
+                <v-row>
+                  <v-col>
+                    <img
+                      width="32%"
+                      height="100%"
                       :src="resource.coverImage"
                       class="rounded"
-                    ></v-img>
+                    />
                   </v-col>
+                  <!-- 
+                   -->
 
-                  <v-col cols="9" class="pl-2">
-                    <v-card-title
-                      class="text-body-1 font-weight-medium mb-1"
-                      style="font-size: 1rem"
+                  <v-col cols="9">
+                    <h4
+                      class="text-body-2 font-weight-medium mb-1"
+                      style="font-size: 0.9rem; color: #333; line-height: 1.2"
                     >
                       {{ resource.title }}
-                    </v-card-title>
-                    <p class="text-caption font-weight-light">
+                    </h4>
+                    <p
+                      class="text-caption font-weight-light"
+                      style="font-size: 0.8rem; color: #666"
+                    >
                       {{ truncateText(resource.description, 50) }}
                     </p>
                   </v-col>
@@ -158,7 +157,7 @@
     </v-row>
   </v-container>
 </template>
- 
+
 <style scoped>
 .sort-filter-select {
   max-height: 67%;
@@ -175,7 +174,7 @@
 </style>
 
 <script setup lang="ts">
-import { ref, computed, onBeforeMount } from "vue";
+import { ref, computed, onBeforeMount, onMounted } from "vue";
 import VideoPlayer from "../resourcePlayers/video/VideoPlayer.vue";
 import AudioPlayer from "../resourcePlayers/audio/AudioPlayer.vue";
 import ImagePlayer from "../resourcePlayers/images/ImagePlayer.vue";
@@ -194,7 +193,17 @@ import ModelPlayer from "../resourcePlayers/models/ModelPlayer.vue";
 import { useResourceStore } from "../../stores/resources"; // Replace with actual path
 
 const resourceStore = useResourceStore();
+const isMobile = ref(false);
 
+const checkIsMobile = () => {
+  isMobile.value =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+};
+
+// Run check on component mount
+onMounted(checkIsMobile);
 // Define ResourceType as a constant object with keys
 const ResourceType = {
   AUDIO: "AUDIO",

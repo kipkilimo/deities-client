@@ -1,46 +1,58 @@
 <template>
   <v-container class="my-5">
+    <!-- Progress bar shown while loading resources -->
     <v-progress-linear
-      color="#212121"
-      v-if="resourceFilterOptionsSelected"
+      color="#08487f"
+      v-if="settingUpLibrary"
       indeterminate
     ></v-progress-linear>
+
     <v-row>
-      <v-col
+      <!-- Display each resource as a card -->
+      <v-col :disabled="!settingUpLibrary===true"
         v-for="(resource, index) in updatedResources"
         :key="index"
         cols="12"
         md="6"
         lg="4"
-        xl="4"
       >
         <v-card
           class="mx-auto my-3 resource-card"
           max-width="540"
           height="13.5rem"
-          :disabled="resource.resourceCount === 0"
+          :disabled="!resource?.resourceCount"
           outlined
         >
           <v-card-title
-            style="cursor: pointer"
-            :disabled="resourceFilterOptionsSelected"
-            @click="showFilterOptionsSelector(resource)"
-            color="#08487f"
             class="d-flex align-center justify-space-between"
+            :style="{
+              cursor: resourceFilterOptionsSelected ? 'default' : 'pointer',
+            }"
+            color="#08487f"
+            @click="
+              resourceFilterOptionsSelected ||
+                showFilterOptionsSelector(resource)
+            "
           >
-            <span class="resource-icon">{{ resource.icon }}</span>
+            <span class="resource-icon">{{ resource?.icon || "📘" }}</span>
             <span class="resource-name">
-              {{ resource.name }} ({{ resource.resourceCount }})
-              <v-card-text class="text-h11">
-                {{ resource.type }}
-              </v-card-text>
+              {{ resource?.name || "Unknown Resource" }} ({{
+                resource?.resourceCount || 0
+              }})
+              <v-card-text class="text-h11">{{
+                resource?.type || "General"
+              }}</v-card-text>
             </span>
           </v-card-title>
 
           <v-divider></v-divider>
+
+          <!-- Resource description -->
           <v-card-text class="resource-description text-h7 py-2">
-            {{ resource.description }}
+            {{ resource?.description || "No description available" }}
           </v-card-text>
+
+          <!-- Card actions with Explore button -->
           <v-card-actions class="fixed-actions mb-1">
             <v-btn
               append-icon="mdi-chevron-right"
@@ -48,100 +60,51 @@
               variant="outlined"
               block
               @click="goToResourceRenderer(resource)"
-              :disabled="!resourceFilterOptionsSelected"
+              :disabled="!resource?.resourceCount"
             >
-              Explore {{ resource.name }} resources
+              Explore {{ resource?.name || " " }} resources
             </v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
 
-    <!-- Existing Filter Dialog -->
+    <!-- Filter Options Dialog -->
     <v-dialog width="87%" v-model="resourceSelected" style="overflow: hidden">
       <v-card flat height="13.5rem" class="ma-4" style="padding: 0">
-        <h3 color="#b5b1b2" class="text-h10 mb-4 ml-44 mt-2">
-          Specify the resources to get started. The input values are optional.
+        <h3 class="text-h10 mb-4 ml-44 mt-2" color="#b5b1b2">
+          Specify resources to get started. Input values are optional.
         </h3>
         <v-divider />
-        <br />
-        <v-row no-gutters>
-          <v-col cols="2" style="padding: 0 8px">
-            <v-select
-              v-model="formData.selectedSubject"
-              :items="subjects"
-              label="Subject"
-              dense
-              outlined
-              hint="What do you want to study?"
-              hide-details
-            ></v-select>
-          </v-col>
-          <v-col cols="2" style="padding: 0 8px">
-            <v-select
-              v-model="formData.selectedTopicConcept"
-              :items="allSubjectConcepts"
-              label="Resource Level"
-              hint="Resource Level"
-              dense
-              outlined
-              hide-details
-            ></v-select>
-          </v-col>
-          <v-col cols="2" style="padding: 0 8px">
-            <v-select
-              v-model="formData.selectedTopic"
-              :items="allSubjectTopics"
-              label="Topic to study"
-              hint="Topic to study"
-              dense
-              outlined
-              hide-details
-            ></v-select>
-          </v-col>
-          <v-col cols="2" style="padding: 0 8px">
-            <v-select
-              v-model="formData.selectedTargetRegion"
-              :items="regions"
-              label="Resource target Region"
-              hint="Resource target Region"
-              dense
-              outlined
-              hide-details
-            ></v-select>
-          </v-col>
 
-          <v-col cols="2" style="padding: 0 8px">
+        <!-- Filter fields row -->
+        <v-row no-gutters>
+          <v-col
+            v-for="(field, key) in filterFields"
+            :key="key"
+            cols="2"
+            style="padding: 0 8px"
+          >
             <v-select
-              v-model="formData.selectedCountry"
-              :items="countriesList"
-              label="Select country"
-              hint="Resource target country"
+              v-model="formData[key]"
+              :items="field.options"
+              :label="field.label"
+              :hint="field.hint"
               dense
               outlined
               hide-details
-            ></v-select
-          ></v-col>
-          <v-col cols="2" style="padding: 0 8px">
-            <v-select
-              v-model="formData.selectedLanguage"
-              :items="languagesList"
-              label="Language"
-              hint="Resource Language"
-              dense
-              outlined
-              hide-details
-            ></v-select
-          ></v-col>
+            ></v-select>
+          </v-col>
         </v-row>
-        <br /><br />
+
+        <!-- Save button -->
         <v-card-actions class="fixed-actions mb-1">
           <v-btn
             append-icon="mdi-chevron-right"
             color="#08487f"
             variant="outlined"
             block
-            @click="saveSelectedFilelds"
+            @click="saveSelectedFields"
           >
             Save selections and get resources
           </v-btn>
@@ -150,25 +113,22 @@
     </v-dialog>
   </v-container>
 </template>
-<script setup lang="ts">
-import { ref, computed, onBeforeMount, watch } from "vue";
-import { useResourceStore } from "../../../stores/resources";
-import staticResourcesData from "@/data/staticResources";
-
-const { resourceType, staticResources } = staticResourcesData;
-
-console.log({ staticResourcesTypes: staticResources.value });
+<script setup>
+import { ref, computed, watch, onBeforeMount,onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { useResourceStore } from "../../../stores/resources";
+import staticResources from "../../../data/staticResources";
 import worldRegions from "../../../data/languages";
 import topicsData from "../../../data/topics";
 
 const router = useRouter();
+const resourceStore = useResourceStore();
+const settingUpLibrary=ref(true)
 
-const subjects = ref(Object.keys(topicsData));
-
+// Reactive properties
 const resourceSelected = ref(false);
 const resourceFilterOptionsSelected = ref(false);
-
+const subjects = ref(Object.keys(topicsData));
 const formData = ref({
   selectedSubject: "",
   selectedTopicConcept: "",
@@ -176,169 +136,124 @@ const formData = ref({
   selectedTargetRegion: "",
   selectedCountry: "",
   selectedLanguage: "",
-});
+}); 
 
-const allSubjectConcepts = ref([]);
-const allSubjectTopics = ref([]);
-const countriesList = ref([]);
-const languagesList = ref([]);
-
-// Watch for changes in selectedSubject to reset related fields
-watch(
-  () => formData.value.selectedSubject,
-  (newValue) => {
-    formData.value.selectedTopicConcept = "";
-    formData.value.selectedTopic = "";
-    allSubjectConcepts.value = newValue
-      ? extractSubelements(newValue, topicsData)
-      : [];
-  }
-);
-
-// Watch for changes in selectedTopicConcept to reset related fields
-watch(
-  () => formData.value.selectedTopicConcept,
-  (newValue) => {
-    formData.value.selectedTopic = "";
-    allSubjectTopics.value = newValue
-      ? getTopicsArray(formData.value.selectedSubject, newValue, topicsData)
-      : [];
-  }
-);
-
-// Watch for changes in selectedTopic to handle any specific logic if needed
-watch(
-  () => formData.value.selectedTopic,
-  (newValue) => {
-    // Add logic if needed when selectedTopic changes
-  }
-);
-
-// Watch for changes in selectedTargetRegion to reset related fields
-watch(
-  () => formData.value.selectedTargetRegion,
-  (newValue) => {
-    formData.value.selectedCountry = "";
-    formData.value.selectedLanguage = "";
-    countriesList.value = newValue ? getCountriesByRegion(newValue) : [];
-    languagesList.value = newValue ? getLanguagesByRegion(newValue) : [];
-  }
-);
-
-// Function to extract sub-elements based on the subject
-function extractSubelements(subject: string, schema: { [key: string]: any }) {
-  if (!schema.hasOwnProperty(subject)) {
-    throw new Error(`Subject ${subject} not found in schema.`);
-  }
-  return Object.keys(schema[subject]);
-}
-
-// Function to get topics array based on subject and concept
-function getTopicsArray(
-  subject: string,
-  concept: string,
-  schema: { [key: string]: any }
-) {
-  if (!schema.hasOwnProperty(subject)) {
-    throw new Error(`Subject "${subject}" not found in schema.`);
-  }
-  if (!schema[subject].hasOwnProperty(concept)) {
-    throw new Error(`Concept "${concept}" not found in subject "${subject}".`);
-  }
-  return schema[subject][concept];
-}
-
-// Function to get countries by region
-function getCountriesByRegion(region: string): string[] | undefined {
-  const regionData = worldRegions[region];
-  return regionData ? regionData.countries : undefined;
-}
-
-// Function to get languages by region
-function getLanguagesByRegion(region: string): string[] | undefined {
-  const regionData = worldRegions[region];
-  return regionData
-    ? regionData.languages.map((language) => language.name)
-    : undefined;
-}
-
-const regions = computed(() => {
-  return Object.keys(worldRegions).filter(
-    (region) => region === "Global" || region.includes("Africa")
-  );
-});
-
-const resourceStore = useResourceStore();
 const updatedResources = computed(() => {
-  return staticResources.value.map((resource) => {
-    const matchingResources = resourceStore.resources.filter(
+  return staticResources.staticResources.value.map((resource) => {
+    const matches = resourceStore.resources.filter(
       (res) => res.contentType === resource.type
     );
-    return {
-      ...resource,
-      resourceCount: matchingResources.length,
-    };
+    return { ...resource, resourceCount: matches.length };
   });
 });
+onMounted(() => {
+  setTimeout(() => {
+    settingUpLibrary.value=false
+  }, 900);
+})
+// Filter fields configuration
+const filterFields = ref({
+  selectedSubject: {
+    label: "Subject",
+    hint: "What do you want to study?",
+    options: subjects.value,
+  },
+  selectedTopicConcept: {
+    label: "Resource Level",
+    hint: "Resource Level",
+    options: ref([]),
+  },
+  selectedTopic: { label: "Topic", hint: "Topic to study", options: ref([]) },
+  selectedTargetRegion: {
+    label: "Region",
+    hint: "Resource region",
+    options: computed(() => Object.keys(worldRegions)),
+  },
+  selectedCountry: {
+    label: "Country",
+    hint: "Target country",
+    options: ref([]),
+  },
+  selectedLanguage: {
+    label: "Language",
+    hint: "Resource language",
+    options: ref([]),
+  },
+});
 
-function goToResourceRenderer(resource: { type: string }) {
-  const fetchParams = [
-    {
-      resourceType: resource.type,
-      selectedSubject: formData.value.selectedSubject,
-      selectedTopicConcept: formData.value.selectedTopicConcept,
-      selectedTopic: formData.value.selectedTopic,
-      selectedTargetRegion: formData.value.selectedTargetRegion,
-      selectedCountry: formData.value.selectedCountry,
-      selectedLanguage: formData.value.selectedLanguage,
-    },
-  ];
-  localStorage.setItem("queryParams", JSON.stringify(fetchParams));
-  if (resource.type === "TEST") {
-    router.push("/exam/mocks");
-
-    resourceFilterOptionsSelected.value = false;
-    return;
+// Watchers for dynamic option changes
+watch(
+  () => formData.value.selectedSubject,
+  (val) => {
+    formData.value.selectedTopicConcept = "";
+    filterFields.value.selectedTopicConcept.options = val
+      ? Object.keys(topicsData[val])
+      : [];
   }
-  router.push("/dashboard/player");
+);
+watch(
+  () => formData.value.selectedTopicConcept,
+  (val) => {
+    formData.value.selectedTopic = "";
+    filterFields.value.selectedTopic.options = val
+      ? topicsData[formData.value.selectedSubject][val]
+      : [];
+  }
+);
+watch(
+  () => formData.value.selectedTargetRegion,
+  (val) => {
+    formData.value.selectedCountry = "";
+    formData.value.selectedLanguage = "";
+    filterFields.value.selectedCountry.options = val
+      ? worldRegions[val].countries
+      : [];
+    filterFields.value.selectedLanguage.options = val
+      ? worldRegions[val].languages.map((lang) => lang.name)
+      : [];
+  }
+);
+
+// Navigation and data-saving functions
+function goToResourceRenderer(resource) {
+  localStorage.setItem(
+    "queryParams",
+    JSON.stringify([{ ...formData.value, resourceType: resource.type }])
+  );
+  router.push(resource.type === "TEST" ? "/exam/mocks" : "/dashboard/player");
   resourceFilterOptionsSelected.value = false;
 }
 
-function saveSelectedFilelds() {
+function saveSelectedFields() {
   resourceSelected.value = false;
   resourceFilterOptionsSelected.value = true;
-  let rawResource = localStorage.getItem("targetResource");
-  rawResource = JSON.parse(rawResource)[0];
-  goToResourceRenderer(rawResource);
+  const targetResource = JSON.parse(
+    localStorage.getItem("targetResource") || "[]"
+  )[0];
+  goToResourceRenderer(targetResource);
 }
 
-function showFilterOptionsSelector(resource: any) {
-  let resRaw = [resource];
-  resRaw = JSON.stringify(resRaw);
-  localStorage.setItem("targetResource", resRaw);
+function showFilterOptionsSelector(resource) {
+  localStorage.setItem("targetResource", JSON.stringify([resource]));
   resourceSelected.value = true;
 }
 
-onBeforeMount(() => {
-  resourceStore.getAllResources();
+// Fetch resources on load
+onBeforeMount(async () => {
+  await resourceStore.getAllResources();
 });
 </script>
-
 <style scoped>
-/* Styles for the resource card */
 .resource-card {
   transition:
     transform 0.2s ease,
     box-shadow 0.3s ease;
-  position: relative;
-  padding-bottom: 3rem; /* Space reserved for buttons */
+  padding-bottom: 3rem;
 }
-
 .resource-card:hover {
-  transform: scale(1.0025); /* Slightly scale the card */
-  box-shadow: 0px 10px 20px rgba(26, 25, 25, 0.7); /* Add pronounced shadow */
+  transform: scale(1.0025);
+  box-shadow: 0px 10px 20px rgba(26, 25, 25, 0.7);
 }
-
 .fixed-actions {
   position: absolute;
   bottom: 0;
@@ -346,27 +261,22 @@ onBeforeMount(() => {
   right: 0;
   padding: 0.5rem;
 }
-
 .resource-icon {
   font-size: 2.5rem;
 }
-
 .resource-name {
   font-size: 1.5rem;
   font-weight: 600;
 }
-
 .resource-description {
   font-size: 1.1rem;
   color: #555;
 }
-
 .v-btn {
   text-transform: uppercase;
   border-radius: 4px !important;
 }
 </style>
-
 <route lang="yaml">
 meta:
   layout: DashboardLayout

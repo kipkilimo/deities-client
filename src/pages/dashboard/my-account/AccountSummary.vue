@@ -1,6 +1,5 @@
 <template>
   <v-container>
-    {{ useUserStore().user }}
     <v-row justify="center">
       <!-- User Profile Card -->
       <v-col cols="12" md="6">
@@ -9,18 +8,20 @@
             <v-col cols="2">
               <div class="avatar-wrapper ma-1 mt-4 ml-4">
                 <v-avatar size="63">
-                  <img :src="`${generateMD5Hash()}`" />
+                  <img
+                    :src="generateMD5Hash() || '/path/to/default/avatar.jpg'"
+                  />
                 </v-avatar>
               </div>
             </v-col>
 
             <v-col class="ma-1" cols="7">
-              <v-card-title class="text-h5"
-                >{{ useUserStore().user.personalInfo.fullName }}
+              <v-card-title class="text-h5">
+                {{ user?.personalInfo?.fullName || "Guest User" }}
               </v-card-title>
-              <v-card-title class="text-overline"
-                >ROLE: {{ useUserStore().user.role }}</v-card-title
-              >
+              <v-card-title class="text-overline">
+                ROLE: {{ user?.role || "Guest" }}
+              </v-card-title>
             </v-col>
           </v-row>
 
@@ -29,8 +30,8 @@
           <v-card-text>
             <v-row>
               <v-col cols="12" sm="4">
-                <h3>{{ user.name }}</h3>
-                <p>{{ user.email }}</p>
+                <h3>{{ user?.name || "Guest" }}</h3>
+                <p>{{ user?.email || "Not Available" }}</p>
               </v-col>
             </v-row>
 
@@ -38,7 +39,12 @@
 
             <v-row>
               <v-col>
-                <v-btn class="mt-3" color="primary" @click="editProfile">
+                <v-btn
+                  class="mt-3"
+                  color="primary"
+                  @click="editProfile"
+                  :disabled="!user"
+                >
                   Edit Profile
                 </v-btn>
               </v-col>
@@ -56,19 +62,19 @@
 
           <v-card-text>
             <v-list>
-              <v-list-item @click="changePassword">
+              <v-list-item @click="changePassword" v-if="user">
                 <v-list-item-title>Change Password</v-list-item-title>
               </v-list-item>
 
-              <v-divider></v-divider>
+              <v-divider v-if="user"></v-divider>
 
-              <v-list-item @click="updateEmail">
+              <v-list-item @click="updateEmail" v-if="user">
                 <v-list-item-title>Update Email</v-list-item-title>
               </v-list-item>
 
-              <v-divider></v-divider>
+              <v-divider v-if="user"></v-divider>
 
-              <v-list-item @click="manageNotifications">
+              <v-list-item @click="manageNotifications" v-if="user">
                 <v-list-item-title>Change Name</v-list-item-title>
               </v-list-item>
             </v-list>
@@ -76,6 +82,7 @@
         </v-card>
       </v-col>
     </v-row>
+
     <!-- Activity Section -->
     <v-row>
       <v-col md="3" sm="12">
@@ -85,7 +92,7 @@
           <v-divider></v-divider>
 
           <v-card-text>
-            <v-list>
+            <v-list v-if="user?.recentActivity && user.recentActivity.length">
               <v-list-item
                 v-for="(activity, index) in user.recentActivity"
                 :key="index"
@@ -100,238 +107,111 @@
                 </v-list-item-content>
               </v-list-item>
             </v-list>
+            <p v-else>No recent activity available.</p>
           </v-card-text>
         </v-card>
       </v-col>
 
-      <v-col md="2" sm="12">
+      <!-- Faculty or Student Section Based on Role -->
+      <v-col md="2" sm="12" v-if="user?.role === 'FACULTY'">
         <v-card>
-          <v-card-title class="text-h5">Recent Activity</v-card-title>
+          <v-card-title class="text-h5">
+            My Department
+            <v-avatar
+              class="ma-1"
+              @click="manageDepartmentDialog = true"
+              color="surface-light"
+              size="24"
+              style="cursor: pointer"
+            >
+              📝
+            </v-avatar>
+          </v-card-title>
 
           <v-divider></v-divider>
 
-          <v-card-text>
-            <v-list>
-              <v-list-item
-                v-for="(activity, index) in user.recentActivity"
-                :key="index"
-              >
-                <v-list-item-content>
-                  <v-list-item-title>{{
-                    activity.description
-                  }}</v-list-item-title>
-                  <v-list-item-subtitle>{{
-                    activity.date
-                  }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
+          <v-card-text v-if="user?.departments?.length >= 1">
+            <p>{{ user.departments[0].name }}</p>
+            <v-chip variant="outlined" rounded="2"
+              >ID: {{ user.departments[0].departmentId }}</v-chip
+            >
+          </v-card-text>
+          <v-card-text v-else>
+            <v-btn
+              width="100%"
+              color="primary"
+              variant="tonal"
+              @click="addDepartmentDialog = true"
+            >
+              <v-icon class="mr-1">mdi-plus</v-icon> Add Department
+            </v-btn>
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col md="7" sm="12">
+
+      <v-col md="2" sm="12" v-if="user?.role === 'STUDENT'">
         <v-card>
-          <v-card-title class="text-h5">Recent Activity</v-card-title>
+          <v-card-title class="text-h5">
+            My Discussion Group
+            <v-avatar
+              class="ma-1"
+              @click="manageDiscussionGroupDialog = true"
+              color="surface-light"
+              size="24"
+              style="cursor: pointer"
+            >
+              📝
+            </v-avatar>
+          </v-card-title>
 
           <v-divider></v-divider>
 
-          <v-card-text>
-            <v-list>
-              <v-list-item
-                v-for="(activity, index) in user.recentActivity"
-                :key="index"
-              >
-                <v-list-item-content>
-                  <v-list-item-title>{{
-                    activity.description
-                  }}</v-list-item-title>
-                  <v-list-item-subtitle>{{
-                    activity.date
-                  }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
+          <v-card-text v-if="user?.discussion_groups?.length >= 1">
+            <p>{{ user.discussion_groups[0].name }}</p>
+            <v-chip variant="outlined" rounded="2"
+              >ID: {{ user.discussion_groups[0].discussionGroupId }}</v-chip
+            >
+          </v-card-text>
+          <v-card-text v-else>
+            <v-btn
+              width="100%"
+              color="primary"
+              variant="tonal"
+              @click="addDiscussionGroupDialog = true"
+            >
+              <v-icon class="mr-1">mdi-plus</v-icon> Add Discussion Group
+            </v-btn>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
 
-    <!-- Profile Actions -->
-    <v-row>
-      <v-col md="7" sm="12">
-        <v-card>
-          <v-card-title class="text-h5">Recent Activity</v-card-title>
-
-          <v-divider></v-divider>
-
-          <v-card-text>
-            <v-list>
-              <v-list-item
-                v-for="(activity, index) in user.recentActivity"
-                :key="index"
-              >
-                <v-list-item-content>
-                  <v-list-item-title>{{
-                    activity.description
-                  }}</v-list-item-title>
-                  <v-list-item-subtitle>{{
-                    activity.date
-                  }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col md="3" sm="12">
-        <v-card>
-          <v-card-title class="text-h5">Recent Activity</v-card-title>
-
-          <v-divider></v-divider>
-
-          <v-card-text>
-            <v-list>
-              <v-list-item
-                v-for="(activity, index) in user.recentActivity"
-                :key="index"
-              >
-                <v-list-item-content>
-                  <v-list-item-title>{{
-                    activity.description
-                  }}</v-list-item-title>
-                  <v-list-item-subtitle>{{
-                    activity.date
-                  }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-      <v-col md="2" sm="12" v-if="useUserStore().user.role === 'FACULTY'">
-        <v-card>
-          <v-card-title class="text-h5">
-            <v-card-actions
-              >My Department<v-spacer /><v-spacer /><v-spacer />
-              <v-tooltip text="Manage department">
-                <template v-slot:activator="{ props }">
-                  <v-avatar
-                    v-bind="props"
-                    class="ma-1"
-                    @click="manageDepartmentDialog = true"
-                    color="surface-light"
-                    style="cursor: pointer"
-                    size="24"
-                    >📝</v-avatar
-                  >
-                </template>
-              </v-tooltip>
-            </v-card-actions></v-card-title
-          >
-
-          <v-divider></v-divider>
-
-          <v-card-text v-if="useUserStore().user.departments.length >= 1">
-            <p>{{ useUserStore().user.departments[0].name }}</p>
-            <v-divider class="mb-1"></v-divider>
-            <v-chip variant="outlined" rounded="2">
-              ID:
-              {{ useUserStore().user.departments[0].departmentId }}</v-chip
-            >
-          </v-card-text>
-          <v-card-text v-if="useUserStore().user.departments.length === 0">
-            <v-card-actions>
-              <v-btn
-                width="100%"
-                color="primary"
-                variant="tonal"
-                @click="addDepartmentDialog = true"
-                ><v-icon class="mr-1">mdi-plus</v-icon> department</v-btn
-              >
-            </v-card-actions>
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-      <!-- Discussion group students -->
-      <v-col md="2" sm="12" v-if="useUserStore().user.role === 'STUDENT'">
-        <v-card>
-          <v-card-title class="text-h5">
-            <v-card-actions
-              >My DG<v-spacer /><v-spacer /><v-spacer />
-
-              <v-tooltip text="Manage discussion group">
-                <template v-slot:activator="{ props }">
-                  <v-avatar
-                    v-bind="props"
-                    class="ma-1"
-                    @click="manageDiscussionGroupDialog = true"
-                    color="surface-light"
-                    style="cursor: pointer"
-                    size="24"
-                    >📝</v-avatar
-                  >
-                </template>
-              </v-tooltip>
-            </v-card-actions></v-card-title
-          >
-
-          <v-divider></v-divider>
-
-          <v-card-text v-if="useUserStore().user.discussion_groups.length >= 1">
-            <p>{{ useUserStore().user.discussion_groups[0].name }}</p>
-            <v-divider class="mb-1"></v-divider>
-            <v-chip variant="outlined" rounded="2">
-              ID:
-              {{
-                useUserStore().user.discussion_groups[0].discussionGroupId
-              }}</v-chip
-            >
-          </v-card-text>
-          <v-card-text
-            v-if="useUserStore().user.discussion_groups.length === 0"
-          >
-            <v-card-actions>
-              <v-btn
-                width="100%"
-                color="primary"
-                variant="tonal"
-                @click="addDiscussionGroupDialog = true"
-                ><v-icon class="mr-1">mdi-plus</v-icon> discussion group</v-btn
-              >
-            </v-card-actions>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-
+    <!-- Dialogs -->
     <v-dialog max-width="63rem" v-model="addDiscussionGroupDialog">
       <v-card>
-        <DiscussionGroupForm @closeDialog="closeDialog()" />
-      </v-card>
-    </v-dialog>
-
-    <v-dialog max-width="720" v-model="addDepartmentDialog">
-      <v-card>
-        <DepartmentForm  @closeDialog="closeDialog()"  />
+        <DiscussionGroupForm @closeDialog="closeDialog" />
       </v-card>
     </v-dialog>
 
     <v-dialog max-width="63rem" v-model="manageDiscussionGroupDialog">
       <v-card>
-        <ManageDiscussionGroupForm @closeDialog="closeDialog()" />
+        <ManageDiscussionGroupForm @closeDialog="closeDialog" />
+      </v-card>
+    </v-dialog>
+
+    <v-dialog max-width="720" v-model="addDepartmentDialog">
+      <v-card>
+        <DepartmentForm @closeDialog="closeDialog" />
       </v-card>
     </v-dialog>
 
     <v-dialog max-width="63rem" v-model="manageDepartmentDialog">
       <v-card>
-        <ManageDepartmentForm  @closeDialog="closeDialog()"  />
+        <ManageDepartmentForm @closeDialog="closeDialog" />
       </v-card>
     </v-dialog>
   </v-container>
 </template>
-
 <script setup>
 import { ref, onBeforeMount, onMounted, watch } from "vue";
 const userId = ref(localStorage.getItem("sessionId")); // Retrieve userId from local storage
@@ -350,7 +230,7 @@ onBeforeMount(async () => {
   await userStore.getCurrentUser(userId.value || "");
 });
 function closeDialog() {
-  console.log('Closing dialog...')
+  console.log("Closing dialog...");
   addDiscussionGroupDialog.value = false;
   manageDiscussionGroupDialog.value = false;
   addDepartmentDialog.value = false;

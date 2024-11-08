@@ -161,7 +161,7 @@
             <v-spacer />
             <v-btn @click="scrollToTop">
               <v-icon>mdi-arrow-up</v-icon> Back to Top
-            </v-btn> 
+            </v-btn>
             <v-btn @click="scrollToCallToAction">
               <v-icon>mdi-login</v-icon> Continue to the Application
             </v-btn>
@@ -217,8 +217,7 @@ const currentYear = ref(new Date().getFullYear());
 const router = useRouter();
 
 const scrollToCallToAction = () => {
-  const session = localStorage.getItem("sessionId");
-  router.push(session ? "/dashboard/library" : "/auth/login");
+  router.push("/dashboard/library");
 };
 
 const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });

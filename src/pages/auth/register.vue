@@ -90,9 +90,9 @@
               :disabled="
                 isButtonDisabled1 || (isButtonDisabled2 && !agreeToTerms)
               "
-                          type="submit"
-            color="primary"
-              style="width: 13.5rem;background-color: #8fc0c5;" 
+              type="submit"
+              color="primary"
+              style="width: 13.5rem; background-color: #8fc0c5"
               :loading="registerLoading"
             >
               <v-icon class="mr-sm">mdi-location-enter</v-icon> Register
@@ -108,12 +108,12 @@
                   height="30"
                   variant="outlined"
                   v-bind="props"
-                  to="/welcome"
+                  to="/auth/login"
                 >
-                  <v-icon>mdi-home-account</v-icon>
+                  <v-icon>mdi-login-variant</v-icon>
                 </v-btn>
               </template>
-              <span> Home</span>
+              <span>Registered? Signin.</span>
             </v-tooltip>
             <v-spacer />
           </v-card-actions>
@@ -227,7 +227,7 @@ const submitRegister = async () => {
       password.value
     );
     // Handle successful login (e.g., redirect to home page)
-  
+
     // You can use a router or state management solution like Vuex
   } catch (error) {
     loginError.value = "Failed to register new user."; // Set error message

@@ -1,11 +1,16 @@
 <template>
-  <v-app full-height v-if="readyView === true">
+  <v-app v-if="readyView" full-height>
     <v-layout full-height>
-      <v-app-bar class="!fixed">
-        <router-link to="/welcome" class="px-8 flex items-center w-64">
+      <!-- App Bar -->
+      <v-app-bar class="">
+        <router-link
+          to="/dashboard/library"
+          class="px-8 flex items-center w-64"
+        >
           <v-img
             src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png"
             width="180"
+            @click="drawer = true"
             height="120"
           />
         </router-link>
@@ -14,7 +19,11 @@
           <span class="i-iconoir-menu text-2xl"></span>
         </v-btn>
 
-        <v-spacer></v-spacer>
+        <v-spacer />
+
+        <!-- User Controls v-if="userStore.user && userStore.user.personalInfo.username"
+v-if="userStore.user && userStore.user.personalInfo.username"
+v-if="userStore.user && userStore.user.personalInfo.username" -->
         <v-col cols="auto">
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
@@ -23,13 +32,20 @@
                 icon
                 rounded
                 density="comfortable"
-                @click="resourceStore.showCreateResourceDialog = true"
+                @click="goToRegister()"
               >
                 <v-icon>mdi-note-plus-outline</v-icon>
               </v-btn>
             </template>
-            <span> Add a resource</span>
+            <span
+              >{{
+                userStore.user && userStore.user.personalInfo.username
+                  ? "Add a resource"
+                  : "Add a resource | ⓘ Requires signing in"
+              }}
+            </span>
           </v-tooltip>
+
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
@@ -43,8 +59,15 @@
                 <v-icon>mdi-calendar-check-outline</v-icon>
               </v-btn>
             </template>
-            <span> Manage my assignments</span>
+            <span
+              >{{
+                userStore.user && userStore.user.personalInfo.username
+                  ? "Manage my assignments"
+                  : "Manage my assignments | ⓘ Requires signing in"
+              }}
+            </span>
           </v-tooltip>
+
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
@@ -58,8 +81,15 @@
                 <v-icon>mdi-clock-edit-outline</v-icon>
               </v-btn>
             </template>
-            <span> Manage my exams</span>
+            <span
+              >{{
+                userStore.user && userStore.user.personalInfo.username
+                  ? "Manage my exams"
+                  : "Manage my exams | ⓘ Requires signing in"
+              }}
+            </span>
           </v-tooltip>
+
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn
@@ -73,7 +103,13 @@
                 <v-icon>mdi-account-file-text-outline</v-icon>
               </v-btn>
             </template>
-            <span>My account</span>
+            <span
+              >{{
+                userStore.user && userStore.user.personalInfo.username
+                  ? "My account"
+                  : "My account | ⓘ Requires signing in"
+              }}
+            </span>
           </v-tooltip>
         </v-col>
 
@@ -81,10 +117,11 @@
         <ThemeToggler />
       </v-app-bar>
 
+      <!-- Navigation Drawer -->
       <v-navigation-drawer
         rounded
         v-model="drawer"
-        class="m-2 max-h-[calc(100%-82px)] !fixed"
+        class="m-2 max-h-[calc(100%-82px)]"
         :rail="rail"
         :location="isRTL ? 'end' : 'start'"
       >
@@ -102,14 +139,27 @@
         <v-list density="compact" nav>
           <v-list-item
             height="100"
-            :prepend-avatar="`https://ui-avatars.com/api/?name=${userStore.user.personalInfo.username}&background=0D8ABC&color=fff`"
-            :title="userStore.user.personalInfo.username"
-            :subtitle="obfuscateEmail(userStore.user.personalInfo.email)"
+            :prepend-avatar="
+              userStore.user && userStore.user.personalInfo.username
+                ? `https://ui-avatars.com/api/?name=${userStore.user.personalInfo.username}&background=0D8ABC&color=fff`
+                : 'https://ui-avatars.com/api/?name=Guest&background=0D8ABC&color=fff'
+            "
+            :title="
+              userStore.user && userStore.user.personalInfo.username
+                ? userStore.user.personalInfo.username
+                : 'Guest User'
+            "
+            :subtitle="
+              userStore.user && userStore.user.personalInfo.email
+                ? obfuscateEmail(userStore.user.personalInfo.email)
+                : 'guest@nem.bio'
+            "
             class="me-4"
-          ></v-list-item>
+          />
 
           <v-divider></v-divider>
-          <v-list-item-group>
+
+          <v-list>
             <v-list-item
               v-for="item in sidebarItems"
               :key="item.value"
@@ -118,7 +168,7 @@
             >
               <v-tooltip
                 activator="parent"
-                location="top"
+                location="bottom"
                 class="custom-tooltip"
               >
                 <template v-slot:activator="{ props }" v-show="rail">
@@ -132,42 +182,40 @@
                 }}</span>
               </v-tooltip>
             </v-list-item>
+
             <v-divider class="mt-2" />
             <h3 color="#777777" class="ml-2 mt-2 mb-2 text-left">
               {{ titlize(currentPartner.partnerType) }} Partner
             </h3>
+            <v-divider class="mt-1" />
 
-            <v-divider class="mt-1" /> 
-              <v-img
-                class="bg-white ma-4 d-flex justify-left"
-                :src="currentPartner.logo"
-                max-width="85%"
-                contain
-                max-height="27.5vh"
-                cover
-              ></v-img> 
-
-            <v-divider/>
-          </v-list-item-group>
+            <v-img
+              class="bg-white ma-4 d-flex justify-left"
+              :src="currentPartner.logo"
+              max-width="85%"
+              contain
+              max-height="27.5vh"
+            ></v-img>
+            <p class="text-center">
+               {{ currentPartner.fullname }} 
+            </p>
+            <div class="pa-2">
+              <v-btn
+                :block="!rail"
+                :icon="rail"
+                variant="outlined"
+                :size="rail ? 'small' : undefined"
+                @click="logout"
+              >
+                <v-icon class="i-iconoir-log-out text-xl"></v-icon>
+                <span v-show="!rail">{{ $t("dashboard.sidebar.logout") }}</span>
+              </v-btn>
+            </div>
+          </v-list>
         </v-list>
-
-        <template v-slot:append>
-          <div class="pa-2">
-            <v-btn
-              :block="!rail"
-              :icon="rail"
-              :size="rail ? 'small' : undefined"
-              @click="logout"
-            >
-              <v-icon class="i-iconoir-log-out text-xl"></v-icon>
-              <span v-show="!rail">
-                {{ $t("dashboard.sidebar.logout") }}
-              </span>
-            </v-btn>
-          </div>
-        </template>
       </v-navigation-drawer>
 
+      <!-- Main Content Area -->
       <v-main class="text-slate-700 dark:text-slate-300">
         <v-container>
           <RouterView />
@@ -208,9 +256,11 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
     <v-dialog width="630" v-model="resourceStore.showExamsDialog">
       <PublisherExams />
     </v-dialog>
+
     <v-dialog width="630" v-model="resourceStore.showAssignmentsDialog">
       <PublisherAssignments />
     </v-dialog>
@@ -231,6 +281,9 @@ import { useResourceStore } from "@/stores/resources";
 const isComputingRoute = ref(false);
 const route = useRoute();
 const readyView = ref(false);
+const userStore = useUserStore();
+
+const currentUserId = localStorage.getItem("sessionId");
 // Method to check if the current route includes 'dashboard/computing'
 const checkRoute = () => {
   if (route.path.includes("dashboard/computing")) {
@@ -286,23 +339,20 @@ const topicTitle = localStorage.getItem("articleTopic");
 if (topicTitle !== null && topicTitle.length > 5) {
   addingComputing.value = true;
 }
+
 onBeforeMount(async () => {
   localStorage.removeItem("articleLanguage");
   localStorage.removeItem("articleTopic");
 
   if (typeof localStorage !== "undefined") {
     const storedUser = localStorage.getItem("sessionId");
-    if (storedUser) {
-      try {
-        await userStore.getCurrentUser(storedUser);
-        readyView.value = true;
-      } catch (error) {
-        router.push("/auth/login");
-      //  setTimeout(() => {
-         
-      //  }, 60000*5);
-      }
+    if (storedUser === null || storedUser === "GUEST ACCESS" || !storedUser) {
+      localStorage.setItem("sessionId", "GUEST ACCESS");
+      readyView.value = true;
+      return;
     }
+    await userStore.getCurrentUser(storedUser);
+    readyView.value = true;
   }
 });
 onMounted(async () => {
@@ -310,7 +360,6 @@ onMounted(async () => {
 });
 const { t, locale } = useI18n();
 const router = useRouter();
-const userStore = useUserStore();
 
 const drawer = ref(true);
 const rail = ref(false);
@@ -321,6 +370,10 @@ const evalPollPath = ref("/poll/participant");
 // Function to fetch the latest poll and update the path
 const fetchPoll = async () => {
   const userId = localStorage.getItem("sessionId");
+  if (userId === null || userId === "GUEST ACCESS" || !userId) {
+    localStorage.setItem("sessionId", "GUEST ACCESS");
+    return 0;
+  }
   //@ts-ignore
   await resourceStore.getPublisherLatestPoll(userId);
 
@@ -426,14 +479,33 @@ function getTooltipHighlight(title: string) {
 }
 async function fetchPresentersExams() {
   const userId = localStorage.getItem("sessionId");
+  if (userId === null || userId === "GUEST ACCESS" || !userId) {
+    localStorage.setItem("sessionId", "GUEST ACCESS");
+    router.push("/auth/register");
+    return;
+  }
   //@ts-ignore
   await resourceStore.getPublisherLatestExams(userId);
 
   // Check if user is creator
   //@ts-ignore
 }
+function goToRegister() {
+  const userId = localStorage.getItem("sessionId");
+  if (userId === null || userId === "GUEST ACCESS" || !userId) {
+    localStorage.setItem("sessionId", "GUEST ACCESS");
+    router.push("/auth/register");
+    return;
+  }
+  resourceStore.showCreateResourceDialog = true;
+}
 async function fetchPresentersTasks() {
   const userId = localStorage.getItem("sessionId");
+  if (userId === null || userId === "GUEST ACCESS" || !userId) {
+    localStorage.setItem("sessionId", "GUEST ACCESS");
+    router.push("/auth/register");
+    return;
+  }
   //@ts-ignore
   await resourceStore.getPublisherLatestTasks(userId);
 
@@ -479,6 +551,12 @@ function logout() {
   }
 }
 const goToMyAccount = () => {
+  const userId = localStorage.getItem("sessionId");
+  if (userId === null || userId === "GUEST ACCESS" || !userId) {
+    localStorage.setItem("sessionId", "GUEST ACCESS");
+    router.push("/auth/register");
+    return;
+  }
   router.push("my-account"); // Navigates to /my-account
 };
 </script>

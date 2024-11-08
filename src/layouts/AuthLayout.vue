@@ -12,10 +12,9 @@
         <v-img
           class="bg-white"
           :src="currentPartner.logo"
-          max-width="85%"
-          contain
+          max-width="85%" 
           max-height="27.5vh"
-          cover
+          contain
         ></v-img>
       </div>
 
@@ -45,28 +44,28 @@ import partners from "@/data/partnersSponsors";
 const currentEvents = [
   {
     posterUrl:
-      "https://cdn-az.allevents.in/events5/banners/2e587573ad3830fda503d5e7cd8816e9f74bb07689d23cba6c48dce1252a2a49-rimg-w1200-h600-dc6bc8cd-gmir.jpg",
-    organizerName: "AllEvents",
+      "https://researchweek.uonbi.ac.ke/wp-content/uploads/2024/04/RW-Website-Banner-2-3-1024x272.png",
+    organizerName: "University of Nairobi",
   },
   {
     posterUrl:
-      "https://media.licdn.com/dms/image/v2/D4E10AQEiLte9W_5fGw/image-shrink_1280/image-shrink_1280/0/1728407714063?e=1730217600&v=beta&t=l6Yj3CfhkDprh8dIs_8YavMecdf2qthbgepYane6t3k",
-    organizerName: "Fierce Biotech",
+      "https://pbs.twimg.com/media/GIY2xwCW4AAvJjO?format=jpg&name=4096x4096",
+    organizerName: "KNH Research",
   },
   {
     posterUrl:
-      "https://medall-prod-assets.s3.eu-west-2.amazonaws.com/uploads/organisation_event/image/ae8d528e-a71a-4ada-8908-fb6e912b5572/932ff6e046.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIATF6O5WPBDCOEPEFD%2F20241022%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20241022T151903Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=009947183d6da8787a4170fc0fccaae07257c82714c8f51c0b1658d42735ac27",
-    organizerName: "Global Surgery",
+      "https://scontent.fnuu2-1.fna.fbcdn.net/v/t1.6435-9/67443204_2874234642650088_6613907305471672320_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeGC8vDQ_TzPjNmjaMgwKM8qVx9PoaSfa9FXH0-hpJ9r0VPFXJOaPilqz7bmjGACnXKOo3Rllen5iiVz_-rfprgV&_nc_ohc=XYmvs-Z0b5wQ7kNvgFl8_yf&_nc_zt=23&_nc_ht=scontent.fnuu2-1.fna&_nc_gid=AixG3K9gus7f6AwvE0blBvI&oh=00_AYClojqI0gJ93DdoZZG7aroB3ybZCXp0FLngrZJyRh2tIA&oe=6754896F",
+    organizerName: "KNH Research",
   },
   {
     posterUrl:
-      "https://scontent.fnuu2-1.fna.fbcdn.net/v/t39.30808-6/398193494_1044255920330534_6286505808141889138_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeGO9_9-fFV0AAQbNwcB-I12wHvDC0tYejPAe8MLS1h6MxyCRtnSdfpZ_yEuVJioFCGGyeZqd1ustnood5O-wmeP&_nc_ohc=B3vljSVP-ncQ7kNvgG8eJla&_nc_zt=23&_nc_ht=scontent.fnuu2-1.fna&_nc_gid=A8E7gDkv9oQIXKzxHsD8ZT3&oh=00_AYB6RKAka8kumBVQi8pLFB7eeZsYReryEZR5l6JB8T-92g&oe=671D9D01",
-    organizerName: "Global Health Equity",
+      "https://scontent.fnuu2-1.fna.fbcdn.net/v/t39.30808-6/465271248_1110773457717833_815875845610763619_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=f727a1&_nc_eui2=AeHfKwP5tf3Q-qYJK0g8osWHbhAhlBuszQxuECGUG6zNDGM0Fey3wLBCNU7joe1cH_6kQQ7yT6NyJTr1vJqHy_4q&_nc_ohc=N1_scrZZEtAQ7kNvgFWmIOI&_nc_zt=23&_nc_ht=scontent.fnuu2-1.fna&_nc_gid=A8tZNGrOnZNGFg9QLvgyBCn&oh=00_AYBc_s-y2NpZN3U8sFJH3nZmw5XbW0doRABk0JZ1-CesGA&oe=67330139",
+    organizerName: "KESHO",
   },
   {
     posterUrl:
-      "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F872281769%2F2089964232253%2F1%2Foriginal.20241011-112435?h=740&w=1200&auto=format%2Ccompress&q=75&sharp=10&s=dba2946d954064ef4cf8e868cc9aebab",
-    organizerName: "British Association of Black Surgeons",
+      "https://scontent.fnuu2-1.fna.fbcdn.net/v/t39.30808-6/319844893_1246171142607256_5388616207296651138_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeFyY8iLdHcXKArQ56qtOHYqOp2YOQ7D0fw6nZg5DsPR_ARUP-3Z7VQ7iFmUidsN2Oc2wgeIU9M0ii6yxlbbCOV5&_nc_ohc=fPYALr4Tx5kQ7kNvgGjKm6Z&_nc_zt=23&_nc_ht=scontent.fnuu2-1.fna&_nc_gid=AweUO8H8V444Ev5ljvQNjO5&oh=00_AYBS-Cy6y0lpnoKGLRI9MAL32kNcltEnd7H1NTz5MUBT-A&oe=67332247",
+    organizerName: "PSK",
   },
 ];
 
