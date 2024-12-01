@@ -3,14 +3,15 @@
     <v-layout full-height>
       <!-- App Bar -->
       <v-app-bar class="">
-        <router-link
-          to="/dashboard/library"
-          class="px-8 flex items-center w-64"
-        >
+        <router-link to="/welcome" class="px-8 flex items-center w-64">
           <v-img
             src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png"
             width="180"
-            @click="drawer = true"
+            @click="
+              (drawer = true),
+                (resourceStore.showingResourceTitles = true),
+                (resourceStore.showingResourceTitleItems = false)
+            "
             height="120"
           />
         </router-link>
@@ -24,6 +25,19 @@
         <!-- User Controls v-if="userStore.user && userStore.user.personalInfo.username"
 v-if="userStore.user && userStore.user.personalInfo.username"
 v-if="userStore.user && userStore.user.personalInfo.username" -->
+        <v-text-field
+          v-model="searchQuery"
+          label="Search"
+          size="small"
+          variant="outlined"
+          density="compact"
+          rounded
+          class="mt-7"
+          max-width="21rem"
+          clearable
+          append-inner-icon="mdi-magnify"
+          @input="handleInput"
+        ></v-text-field>
         <v-col cols="auto">
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
@@ -172,7 +186,11 @@ v-if="userStore.user && userStore.user.personalInfo.username" -->
                 class="custom-tooltip"
               >
                 <template v-slot:activator="{ props }" v-show="rail">
-                  <div v-bind="props" class="d-flex align-center">
+                  <div
+                    @click="checkRoute(item.title)"
+                    v-bind="props"
+                    class="d-flex align-center"
+                  >
                     <v-icon class="me-2">{{ item.iconClass }}</v-icon>
                     <v-list-item-title>{{ item.title }}</v-list-item-title>
                   </div>
@@ -197,7 +215,7 @@ v-if="userStore.user && userStore.user.personalInfo.username" -->
               max-height="27.5vh"
             ></v-img>
             <p class="text-center">
-               {{ currentPartner.fullname }} 
+              {{ currentPartner.fullname }}
             </p>
             <div class="pa-2">
               <v-btn
@@ -278,20 +296,47 @@ import partners from "@/data/partnersSponsors";
 
 import PublisherAssignments from "@/components/resourcePlayers/tasks/PublisherAssignments.vue";
 import { useResourceStore } from "@/stores/resources";
+
 const isComputingRoute = ref(false);
 const route = useRoute();
 const readyView = ref(false);
 const userStore = useUserStore();
-
+/**setCurrentSubjectArea(newSubject) */
 const currentUserId = localStorage.getItem("sessionId");
+
+const resourceStore = useResourceStore();
+function setSubjectTopics(newSubject: string) {
+  resourceStore.setCurrentSubjectArea(newSubject);
+}
 // Method to check if the current route includes 'dashboard/computing'
-const checkRoute = () => {
+const checkRoute = (newSubject: string) => {
+  resourceStore.showingResourceTitles = true;
+  resourceStore.showingResourceTitleItems = false;
+
+  if (route.path.includes("dashboard/library")) {
+    resourceStore.setCurrentSubjectArea(newSubject);
+  }
   if (route.path.includes("dashboard/computing")) {
     isComputingRoute.value = true;
     drawer.value = false;
   } else {
     isComputingRoute.value = false;
   }
+};
+
+const searchQuery = ref("");
+let debounceTimer: string | number | NodeJS.Timeout | undefined;
+
+const handleInput = () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    onUserPaused(searchQuery.value);
+  }, 300); // 300ms delay
+};
+
+const onUserPaused = (query: string) => {
+  console.log("User paused. Searching for:", query);
+  // Add your logic here, e.g., API call, filtering, etc.
 };
 const currentIndex = ref(Math.floor(Math.random() * partners.length));
 
@@ -330,10 +375,12 @@ onMounted(() => {
 });
 // Optionally, watch for route changes to automatically toggle
 watch(route, (newRoute) => {
-  checkRoute();
   isComputingRoute.value = newRoute.path.includes("dashboard/computing");
+  if (route.path.includes("dashboard/computing")) {
+    isComputingRoute.value = true;
+    drawer.value = false;
+  }
 });
-const resourceStore = useResourceStore();
 const addingComputing = ref(false);
 const topicTitle = localStorage.getItem("articleTopic");
 if (topicTitle !== null && topicTitle.length > 5) {
@@ -343,7 +390,10 @@ if (topicTitle !== null && topicTitle.length > 5) {
 onBeforeMount(async () => {
   localStorage.removeItem("articleLanguage");
   localStorage.removeItem("articleTopic");
-
+router.push("/dashboard/library")
+  drawer.value = true;
+  resourceStore.showingResourceTitles = true;
+  resourceStore.showingResourceTitleItems = false;
   if (typeof localStorage !== "undefined") {
     const storedUser = localStorage.getItem("sessionId");
     if (storedUser === null || storedUser === "GUEST ACCESS" || !storedUser) {
@@ -354,6 +404,7 @@ onBeforeMount(async () => {
     await userStore.getCurrentUser(storedUser);
     readyView.value = true;
   }
+
 });
 onMounted(async () => {
   await fetchPoll();
@@ -390,26 +441,27 @@ const fetchPoll = async () => {
 
 const sidebarItems = computed(() => [
   {
-    title: t("dashboard.sidebar.dashboard-overview"),
-    tooltip: "Glance at an overview of the resources added to NEMBio",
-    value: "dashboard-overview",
-    iconClass: "i-iconoir-dashboard-speed me-4 text-xl",
-    path: "/dashboard/overview",
-  },
-  {
-    title: t("dashboard.sidebar.library"),
-    tooltip: "Access the digital library",
-    value: "library",
-    iconClass: "mdi-bookshelf me-4 text-xl",
+    title: t("dashboard.sidebar.epidemiology"),
+    tooltip: "Explore epidemiology resources",
+    value: "epidemiology",
+    iconClass: "mdi-account-multiple-outline",
     path: "/dashboard/library",
   },
   {
-    title: t("dashboard.sidebar.tasks"),
-    tooltip: "Manage and track your assignments",
-    value: "tasks",
-    iconClass: "i-iconoir-doc-star me-4 text-xl",
-    path: "/dashboard/tasks",
+    title: t("dashboard.sidebar.biostatistics"),
+    tooltip: "Access biostatistics tools and resources",
+    value: "biostatistics",
+    iconClass: "mdi-chart-histogram me-4 text-xl",
+    path: "/dashboard/library",
   },
+  {
+    title: t("dashboard.sidebar.research-methods"),
+    tooltip: "Learn about research methodologies",
+    value: "research-methods",
+    iconClass: "mdi-bookshelf me-4 text-xl",
+    path: "/dashboard/library",
+  },
+
   {
     title: t("dashboard.sidebar.papers"),
     tooltip: "Read and participate in interactive journal papers discussion",
@@ -454,11 +506,11 @@ const sidebarItems = computed(() => [
     path: "/dashboard/consults",
   },
   {
-    title: t("dashboard.sidebar.analysis"),
-    tooltip: "We collect, analyze and generate reports from data",
-    value: "analysis",
-    iconClass: "mdi-database-refresh-outline me-4 text-xl",
-    path: "/dashboard/analysis",
+    title: t("dashboard.sidebar.donate"),
+    tooltip: "Support the life sciences—donate to share knowledge!",
+    value: "donate",
+    iconClass: "mdi-wallet-giftcard me-4 text-xl",
+    path: "/donate",
   },
 ]);
 

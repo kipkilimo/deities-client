@@ -19,7 +19,7 @@ export enum ResourceType {
   TEST = "TEST",
   POSTER = "POSTER",
   ARTICLE = "ARTICLE",
-  JOB = "JOB",
+  OPPORTUNITY = "OPPORTUNITY",
   TASK = "TASK",
 }
 
@@ -62,6 +62,9 @@ export const useResourceStore = defineStore("resource", {
   state: () => ({
     prediction: "",
 
+    currentSubjectArea: "Epidemiology", // Research Methods, Biostatistics
+    showTopics: true,
+
     surveyLikertQuestion:
       "What is your take on NEMBio, 'The Hub for Interactive Life Sciences Research Tools.', after the introduction given?",
     surveyLikertOptions: [
@@ -78,8 +81,13 @@ export const useResourceStore = defineStore("resource", {
     exam: "",
     tasks: "",
     task: "",
+    activeTitle: "",
     resource: {} as Resource,
     resourceIsComputing: false,
+
+    showingResourceTitles: true,
+    showingResourceTitleItems: false,
+
     resources: [] as Resource[],
     filteredResources: [] as Resource[],
     sortBy: "title" as keyof Resource,
@@ -90,6 +98,16 @@ export const useResourceStore = defineStore("resource", {
     showAssignmentsDialog: false,
   }),
   actions: {
+    // currentSubjectArea: "Epidemiology"
+    setCurrentSubjectArea(newSubject: string) {
+      console.log({ setting_subject: newSubject });
+      this.currentSubjectArea = newSubject;
+      this.showTopics = false;
+      setTimeout(() => {
+        this.showTopics = true;
+      }, 90);
+    },
+
     setQuestion(newQuestion: string) {
       this.surveyLikertQuestion = newQuestion;
     },
@@ -266,6 +284,15 @@ export const useResourceStore = defineStore("resource", {
           getAllResources {
             id
             contentType
+            title
+            viewsNumber
+            likesNumber
+            sharesNumber
+            subject
+            topic
+            averageRating
+            createdAt
+            isPublished
           }
         }
       `;
@@ -276,6 +303,47 @@ export const useResourceStore = defineStore("resource", {
         const resources = response.data.getAllResources;
         if (resources) {
           this.resources = resources;
+        } else {
+          throw new Error("Failed to fetch resources");
+        }
+      } catch (error) {
+        console.error("Error fetching resources:", error);
+      }
+    },
+    async getAllTopicResourcesByTopic(resourceTitle: string) {
+      const GET_TOPIC_RESOURCES = gql`
+        query ($resourceTitle: String!) {
+          getAllTopicResourcesByTopic(resourceTitle: $resourceTitle) {
+            id
+            contentType
+            title
+            contentType
+            viewsNumber
+            likesNumber
+            sharesNumber
+            subject
+            topic
+            coverImage
+            averageRating
+            createdAt
+            keywords
+            description
+          }
+        }
+      `;
+
+      try {
+        this.resources = [];
+        const response = await client.query({
+          query: GET_TOPIC_RESOURCES,
+          variables: { resourceTitle },
+        });
+
+        const resources = response.data.getAllTopicResourcesByTopic;
+        if (resources) {
+          this.resources = resources;
+          this.showingResourceTitles = false;
+          this.showingResourceTitleItems = true;
         } else {
           throw new Error("Failed to fetch resources");
         }
@@ -366,6 +434,7 @@ export const useResourceStore = defineStore("resource", {
         });
         const resources = response.data.getAllSpecificTypeResources;
         this.resources = resources;
+        this.resource = resources[0];
       } catch (error) {
         console.error("Error fetching resources:", error);
       }
@@ -899,6 +968,40 @@ export const useResourceStore = defineStore("resource", {
         console.error("Error fetching resources:", error);
       }
     },
+    async togglePublicationStatus(resourceData: {
+      resourceStatus: string;
+      resourceId: string;
+    }) {
+      const TOGGLE_RESOURCE_STATUS = gql`
+        mutation TogglePublicationStatus(
+          $resourceStatus: String!
+          $resourceId: String!
+        ) {
+          togglePublicationStatus(
+            resourceStatus: $resourceStatus
+            resourceId: $resourceId
+          ) {
+            id
+            contentType
+            title
+          }
+        }
+      `;
+
+      try {
+        const response = await client.mutate({
+          mutation: TOGGLE_RESOURCE_STATUS,
+          variables: resourceData,
+        });
+
+        // Update the resource with the response data
+        const newResource = response.data.togglePublicationStatus;
+        this.resource = newResource;
+      } catch (error) {
+        console.error("Error toggling publication status:", error);
+      }
+    },
+
     async createResource(resourceData: {
       title: string;
       description: string;

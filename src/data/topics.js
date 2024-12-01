@@ -1,18 +1,18 @@
 const topics = {
     "Epidemiology": {
         "Core Concepts": [
+            "Introduction to Epidemiology",
             "Principles of Epidemiology",
             "Measures of Disease Frequency",
             "Measures of Association",
             "Measures of Effect",
             "Study Designs (e.g Cohort, Case-Control, Cross-Sectional)",
             "Bias, Confounding, and Interaction",
-            "Causal Inference",
-            "Infectious Disease Epidemiology", "Screening and Diagnostic Tests",
-            "Outbreak Investigation and Response",
-            "Surveillance Systems",
+            "Causal Inference", "Screening and Diagnostic Tests",
+            "Outbreak Investigation and Surveillance Systems",
         ],
-        "Advanced Topics": [
+        "An introduction to specialised topics": [
+            "Infectious Disease Epidemiology",
             "Social Epidemiology",
             "Molecular Epidemiology",
             "Chronic Disease Epidemiology",
@@ -22,7 +22,7 @@ const topics = {
             "Cancer Epidemiology",
             "Pharmacoepidemiology"
         ],
-        "Data Analysis": [
+        "Specialised Data Collection & Management Methods": [
             "Survival Analysis",
             "Multivariable Regression",
             "Longitudinal Data Analysis",
@@ -33,29 +33,31 @@ const topics = {
 
     "Biostatistics": {
         "Core Concepts": [
-            "Descriptive Statistics", "Probability Theory", "Hypothesis Testing", "Confidence Intervals", "Correlation and Regression", "Nonparametric Statistics", "Sampling and Sampling Distributions", "Computing and Statistical Software"
+            "Introduction to Biostatistics",
+            "Descriptive Statistics", "Probability Theory", "Hypothesis Testing", "Confidence Intervals", "Correlation and Regression", "Nonparametric Statistics", "Sampling and Sampling Distributions", "Introduction to Computing and Statistical Software"
         ],
-        "Advanced Topics": [
-            "Bayesian Methods",
-            "Machine Learning for Health Data",
-            "Genomic Data Analysis",
-            "Clinical Trials Design and Analysis",
-            "Hierarchical and Mixed Models",
-            "Statistical Computing",
-            "Cox Proportional Hazards Model",
-            "Kaplan-Meier Estimator",
+        "An introduction to specialised topics": [
+            "Topics in Statistical Computing",
             "Generalized Linear Models (GLM)",
+            "Multivariable Analysis",
+            "Principal Component Analysis (PCA)",
+            "Meta-Analysis",
+            "Kaplan-Meier Estimator",
+            "Cox Proportional Hazards Model",
+            "Hierarchical and Mixed Models",
             "Mixed Effects Models",
             "Propensity Score Matching",
-            "Meta-Analysis",
-            "Multivariate Analysis",
-            "Principal Component Analysis (PCA)",
-            "Structural Equation Modeling (SEM)"
+            "Structural Equation Modeling (SEM)",
+            "Clinical Trials Design and Analysis",
+            "Machine Learning for Health Data",
+            "Genomic Data Analysis",
+            "Bayesian Methods"
         ],
-        "Data Management": [
+
+        "Specialised Data Collection & Management Methods": [
             "Data Cleaning and Preparation",
             "Data Visualization",
-            "Advanced Statistical Software (R, SAS, STATA)"
+            "Advanced Statistical Software (STATA, R, Python)"
         ]
     }
 
@@ -69,15 +71,20 @@ const topics = {
             "Mixed Methods Research",
             "Systematic Reviews and Meta-Analysis"
         ],
-        "Advanced Topics": [
-            "Grant Writing and Proposal Development",
-            "Community-Based Participatory Research",
-            "Implementation Science",
-            "Health Policy Research",
-            "Global Health Research Methods",
-            "Randomized Controlled Trials"
-        ],
-        "Data Collection & Management": [
+        "An introduction to specialised topics": [
+            "Qualitative Research: Data collection methods",
+            "Quantitative Research: Statistical analysis and surveys",
+            "Mixed-Methods: Combining qualitative and quantitative",
+            "Experimental Design: Control and randomization",
+            "Survey Methods: Design and sampling",
+            "Longitudinal Studies: Tracking over time",
+            "Case Studies: In-depth contextual research",
+            "Sampling: Types and techniques",
+            "Systematic Reviews: Synthesizing studies",
+            "Research Ethics: Consent and confidentiality"
+        ]
+        ,
+        "Specialised Data Collection & Management Methods": [
             "Survey Development",
             "Questionnaire Design",
             "Data Collection Techniques",

@@ -178,9 +178,12 @@ const uploadJournalPaper = async () => {
   }
 };
 
-onBeforeMount(async () => {
-  await paperStore.getMostRecentPapers();
-});
+// onBeforeMount(async () => {
+//   if(userId.value === 'GUEST ACCESS'){
+//   return 0
+// }
+//   await paperStore.getMostRecentPapers();
+// });
 </script>
 
 <style scoped>

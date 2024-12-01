@@ -42,7 +42,7 @@
       ></v-img>
 
       <!-- Subtitle -->
-      <div class="text-subtitle-1 text-medium-emphasis">Purchase Via MPESA</div>
+      <div class="text-subtitle-1 text-medium-emphasis">Donation Via MPESA</div>
 
       <!-- Form -->
       <v-form v-model="isFormValid" lazy-validation>
@@ -72,7 +72,7 @@
               </v-card-text>
             </v-card>
 
-            <!-- Initiate Purchase Button -->
+            <!-- Initiate Donation Button -->
             <v-btn
               block
               rounded="4"
@@ -82,9 +82,9 @@
               size="large"
               :disabled="phone_number.length < 9 || isLoading"
               :loading="isLoading"
-              @click="handlePublicationCreditsPaymentViaMpesa"
+              @click="handleDonationViaMpesa"
             >
-              Initiate Purchase
+              Initiate Donation
             </v-btn>
           </v-col>
         </v-row>
@@ -112,19 +112,20 @@ const phonenumberRules = [
   (v) => (v && v.length >= 9) || "Phone number too short",
 ];
 
+// handleMakeDonationViaPaypal,handleDonationViaMpesa
 const phone_number = ref("");
 const success = ref(null);
 const error = ref(null);
 const isLoading = ref(false);
 const isFormValid = ref(true);
-const handlePublicationCreditsPaymentViaMpesa = async () => {
+const handleDonationViaMpesa = async () => {
   const paymentsStore = usePaymentsStore();
   isLoading.value = true;
   try {
-    const retrievedPurchaseDetails = JSON.parse(
+    const retrievedDonationDetails = JSON.parse(
       localStorage.getItem("creditPurchaseDetails") || "{}"
     );
-    console.log({ retrievedPurchaseDetails });
+    console.log({ retrievedDonationDetails });
     var lastNine = phone_number.value.slice(-9);
     const phone_number_full = `254${lastNine}`;
     const vals = {
@@ -133,22 +134,11 @@ const handlePublicationCreditsPaymentViaMpesa = async () => {
       paidAmount: String(
         (Number(retrievedDonationDetails.paidAmount) * DOLLAR_RATE).toFixed(0)
       ),
-      departmentId: retrievedPurchaseDetails.departmentId,
-      transactionEntity: retrievedPurchaseDetails.payersName,
+      departmentId: retrievedDonationDetails.departmentId,
+      transactionEntity: retrievedDonationDetails.payersName,
     };
 
-    const response =
-      await paymentsStore.publicationCreditsPaymentViaMpesa(vals);
-    console.log({ paymentResponse: response });
-    if (response.transactionReferenceNumber.length === 12) {
-      success.value = "Success. Publication credits have been updated.";
-    }
-    setTimeout(() => {
-      isLoading.value = false;
-
-      window.location.href = "/dashboard/library";
-      success.value = null;
-    }, 4200);
+    await paymentsStore.handleDonationViaMpesa(vals);
   } catch (err) {
     error.value = err.message.replace("GraphQL error:", "").trim();
     isLoading.value = false;

@@ -181,7 +181,7 @@ const ResourceType = {
   TEST: "TEST",
   POSTER: "POSTER",
   ARTICLE: "ARTICLE",
-  JOB: "JOB",
+  OPPORTUNITY: "OPPORTUNITY",
   TASK: "TASK",
   MODEL: "MODEL",
   COMPUTING: "COMPUTING",
@@ -201,7 +201,7 @@ const resourceComponentMap = {
   [ResourceType.ARTICLE]: { uploader: null, form: ArticleForm },
   [ResourceType.POLL]: { uploader: null, form: PollForm },
   [ResourceType.LINK]: { uploader: null, form: LinksForm },
-  [ResourceType.JOB]: { uploader: null, form: JobForm },
+  [ResourceType.OPPORTUNITY]: { uploader: null, form: JobForm },
   [ResourceType.MODEL]: { uploader: null, form: ModelForm }, //
   [ResourceType.COMPUTING]: { uploader: null, form: ComputingTopicForm },
 };

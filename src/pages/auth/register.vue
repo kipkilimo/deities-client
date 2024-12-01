@@ -1,8 +1,8 @@
 <template>
   <v-card class="login-card mt-4 ml-2" elevation="4" outlined rounded>
     <v-card-title class="text-center">
-      <v-img
-        style="height: 12rem"
+      <v-img  @click="goHome"
+        style="height: 12rem;cursor: pointer"
         src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png"
       />
       <h5 class="mt-4 mr-11" style="color: #777777">
@@ -210,6 +210,9 @@ const validatePassword = () => {
   );
   isButtonDisabled2.value = !allRulesPass;
 };
+function goHome() {
+  router.push("/welcome");
+}
 const togglePassword = () => {
   showPassword.value = !showPassword.value;
 };

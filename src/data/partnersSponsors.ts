@@ -13,7 +13,7 @@ const partners = [
   },
   {
     partnerType: "strategic",
-    logo: "https://scontent.fnuu2-1.fna.fbcdn.net/v/t39.30808-6/306964860_464793549010314_3907398108663779951_n.png?_nc_cat=103&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeF_tP_pc4lLa7nSNaiEC_1p17XYwgFBWMPXtdjCAUFYw5RmQX8HQPxJTZGyR_U3uSQq-7ybmXzQvoJPoXodMNE2&_nc_ohc=ENXYjy0mRFsQ7kNvgEwmMRm&_nc_zt=23&_nc_ht=scontent.fnuu2-1.fna&_nc_gid=AEsazj3L4Zx1_Z8KiKpXYVX&oh=00_AYCY47rJ4spxEZ1o0Mv74lWmC5hb1soRbi3R455smHgcQg&oe=67336DA6",
+    logo: "https://pbs.twimg.com/profile_images/771738168127348740/gwHQYC6I_400x400.jpg",
     fullname: "MSAKE",
   },
   {

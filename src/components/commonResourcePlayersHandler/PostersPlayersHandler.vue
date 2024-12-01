@@ -151,7 +151,7 @@ const ResourceType = {
   TEST: "TEST",
   POSTER: "POSTER",
   ARTICLE: "ARTICLE",
-  JOB: "JOB",
+  OPPORTUNITY: "OPPORTUNITY",
   TASK: "TASK",
   MODEL: "MODEL",
 } as const;
@@ -220,7 +220,7 @@ const resourceComponent = computed(() => {
     [ResourceType.EVENT]: EventPlayer,
     [ResourceType.ARTICLE]: ArticlePlayer,
     [ResourceType.POLL]: PollPlayer,
-    [ResourceType.JOB]: JobPlayer,
+    [ResourceType.OPPORTUNITY]: JobPlayer,
     [ResourceType.TASK]: AssignmentTaskPlayer,
     [ResourceType.LINK]: LinksPlayer,
     [ResourceType.MODEL]: ModelPlayer,

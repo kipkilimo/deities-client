@@ -12,10 +12,13 @@ hero:
     title: Features
 dashboard:
   sidebar:
-    dashboard-overview: Dashboard
-    papers: Paper Dive
+    epidemiology: Epidemiology
+    biostatistics: Biostatistics
+    research-methods: Research Methods
+
+    papers: Journal Club
     poster: Posters
-    poll: Live Poll
+    poll: NEMBio Polls
     tasks: Assignment Tasks
 
     events: Events
@@ -23,7 +26,7 @@ dashboard:
 
     programming: Computational Methods
     consults: Research Consultation
-    analysis: Data Analysis
+    donate: Donate to NEMBio
     logout: Logout
   main:
     dashboard-overview: Overview
@@ -44,3 +47,24 @@ error:
     is temporarily unavailable.
   backToHome: Back to home
   backToDashboard: Back to dashboard
+# {
+#     title: t("dashboard.sidebar.epidemiology"),
+#     tooltip: "Explore epidemiology resources",
+#     value: "epidemiology",
+#     iconClass: "mdi-virus me-4 text-xl",
+#     path: "/dashboard/epidemiology",
+# },
+# {
+#     title: t("dashboard.sidebar.biostatistics"),
+#     tooltip: "Access biostatistics tools and resources",
+#     value: "biostatistics",
+#     iconClass: "mdi-chart-bar me-4 text-xl",
+#     path: "/dashboard/biostatistics",
+# },
+# {
+#     title: t("dashboard.sidebar.research-methods"),
+#     tooltip: "Learn about research methodologies",
+#     value: "research-methods",
+#     iconClass: "mdi-lightbulb-question-outline me-4 text-xl",
+#     path: "/dashboard/research-methods",
+# },

@@ -306,7 +306,7 @@
           class="bbc-subtitle text-h5 primary pa-2 white--text"
           style="text-align: center"
         >
-          Set your programming language
+          Set your programming environment
         </v-toolbar>
 
         <v-card-actions class="d-flex justify-center">

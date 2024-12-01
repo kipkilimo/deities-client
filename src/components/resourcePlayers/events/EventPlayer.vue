@@ -135,10 +135,6 @@
 import { ref, onBeforeMount } from "vue";
 import { useResourceStore } from "@/stores/resources";
 
-const resourceStore = useResourceStore();
-
-// Slide URLs
-const retrievedParamsRaw = resourceStore.resource.content;
 // Fetch resources before mounting the component
 onBeforeMount(async () => {
   const queryParams = [
@@ -155,8 +151,12 @@ onBeforeMount(async () => {
   // selectResource(resourceStore.resources[0]);
 });
 // Sort the URLs
+const resourceStore = useResourceStore();
+
+// Slide URLs
+const retrievedParamsRaw =ref(resourceStore.resource.content);
 // Assuming you have retrieved paramsObjRaw from storage or API
-const retrievedParams = JSON.parse(retrievedParamsRaw);
+const retrievedParams = JSON.parse(retrievedParamsRaw.value);
 const currentEvent = retrievedParams[0];
 function formatLongDateWithTime(dateString) {
   const date = new Date(dateString);

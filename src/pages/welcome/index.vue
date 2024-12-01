@@ -217,7 +217,8 @@ const currentYear = ref(new Date().getFullYear());
 const router = useRouter();
 
 const scrollToCallToAction = () => {
-  router.push("/dashboard/library");
+  // @ts-ignore
+  window.location = "/dashboard/library";
 };
 
 const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });

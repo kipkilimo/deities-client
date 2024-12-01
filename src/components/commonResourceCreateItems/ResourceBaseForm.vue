@@ -5,8 +5,7 @@
       <v-col cols="12">
         <v-text-field
           v-model="formData.title"
-          label="Title"
-          :disabled="formData.resourceType === 'COMPUTING'"
+          label="Resource headline"
           :rules="[rules.required]"
         />
       </v-col>
@@ -265,7 +264,7 @@ onBeforeMount(async () => {
 // Define the form data
 const formData = ref({
   title: "",
-  description:   "",
+  description: "",
   subject: "",
   topic: "",
   targetRegion: "",

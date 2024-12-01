@@ -12,7 +12,7 @@ const resourceType = {
   DATASET: { icon: "⛁", name: "⛁⛁ DATASETS" },
   POLL: { icon: "🗣️📊", name: "🗣️📊 LIVE POLLS" },
   POSTER: { icon: "🎴", name: "🎴 ABSTRACT POSTERS" },
-  JOB: { icon: "📁", name: "📁 WORK STUDY" },
+  OPPORTUNITY: { icon: "📁", name: "📁 WORK STUDY" },
   LINK: { icon: "⛓️", name: "⛓️ RESOURCE LINKS" },
   MODEL: { icon: "🎲", name: "🎲 CLINICAL MODELS" },
   // Add more resource types here if needed
@@ -94,10 +94,10 @@ const staticResources = ref([
     ...resourceType.MODEL,
   },
   {
-    type: "JOB",
+    type: "OPPORTUNITY",
     description: "Find job opportunities and career resources.",
     resourceCount: 0,
-    ...resourceType.JOB,
+    ...resourceType.OPPORTUNITY,
   },
   // Add more static resources here if needed
 ]);

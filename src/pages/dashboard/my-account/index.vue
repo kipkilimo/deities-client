@@ -1,10 +1,15 @@
 <template>
   <v-container>
-    <AccountSummary />
+    <div class="" v-if="user.role !== 'ADMIN'">
+      <AccountSummary />
+    </div>
+    <div class="" v-if="user.role === 'ADMIN'">
+      <AdminDashboardItems />
+    </div>
   </v-container>
 </template>
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onBeforeMount, onMounted } from "vue";
 import gql from "graphql-tag";
 import { client } from "@/graphql/apolloClient";
 import {
@@ -18,6 +23,10 @@ import AccountSummary from "./AccountSummary.vue";
 // Register chart.js components
 Chart.register(LineElement, CategoryScale, LinearScale, Title);
 
+import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/users";
+import AdminDashboardItems from "./AdminDashboardItems.vue";
+const user = useUserStore().user;
 // State variables
 const isLoading = ref(false);
 const isError = ref(null);
@@ -86,6 +95,11 @@ function formatDate(dateString) {
 }
 
 onMounted(() => {
+  // const router = useRouter();
+  // console.log({user})
+  // if (user.role === "ADMIN") {
+  //   router.push("/dashboard/admin");
+  // }
   getAllResourcesSummary();
 });
 </script>

@@ -344,6 +344,9 @@ function evalClosingDate(timestamp) {
   return formattedDateTime;
 }
 const getRecentPapers = async () => {
+if(userId.value === 'GUEST ACCESS'){
+  return 0
+}
   isLoading.value = true;
 
   await paperStore.getMostRecentPapers(userId.value);

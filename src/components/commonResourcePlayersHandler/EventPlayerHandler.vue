@@ -4,7 +4,7 @@
     fluid
   >
     <!-- Top Row: Sort, Filter, Search Strip -->
- 
+    <!-- Add your sort, filter, and search components here -->
 
     <v-divider class="mb-2" />
 
@@ -13,31 +13,25 @@
       <!-- Right Column: Selected Resource -->
       <v-col cols="12" md="10">
         <v-card
-          v-if="!currentEvent"
+          v-if="sortedAndFilteredResources.length === 0"
           fluid
           @click="selectResource(resourceStore.resources[0])"
           height="63vh"
-          style="
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border-radius: 5px 5px 0px 0px !important;
-          "
+          class="center-content cursor-pointer rounded-top"
         >
           <v-img
             height="21vh"
-            class="mt-24 ma-4"
-            style="cursor: pointer"
+            class="mt-24 ma-4 cursor-pointer"
             src="https://cdn-icons-png.flaticon.com/512/907/907805.png"
           ></v-img>
         </v-card>
 
-        <v-container fluid v-if="currentEvent && showMedia">
+        <v-container fluid v-if="sortedAndFilteredResources.length >=1">
           <!-- Dynamic Resource Renderer -->
           <EventPlayer />
         </v-container>
       </v-col>
+
       <!-- Left Column: Resource Iterator Cards -->
       <v-col cols="12" md="2">
         <!-- Container for vertical scrolling -->
@@ -52,25 +46,25 @@
           >
             <v-card
               fluid
-              class="mb-2"
+              class="mb-2 resource-card cursor-pointer"
               height="4.5rem"
               @click="selectResource(resource)"
             >
               <v-row no-gutters>
                 <!-- Left Column: Image -->
                 <v-col cols="4">
-                  <v-img height="4.5rem" :src="resource.coverImage"></v-img>
+                  <v-img height="4.5rem" :src="resource.coverImage" />
                 </v-col>
 
                 <!-- Right Column: Details -->
                 <v-col cols="8">
-                  <v-card-title style="font-weight: 700">
-                    {{ resource.title }}
-                  </v-card-title>
-                  <v-card-subtitle style="font-weight: 400">
+                  <v-card-title class="resource-title">{{
+                    resource.title
+                  }}</v-card-title>
+                  <v-card-subtitle class="resource-subtitle">
                     {{ resource.subject }} - {{ resource.topic }}
                   </v-card-subtitle>
-                  <v-card-text style="font-weight: 400">
+                  <v-card-text class="resource-text">
                     {{ truncateText(resource.description, 50) }}
                   </v-card-text>
                 </v-col>
@@ -84,21 +78,11 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ref,
-  watch,
-  computed,
-  onMounted,
-  onBeforeMount,
-  onBeforeUnmount,
-} from "vue";
-// Import your components and store as needed
-import { useResourceStore } from "../../stores/resources"; // Adjust the path as necessary
+import { ref, watch, computed, onMounted, onBeforeMount } from "vue";
+import { useResourceStore } from "../../stores/resources";
+
 const resourceStore = useResourceStore();
 const retrievedParamsRaw = resourceStore.resource.content;
-
-// Sort the URLs
-// Assuming you have retrieved paramsObjRaw from storage or API
 const retrievedParams = retrievedParamsRaw
   ? JSON.parse(retrievedParamsRaw)
   : [];
@@ -113,22 +97,17 @@ const selectedResource = ref({});
 const showMedia = ref(false);
 
 const truncateText = (text: string | undefined, length: number) => {
-  if (!text) {
-    return ""; // Default return value
-  }
+  if (!text) return "";
   return text.length > length ? text.substring(0, length) + "..." : text;
 };
 
-// Computed property to filter and sort resources
 const sortedAndFilteredResources = computed(() => {
   let filtered = resourceStore.resources.filter((resource) => {
     const matchesSearch = resource.title
       ? resource.title.toLowerCase().includes(searchQuery.value.toLowerCase())
       : false;
-
     const matchesFilter =
       !filterOption.value || resource.subject === filterOption.value;
-
     return matchesSearch && matchesFilter;
   });
 
@@ -146,31 +125,21 @@ const sortedAndFilteredResources = computed(() => {
   return filtered;
 });
 
-const selectResource = async (resource: any) => {
+const selectResource = async (resource: { id: string; title: string; description: string; content: string; targetRegion: string; targetCountry: string; slug: string; language: string; contentType: string; viewsNumber: number; likesNumber: number; sharesNumber: number; subject: string; topic: string; rating: string; participants: string; sessionId: string; accessKey: string; keywords: string; coverImage: string; isPublished: boolean; averageRating: number; reviews: string; createdBy: string; createdAt: string; updatedAt: string; }) => {
   showMedia.value = false;
   await resourceStore.fetchResource(resource.id);
   selectedResource.value = resourceStore.resource;
 };
-// Function to select the first resource and show media
+
 const selectFirstResource = () => {
   selectResource(resourceStore.resources[0]);
   showMedia.value = true;
 };
 
-// Watch for changes in currentEvent
 watch(currentEvent, (newValue) => {
-  if (newValue) {
-    // Add any conditions here based on newValue if needed
-    setTimeout(selectFirstResource, 300); // Delay action by 300ms
-  }
+  if (newValue) selectFirstResource;
 });
-
-// Run once on component mount
-onMounted(() => {
-  // Initial setup logic if necessary
-  setTimeout(selectFirstResource, 300);
-});
-// Fetch resources before mounting the component
+ 
 onBeforeMount(async () => {
   const queryParams = [
     {
@@ -183,7 +152,9 @@ onBeforeMount(async () => {
     },
   ];
   await resourceStore.getAllSpecificTypeResources(JSON.stringify(queryParams));
-  //
+  selectResource(resourceStore.resources[0])
+
+  showMedia.value = true;
 });
 </script>
 
@@ -200,22 +171,40 @@ onBeforeMount(async () => {
   font-family: "Inter", sans-serif;
 }
 
-.v-card-title {
+.resource-card {
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.resource-title {
   font-weight: 700;
 }
 
-.v-card-subtitle,
-.v-card-text {
+.resource-subtitle,
+.resource-text {
   font-weight: 400;
 }
 
-/* Add media queries for more specific styling adjustments if needed */
+.center-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.rounded-top {
+  border-radius: 5px 5px 0 0 !important;
+}
+
 @media (max-width: 600px) {
   .v-card {
-    height: auto; /* Adjust card height on smaller screens */
+    height: auto;
   }
   .v-row {
-    flex-direction: column; /* Stack rows on smaller screens */
+    flex-direction: column;
   }
 }
 </style>
