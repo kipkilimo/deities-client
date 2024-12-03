@@ -408,33 +408,140 @@ export const useResourceStore = defineStore("resource", {
         console.error("Error fetching resource:", error);
       }
     },
+    // getAllSpecificTypeResources
     async getAllSpecificTypeResources(resourceType: string) {
-      const SPECIFIC_RESOURCE_TYPE = gql`
+      const GET_RESOURCE_TYPE = gql`
         query ($resourceType: String!) {
           getAllSpecificTypeResources(resourceType: $resourceType) {
             id
+            contentType
             title
             contentType
             viewsNumber
             likesNumber
-            content
             sharesNumber
             subject
             topic
             coverImage
             averageRating
+            createdAt
+            keywords
+            description
           }
         }
       `;
 
       try {
         const response = await client.query({
-          query: SPECIFIC_RESOURCE_TYPE,
+          query: GET_RESOURCE_TYPE,
           variables: { resourceType },
         });
         const resources = response.data.getAllSpecificTypeResources;
         this.resources = resources;
-        this.resource = resources[0];
+      } catch (error) {
+        console.error("Error fetching resources:", error);
+      }
+    },
+    async getRecentResources(userId: string) {
+      this.resources = [];
+      const GET_RECENT_RESOURCES = gql`
+        query ($userId: String!) {
+          getRecentResources(userId: $userId) {
+            id
+            contentType
+            title
+            contentType
+            viewsNumber
+            likesNumber
+            sharesNumber
+            subject
+            topic
+            coverImage
+            averageRating
+            createdAt
+            keywords
+            description
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: GET_RECENT_RESOURCES,
+          variables: { userId },
+        });
+        const resources = response.data.getRecentResources;
+        this.resources = resources;
+      } catch (error) {
+        console.error("Error fetching resources:", error);
+      }
+    },
+    // library
+    async getLibraryResources(userId: string) {
+      this.resources = [];
+      const GET_LIBRARY_RESOURCES = gql`
+        query ($userId: String!) {
+          getLibraryResources(userId: $userId) {
+            id
+            contentType
+            title
+            contentType
+            viewsNumber
+            likesNumber
+            sharesNumber
+            subject
+            topic
+            coverImage
+            averageRating
+            createdAt
+            keywords
+            description
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: GET_LIBRARY_RESOURCES,
+          variables: { userId },
+        });
+        const resources = response.data.getLibraryResources;
+        this.resources = resources;
+      } catch (error) {
+        console.error("Error fetching resources:", error);
+      }
+    },
+    // suggested getSuggestedResources(userId: string)
+    async getSuggestedResources(userId: string) {
+      this.resources = [];
+      const GET_SUGGESTED_RESOURCES = gql`
+        query ($userId: String!) {
+          getSuggestedResources(userId: $userId) {
+            id
+            contentType
+            title
+            contentType
+            viewsNumber
+            likesNumber
+            sharesNumber
+            subject
+            topic
+            coverImage
+            averageRating
+            createdAt
+            keywords
+            description
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: GET_SUGGESTED_RESOURCES,
+          variables: { userId },
+        });
+        const resources = response.data.getSuggestedResources;
+        this.resources = resources;
       } catch (error) {
         console.error("Error fetching resources:", error);
       }

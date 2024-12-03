@@ -166,6 +166,110 @@ export const useUserStore = defineStore("login", {
         throw new Error("Login failed");
       }
     },
+    async handleAddResourceToRecents(userId: string, resourceId: string) {
+      const ADD_TO_RECENTS = gql`
+        mutation addResourceToRecents($userId: String!, $resourceId: String!) {
+          addResourceToRecents(userId: $userId, resourceId: $resourceId) {
+            id
+          }
+        }
+      `;
+
+      try {
+        const response = await client.mutate({
+          mutation: ADD_TO_RECENTS,
+          variables: { userId, resourceId },
+        });
+
+        const user = response.data.addResourceToRecents;
+
+        if (user) {
+          console.log("Resource added to recents:", user);
+          return user;
+        } else {
+          throw new Error("Invalid request or data");
+        }
+      } catch (error) {
+        console.error("Error while adding to recents:", error);
+        throw new Error("Failed to add resource to recents");
+      }
+    },
+
+    //addResourceToFavorites
+    async handleAddResourceToFavorites(userId: string, resourceId: string) {
+      const ADD_TO_FAVORITES = gql`
+        mutation addResourceToFavorites(
+          $userId: String!
+          $resourceId: String!
+        ) {
+          addResourceToFavorites(userId: $userId, resourceId: $resourceId) {
+            id
+          }
+        }
+      `;
+
+      try {
+        const response = await client.mutate({
+          mutation: ADD_TO_FAVORITES,
+          variables: { userId, resourceId },
+        });
+
+        const user = response.data.addResourceToFavorites;
+
+        if (user) {
+          console.log("Resource added to favorites:", user);
+          return user;
+        } else {
+          throw new Error("Invalid request or data");
+        }
+      } catch (error) {
+        console.error("Error while adding to favorites:", error);
+        throw new Error("Failed to add resource to favorites");
+      }
+    },
+
+    // rateReviewResources
+
+    async handleRateReviewResources(
+      userId: string,
+      resourceId: string,
+      reviewDetails: { rating: number; text: string }
+    ) {
+      const RATE_REVIEW_RESOURCE = gql`
+        mutation rateReviewResources(
+          $userId: String!
+          $resourceId: String!
+          $reviewDetails: ReviewInput!
+        ) {
+          rateReviewResources(
+            userId: $userId
+            resourceId: $resourceId
+            reviewDetails: $reviewDetails
+          ) {
+            id
+          }
+        }
+      `;
+
+      try {
+        const response = await client.mutate({
+          mutation: RATE_REVIEW_RESOURCE,
+          variables: { userId, resourceId, reviewDetails },
+        });
+
+        const resource = response.data.rateReviewResources;
+
+        if (resource) {
+          return;
+        } else {
+          console.log("Response:", response);
+          // throw new Error("Invalid request or data");
+        }
+      } catch (error) {
+        console.error("Error while rating resource:", error);
+        throw new Error("Rating resource failed");
+      }
+    },
     async activate(activationToken: string) {
       const ACTIVATE_ACCOUNT = gql`
         mutation ActivateAccount($activationToken: String!) {

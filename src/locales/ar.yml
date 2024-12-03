@@ -1,41 +1,48 @@
 hero:
-  title: ابدأ مشروعك مع Vuetify 3 أسرع من أي وقت مضى
+  title: ابدأ مشروعك باستخدام Vuetify 3 أسرع من أي وقت مضى
   subtitle: >-
-    هذا القالب مخصص ويأتي مع الكثير من الميزات خارج الصندوق. من المفترض أن تكون
-    نقطة انطلاق لمشروعك.
+    هذا القالب موجه ويأتي مع العديد من الميزات جاهزة للاستخدام. إنه مخصص ليكون نقطة
+    انطلاق لمشروعك.
   getStarted: ابدأ الآن
-  github: جيتهاب
-  dashboard: لوحة القيادة
+  github: جيت هاب
+  login: تسجيل الدخول
+
+  dashboard: لوحة التحكم
   features:
     title: الميزات
 dashboard:
   sidebar:
-    dashboard-overview: نظرة عامة على لوحة القيادة
-    rentals: الإيجارات
-    inventory: المخزون
-    customers: العملاء
-    reports: التقارير
-    settings: الإعدادات
-    help: المساعدة
+    epidemiology: علم الأوبئة
+    biostatistics: الإحصاء الحيوي
+    research-methods: منهجيات البحث
+
+    papers: النادي العلمي
+    poster: الملصقات
+    poll: استطلاعات NEMBio
+    tasks: مهام الواجبات
+
+    events: الأحداث
+    library: مركز الموارد
+
+    programming: الطرق الحسابية
+    consults: استشارة بحثية
+    donate: تبرع لـ NEMBio
     logout: تسجيل الخروج
   main:
     dashboard-overview: نظرة عامة
-    total-rentals: |-
-
-      إجمالي الإيجارات
-    revenue: دخل
-    rating: معدل التقييمات
-    publishingFrequency: عدد مرات التأجير
-    carsInfo: معلومات السيارات
-    carModel: طراز السيارة
-    carType: نوع السيارة
-    rentalCost: تكلفة الإيجار
-    rentalDuration: مدة الإيجار
-    mileage: عدد الأميال
+    total-publications: إجمالي المنشورات
+    revenue: الإيرادات
+    rating: التقييم المتوسط
+    publishingFrequency: تكرار النشر
+    publicationsInfo: معلومات المنشورات
+    publicationModel: مستوى المنشور
+    publicationType: نوع المنشور
+    publicationReach: مدى الوصول
+    publicationDuration: مدة النشر
+    age: تم النشر منذ
 error:
-  pageNotFound: صفحة غير موجودة
+  pageNotFound: الصفحة غير موجودة
   pageNotFoundDescription: >-
-    قد تكون الصفحة التي تبحث عنها قد تمت إزالتها أو تغيير اسمها أو غير متوفرة
-    مؤقتًا.
+    الصفحة التي تبحث عنها قد تكون محذوفة أو تم تغيير اسمها أو غير متوفرة مؤقتًا.
   backToHome: العودة إلى الصفحة الرئيسية
-  backToDashboard: العودة إلى لوحة القيادة
+  backToDashboard: العودة إلى لوحة التحكم

@@ -3,7 +3,12 @@
     <v-layout full-height>
       <!-- App Bar -->
       <v-app-bar class="">
-        <router-link to="/welcome" class="px-8 flex items-center w-64">
+        <router-link
+          :to="
+            route.path.includes('computing') ? '/dashboard/library' : '/welcome'
+          "
+          class="px-8 flex items-center w-64"
+        >
           <v-img
             src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png"
             width="180"
@@ -289,7 +294,8 @@ v-if="userStore.user && userStore.user.personalInfo.username" -->
 import { ref, computed, onMounted, onBeforeMount } from "vue";
 import { useI18n } from "vue-i18n";
 import { useUserStore } from "@/stores/users";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
+
 import PublisherExams from "@/components/resourcePlayers/test/PublisherExams.vue";
 
 import partners from "@/data/partnersSponsors";
@@ -390,7 +396,7 @@ if (topicTitle !== null && topicTitle.length > 5) {
 onBeforeMount(async () => {
   localStorage.removeItem("articleLanguage");
   localStorage.removeItem("articleTopic");
-router.push("/dashboard/library")
+  router.push("/dashboard/library");
   drawer.value = true;
   resourceStore.showingResourceTitles = true;
   resourceStore.showingResourceTitleItems = false;
@@ -404,10 +410,9 @@ router.push("/dashboard/library")
     await userStore.getCurrentUser(storedUser);
     readyView.value = true;
   }
-
 });
 onMounted(async () => {
-  await fetchPoll();
+ // await fetchPoll();
 });
 const { t, locale } = useI18n();
 const router = useRouter();

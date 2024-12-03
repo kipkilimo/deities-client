@@ -50,7 +50,7 @@
                 outlined
                 @mouseenter="isHovered = true"
                 @mouseleave="isHovered = false"
-              >
+              > 
                 <v-img
                   height="250"
                   :src="resource.coverImage"
@@ -79,14 +79,14 @@
                 <v-card-text>
                   <v-row align="center" class="mx-0">
                     <v-rating
-                      :model-value="4.5"
+                      :model-value="resource.averageRating"
                       color="amber"
                       density="compact"
                       size="small"
                       half-increments
                       readonly
                     ></v-rating>
-                    <div class="text-grey ms-4">4.5 (413)</div>
+                    <div class="text-grey ms-4">{{ resource.averageRating }}</div>
                   </v-row>
 
                   <div class="my-4 text-subtitle-1">

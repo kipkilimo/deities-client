@@ -1,0 +1,49 @@
+hero:
+  title: Démarrez votre projet avec Vuetify 3 plus rapidement que jamais
+  subtitle: >-
+    Ce modèle est orienté et propose de nombreuses fonctionnalités prêtes à
+    l'emploi. Il est conçu pour être un point de départ pour votre projet.
+  getStarted: Commencer
+  github: Github
+  login: Connexion
+
+  dashboard: Tableau de bord
+  features:
+    title: Fonctionnalités
+dashboard:
+  sidebar:
+    epidemiology: Épidémiologie
+    biostatistics: Biostatistiques
+    research-methods: Méthodes de recherche
+
+    papers: Club de lecture
+    poster: Posters
+    poll: Sondages NEMBio
+    tasks: Tâches assignées
+
+    events: Événements
+    library: Centre de ressources
+
+    programming: Méthodes computationnelles
+    consults: Consultation en recherche
+    donate: Faire un don à NEMBio
+    logout: Déconnexion
+  main:
+    dashboard-overview: Vue d'ensemble
+    total-publications: Total des publications
+    revenue: Revenus
+    rating: Note moyenne
+    publishingFrequency: Fréquence de publication
+    publicationsInfo: Informations sur les publications
+    publicationModel: Niveau de publication
+    publicationType: Type de publication
+    publicationReach: Portée de la publication
+    publicationDuration: Durée de publication
+    age: Publié depuis
+error:
+  pageNotFound: Page introuvable
+  pageNotFoundDescription: >-
+    La page que vous recherchez a peut-être été supprimée, son nom modifié ou
+    elle est temporairement indisponible.
+  backToHome: Retour à l'accueil
+  backToDashboard: Retour au tableau de bord

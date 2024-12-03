@@ -27,16 +27,17 @@
         >
           <template v-slot:title>
             <span class="font-weight-black text-blue-darken-3"
-              ><span class="mr-4">💝</span> Donate to NEMBio</span
+              ><span class="mr-4">💝</span> Donate to NEMBio Life Sciences</span
             >
           </template>
 
           <v-card-text class="bg-surface-light pt-4">
             <h8>
               Support NEMBio, a web platform for learning Biostatistics ,
-              Epidemiology and Research Methods focusing on African students, faculty and researchers offering a practical,
+              Epidemiology and Research Methods focusing on African students,
+              faculty and researchers offering a practical,
               non-statistician-friendly training. Your donation sustains this
-              vital resource, empowering better research and global health
+              vital resource, empowering better life sciences research and 
               advancements.
             </h8>
           </v-card-text>
@@ -62,7 +63,9 @@
                   prepend-icon="mdi-account-reactivate-outline"
                 >
                   <v-list-item-subtitle
-                    >Most recent donation</v-list-item-subtitle
+                    >Most recent donation ({{
+                      newestPayment.paymentMethod
+                    }})</v-list-item-subtitle
                   >
                 </v-list-item>
 
@@ -71,7 +74,7 @@
                 </v-list-item> -->
               </div>
               <v-col class="text-h4 text-blue-darken-3" cols="12">
-                $2.00 🗳️
+                <div class="">${{ convertToUSD(newestPayment) }} 🗳️</div>
 
                 <v-row>
                   <v-col cols="6">
@@ -120,7 +123,7 @@
               </v-col>
               <v-col cols="6" class="d-flex justify-space-between">
                 <v-container
-                  max-height="7.2rem"
+                  max-height="7rem"
                   max-width="6rem"
                   style="cursor: pointer"
                 >
@@ -135,6 +138,9 @@
       </v-col>
     </v-row>
     <v-card>
+      <div class="">
+        
+      </div>
       <v-card-title class="text-overline">
         Progress
 
@@ -143,7 +149,8 @@
         </div>
 
         <div class="text-h6 text-medium-emphasis font-weight-regular">
-          $98,882.00 to go
+          ${{ (targetAmount - receivedDonations).toLocaleString("en-US") }} to
+          go
         </div>
       </v-card-title>
       <br />
@@ -168,7 +175,7 @@
 
         <div class="d-flex justify-space-between py-3">
           <span class="text-blue-darken-3 font-weight-medium">
-            $0.00 received
+            ${{ (receivedDonations).toLocaleString("en-US") }} received
           </span>
 
           <span class="text-medium-emphasis">
@@ -194,7 +201,18 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, reactive, watch } from "vue";
+import {
+  ref,
+  computed,
+  onMounted,
+  onBeforeMount,
+  nextTick,
+  reactive,
+  watch,
+} from "vue";
+import { usePaymentsStore } from "@/stores/payments";
+const nembioDonations = ref([]);
+const store = usePaymentsStore();
 const MPESAInputDialog = ref(false);
 // Data and reactive properties
 const items = ref([
@@ -206,16 +224,50 @@ const items = ref([
   },
   { src: "https://docs.flexiwan.com/_images/do2.png" },
 ]);
+const targetAmount = ref(98882.0);
+const receivedDonations = ref(0);
 
+const newestPayment = ref({});
+onBeforeMount(async () => {
+  await store.fetchDonations();
+  nembioDonations.value = store.payments;
+  newestPayment.value = nembioDonations.value.sort(
+    (a, b) => Number(b.createdAt) - Number(a.createdAt)
+  )[0];
+  receivedDonations.value = getTotalAmountInUSD(nembioDonations.value);
+});
+
+function convertToUSD(payment) {
+  if (payment.paymentMethod === "MPESA") {
+    const paidAmountUSD = parseFloat(payment.paidAmount) / 131;
+    return paidAmountUSD.toFixed(2); // Returns as a string formatted to 2 decimal places
+  }
+  return payment.paidAmount; // Return null or handle differently if not MPESA
+}
+function getTotalAmountInUSD(payments) {
+  // Calculate total amount in USD for MPESA payments
+  const totalInUSD = payments.reduce((total, payment) => {
+    if (payment.paymentMethod === "MPESA") {
+      return total + parseFloat(payment.paidAmount) / 131;
+    }
+    return total; // Ignore non-MPESA payments
+  }, 0);
+
+  // Return total rounded to 2 decimal places
+  return totalInUSD.toFixed(2);
+}
 const progressPercentage = computed(() => {
-  return (((98882 - 98882) / 98882) * 100).toFixed(0);
+  return (
+    ((targetAmount.value - (targetAmount.value - receivedDonations.value)) /
+      targetAmount.value) *
+    100
+  ).toFixed(0);
 });
 
 const review = computed(() => {
   return `${String(100 - progressPercentage.value)}%`;
 });
 
-import { usePaymentsStore } from "@/stores/payments";
 // import axios from "axios";
 
 import { useUserStore } from "@/stores/users";
@@ -243,7 +295,8 @@ const selectedAmount = ref("1");
 const selectItems = ["1", "2", "5", "10", "20", "50", "100", "200"];
 const inputAmount = ref("1");
 //  const store = usePaymentsStore();const
-const donationRules = [ 
+
+const donationRules = [
   (value) =>
     /^[1-9]\d{0,5}(\.\d{1})?$/.test(value) ||
     "Donation amount must be a number between 1 and 999,999 with up to 1 decimal place",
@@ -528,8 +581,8 @@ onMounted(async () => {
 <style>
 /* Custom styles */
 .paypal-button-small {
-  width: 120; /* Set your desired width */
-  height: 30px; /* Set your desired height */
+  width: 130 !important; /* Set your desired width */
+  height: 30px !important; /* Set your desired height */
 }
 </style>
 

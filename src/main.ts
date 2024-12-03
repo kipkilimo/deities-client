@@ -1,5 +1,6 @@
 import "./assets/main.css";
 import "uno.css";
+import VueSocialSharing from "vue-social-sharing";
 
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -26,6 +27,7 @@ const app = createApp({
 
 // app.use(QuillEditor);
 app.use(VueViewer);
+app.use(VueSocialSharing);
 app
   .use(createPinia())
   .use(vuetify)

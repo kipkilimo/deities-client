@@ -263,5 +263,36 @@ export const usePaymentsStore = defineStore("paymentStore", {
         console.error("PayPal Payment error: ", error);
       }
     },
+    async fetchDonations() {
+      const DONATIONS_QUERY = gql`
+        query {
+          getDonatedPayments {
+            _id
+            paidAmount
+            departmentId
+            transactionReferenceNumber
+            paymentMethod
+            createdAt
+          }
+        }
+      `;
+
+      try {
+        const response = await client.query({
+          query: DONATIONS_QUERY,
+        });
+
+        const payments = response.data.getDonatedPayments;
+        if (payments) {
+          //@ts-ignore
+          this.payments = payments;
+        } else {
+          throw new Error("Failed to fetch payments");
+        }
+      } catch (error) {
+        console.error("Error fetching payments:", error);
+      }
+    },
   },
+  //getDonatedPayments
 });

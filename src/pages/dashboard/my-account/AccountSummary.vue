@@ -2,7 +2,7 @@
   <v-container>
     <v-row justify="center">
       <!-- User Profile Card -->
-      <v-col cols="12" md="6">
+      <v-col cols="12" md="12">
         <v-card>
           <v-row>
             <v-col cols="2">
@@ -28,12 +28,12 @@
           <v-divider></v-divider>
 
           <v-card-text>
-            <v-row>
+            <!-- <v-row>
               <v-col cols="12" sm="4">
                 <h3>{{ user?.name || "Guest" }}</h3>
                 <p>{{ user?.email || "Not Available" }}</p>
               </v-col>
-            </v-row>
+            </v-row> -->
 
             <v-divider></v-divider>
 
@@ -50,141 +50,65 @@
               </v-col>
             </v-row>
           </v-card-text>
+
+          <v-card-actions>
+            <v-btn
+              variant="outlined"
+              color="primary"
+              prepend-icon="mdi-timer-sand"
+              @click="setResourceView('RECENT')"
+            >
+              View Recents
+            </v-btn>
+
+            <v-btn
+              variant="outlined"
+              color="brown"
+              prepend-icon="mdi-bookmark"
+              @click="setResourceView('LIBRARY')"
+            >
+              View Library
+            </v-btn>
+
+            <v-btn
+              variant="outlined"
+              color="purple"
+              prepend-icon="mdi-tune"
+              @click="setResourceView('SUGGESTED')"
+            >
+              Suggested Resources
+            </v-btn>
+          </v-card-actions>
         </v-card>
       </v-col>
 
       <!-- Account Settings -->
-      <v-col cols="12" md="6">
-        <v-card>
-          <v-card-title class="text-h5">⚙️ Account Settings</v-card-title>
-
-          <v-divider></v-divider>
-
+      <v-col cols="12" md="12">
+        <v-card width="99.96%" v-if="viewingRecents">
           <v-card-text>
-            <v-list>
-              <v-list-item @click="changePassword" v-if="user">
-                <v-list-item-title>Change Password</v-list-item-title>
-              </v-list-item>
-
-              <v-divider v-if="user"></v-divider>
-
-              <v-list-item @click="updateEmail" v-if="user">
-                <v-list-item-title>Update Email</v-list-item-title>
-              </v-list-item>
-
-              <v-divider v-if="user"></v-divider>
-
-              <v-list-item @click="manageNotifications" v-if="user">
-                <v-list-item-title>Change Name</v-list-item-title>
-              </v-list-item>
-            </v-list>
+            <v-scroll-y-wrapper>
+              <RecentResourcesViewer />
+            </v-scroll-y-wrapper>
+          </v-card-text>
+        </v-card>
+        <v-card width="99.96%" v-if="viewingLibrary">
+          <v-card-text>
+            <v-scroll-y-wrapper>
+              <LibraryResourcesViewer />
+            </v-scroll-y-wrapper>
+          </v-card-text>
+        </v-card>
+        <v-card width="99.96%" v-if="viewingSuggestions">
+          <v-card-text>
+            <v-scroll-y-wrapper>
+              <SuggestedResourcesViewer />
+            </v-scroll-y-wrapper>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
 
     <!-- Activity Section -->
-    <v-row>
-      <v-col md="3" sm="12">
-        <v-card>
-          <v-card-title class="text-h5">Recent Activity</v-card-title>
-
-          <v-divider></v-divider>
-
-          <v-card-text>
-            <v-list v-if="user?.recentActivity && user.recentActivity.length">
-              <v-list-item
-                v-for="(activity, index) in user.recentActivity"
-                :key="index"
-              >
-                <v-list-item-content>
-                  <v-list-item-title>{{
-                    activity.description
-                  }}</v-list-item-title>
-                  <v-list-item-subtitle>{{
-                    activity.date
-                  }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-            <p v-else>No recent activity available.</p>
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-      <!-- Faculty or Student Section Based on Role -->
-      <v-col md="2" sm="12" v-if="user?.role === 'FACULTY'">
-        <v-card>
-          <v-card-title class="text-h5">
-            My Department
-            <v-avatar
-              class="ma-1"
-              @click="manageDepartmentDialog = true"
-              color="surface-light"
-              size="24"
-              style="cursor: pointer"
-            >
-              📝
-            </v-avatar>
-          </v-card-title>
-
-          <v-divider></v-divider>
-
-          <v-card-text v-if="user?.departments?.length >= 1">
-            <p>{{ user.departments[0].name }}</p>
-            <v-chip variant="outlined" rounded="2"
-              >ID: {{ user.departments[0].departmentId }}</v-chip
-            >
-          </v-card-text>
-          <v-card-text v-else>
-            <v-btn
-              width="100%"
-              color="primary"
-              variant="tonal"
-              @click="addDepartmentDialog = true"
-            >
-              <v-icon class="mr-1">mdi-plus</v-icon> Add Department
-            </v-btn>
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-      <v-col md="2" sm="12" v-if="user?.role === 'STUDENT'">
-        <v-card>
-          <v-card-title class="text-h5">
-            My Discussion Group
-            <v-avatar
-              class="ma-1"
-              @click="manageDiscussionGroupDialog = true"
-              color="surface-light"
-              size="24"
-              style="cursor: pointer"
-            >
-              📝
-            </v-avatar>
-          </v-card-title>
-
-          <v-divider></v-divider>
-
-          <v-card-text v-if="user?.discussion_groups?.length >= 1">
-            <p>{{ user.discussion_groups[0].name }}</p>
-            <v-chip variant="outlined" rounded="2"
-              >ID: {{ user.discussion_groups[0].discussionGroupId }}</v-chip
-            >
-          </v-card-text>
-          <v-card-text v-else>
-            <v-btn
-              width="100%"
-              color="primary"
-              variant="tonal"
-              @click="addDiscussionGroupDialog = true"
-            >
-              <v-icon class="mr-1">mdi-plus</v-icon> Add Discussion Group
-            </v-btn>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
 
     <!-- Dialogs -->
     <v-dialog max-width="63rem" v-model="addDiscussionGroupDialog">
@@ -214,10 +138,15 @@
 </template>
 <script setup>
 import { ref, onBeforeMount, onMounted, watch } from "vue";
+
+import { useResourceStore } from "@/stores/resources";
 const userId = ref(localStorage.getItem("sessionId")); // Retrieve userId from local storage
 const addDepartmentDialog = ref(false);
 const addDiscussionGroupDialog = ref(false);
 // We're sorry, our system has encountered an error. Please try again.
+const viewingRecents = ref(true);
+const viewingLibrary = ref(false);
+const viewingSuggestions = ref(false);
 
 const manageDepartmentDialog = ref(false);
 const manageDiscussionGroupDialog = ref(false);
@@ -225,10 +154,74 @@ const manageDiscussionGroupDialog = ref(false);
 import CryptoJS from "crypto-js";
 
 import { useUserStore } from "@/stores/users";
+import PaymentsManagementTable from "@/components/admin/Components/PaymentsManagementTable.vue";
 onBeforeMount(async () => {
   const userStore = useUserStore();
   await userStore.getCurrentUser(userId.value || "");
 });
+
+// Method to toggle resource view
+const setResourceView = (actionType) => {
+  // Reset all views
+  // Fetch resources based on the action type
+  getActiveResources(actionType);
+  viewingRecents.value = false;
+  viewingLibrary.value = false;
+  viewingSuggestions.value = false;
+
+  // Set the selected view
+  if (actionType === "RECENT") {
+    viewingRecents.value = true;
+  } else if (actionType === "LIBRARY") {
+    viewingLibrary.value = true;
+  } else if (actionType === "SUGGESTED") {
+    viewingSuggestions.value = true;
+  }
+};
+
+// Method to fetch resources
+
+async function getActiveResources(actionType) {
+  const resourceStore = useResourceStore();
+  const validActions = ["RECENT", "LIBRARY", "SUGGESTED"];
+
+  // Validate actionType
+  if (!validActions.includes(actionType)) {
+    console.error(
+      `Invalid actionType: ${actionType}. Must be one of ${validActions.join(", ")}`
+    );
+    return;
+  }
+
+  const userId = localStorage.getItem("sessionId") || "";
+  if (!userId) {
+    console.warn("No user session ID found.");
+    return;
+  }
+
+  try {
+    switch (actionType) {
+      case "RECENT":
+        await resourceStore.getRecentResources(userId);
+        break;
+      case "LIBRARY":
+        await resourceStore.getLibraryResources(userId);
+        break;
+      case "SUGGESTED":
+        await resourceStore.getSuggestedResources(userId);
+        break;
+    }
+
+    return 1;
+  } catch (error) {
+    console.error(
+      `Error fetching resources for actionType ${actionType}:`,
+      error
+    );
+    return;
+  }
+}
+
 function closeDialog() {
   console.log("Closing dialog...");
   addDiscussionGroupDialog.value = false;
