@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useHead({
-    title: ' NEMBioLearning',
-    meta: [{ name: 'description', content: ' NEMBio Learning' }],
+    title: ' Amane Hospital',
+    meta: [{ name: 'description', content: ' Amane Hospital Learning' }],
 })
 
 // onInitApp()

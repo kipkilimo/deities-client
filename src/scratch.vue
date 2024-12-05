@@ -54,7 +54,7 @@
 </template>
 <script setup>
 import { ref, watch } from "vue";
-import { useResourceStore } from "@/stores/resources";
+import { useResourceStore } from "@/stores/patients";
 const resourceStore = useResourceStore();
 const metaDialog = ref(true);
 const language = ref("");

@@ -48,7 +48,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import axios from "axios";
-import { useResourceStore } from "../../../stores/resources";
+import { useResourceStore } from "../../../stores/patients";
 import { useRouter } from "vue-router";
 
 const resourceStore = useResourceStore();

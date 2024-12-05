@@ -3,41 +3,25 @@
     <v-row class="mb-1">
       <v-col cols="8">
         <v-card>
-          <v-carousel
-            :show-arrows="false"
-            show-arrows="hover"
-            cycle
-            hide-delimiter-background
-          >
-            <v-carousel-item
-              v-for="(item, i) in items"
-              :key="i"
-              :src="item.src"
-              contain
-            ></v-carousel-item>
+          <v-carousel :show-arrows="false" show-arrows="hover" cycle hide-delimiter-background>
+            <v-carousel-item v-for="(item, i) in items" :key="i" :src="item.src" contain></v-carousel-item>
           </v-carousel>
         </v-card>
       </v-col>
       <v-col cols="4">
-        <v-card
-          class="mx-auto"
-          color="#f8fdfe"
-          subtitle="Gift us any donation amount and kind support"
-          width="96%"
-        >
+        <v-card class="mx-auto" color="#f8fdfe" subtitle="Gift us any donation amount and kind support" width="96%">
           <template v-slot:title>
-            <span class="font-weight-black text-blue-darken-3"
-              ><span class="mr-4">💝</span> Donate to NEMBio Life Sciences</span
-            >
+            <span class="font-weight-black text-blue-darken-3"><span class="mr-4">💝</span> Donate to Amane Hospital
+              Life Sciences</span>
           </template>
 
           <v-card-text class="bg-surface-light pt-4">
             <h8>
-              Support NEMBio, a web platform for learning Biostatistics ,
+              Support Amane Hospital, a web platform for learning Biostatistics ,
               Epidemiology and Research Methods focusing on African students,
               faculty and researchers offering a practical,
               non-statistician-friendly training. Your donation sustains this
-              vital resource, empowering better life sciences research and 
+              vital resource, empowering better life sciences research and
               advancements.
             </h8>
           </v-card-text>
@@ -58,15 +42,10 @@
           <v-card-text class="py-0">
             <v-row align="center" no-gutters>
               <div class="d-flex py-1 justify-space-between">
-                <v-list-item
-                  density="compact"
-                  prepend-icon="mdi-account-reactivate-outline"
-                >
-                  <v-list-item-subtitle
-                    >Most recent donation ({{
-                      newestPayment.paymentMethod
-                    }})</v-list-item-subtitle
-                  >
+                <v-list-item density="compact" prepend-icon="mdi-account-reactivate-outline">
+                  <v-list-item-subtitle>Most recent donation ({{
+                    newestPayment.paymentMethod
+                    }})</v-list-item-subtitle>
                 </v-list-item>
 
                 <!-- <v-list-item density="compact" prepend-icon="mdi-trending-up">
@@ -78,21 +57,13 @@
 
                 <v-row>
                   <v-col cols="6">
-                    <v-select
-                      :items="selectItems"
-                      v-model="selectedAmount"
-                      density="compact"
-                      label="Select a donation amount"
-                    ></v-select>
+                    <v-select :items="selectItems" v-model="selectedAmount" density="compact"
+                      label="Select a donation amount"></v-select>
                   </v-col>
 
                   <v-col cols="6">
-                    <v-text-field
-                      v-model="inputAmount"
-                      density="compact"
-                      :rules="donationRules"
-                      label="Option 2: Enter donation amount"
-                    ></v-text-field>
+                    <v-text-field v-model="inputAmount" density="compact" :rules="donationRules"
+                      label="Option 2: Enter donation amount"></v-text-field>
                   </v-col>
                 </v-row>
               </v-col>
@@ -112,26 +83,13 @@
 
                 <!-- M-Pesa container -->
 
-                <v-img
-                  max-height="6rem"
-                  style="cursor: pointer"
-                  v-if="paidAmount < 1110"
-                  @click="showMpesaIcon"
-                  src="https://a2z-v0.s3.eu-central-1.amazonaws.com/1200px-M-PESA_LOGO-01.svg.png"
-                  alt="M-Pesa"
-                ></v-img>
+                <v-img max-height="6rem" style="cursor: pointer" v-if="paidAmount < 1110" @click="showMpesaIcon"
+                  src="https://a2z-v0.s3.eu-central-1.amazonaws.com/1200px-M-PESA_LOGO-01.svg.png" alt="M-Pesa"></v-img>
               </v-col>
               <v-col cols="6" class="d-flex justify-space-between">
-                <v-container
-                  max-height="7rem"
-                  max-width="6rem"
-                  style="cursor: pointer"
-                >
-                  <div
-                    id="paypal-button-container"
-                    class="paypal-button-small mt-5 mb-5"
-                  ></div> </v-container
-              ></v-col>
+                <v-container max-height="7rem" max-width="6rem" style="cursor: pointer">
+                  <div id="paypal-button-container" class="paypal-button-small mt-5 mb-5"></div>
+                </v-container></v-col>
             </v-row>
           </v-card-actions>
         </v-card>
@@ -139,7 +97,7 @@
     </v-row>
     <v-card>
       <div class="">
-        
+
       </div>
       <v-card-title class="text-overline">
         Progress
@@ -158,19 +116,8 @@
         <div class="position-absolute mt-n8 text-caption text-blue-darken-3">
           Donations overview
         </div>
-        <v-progress-linear
-          color="#0570ba"
-          height="22"
-          :model-value="progressPercentage"
-          rounded="lg"
-        >
-          <v-badge
-            :style="`right: ${review}`"
-            class="position-absolute"
-            color="white"
-            dot
-            inline
-          ></v-badge>
+        <v-progress-linear color="#0570ba" height="22" :model-value="progressPercentage" rounded="lg">
+          <v-badge :style="`right: ${review}`" class="position-absolute" color="white" dot inline></v-badge>
         </v-progress-linear>
 
         <div class="d-flex justify-space-between py-3">
@@ -186,12 +133,8 @@
 
       <v-divider></v-divider>
 
-      <v-list-item
-        append-icon="mdi-chevron-right"
-        lines="two"
-        subtitle="Support global life sciences—donate to share knowledge!"
-        link
-      ></v-list-item>
+      <v-list-item append-icon="mdi-chevron-right" lines="two"
+        subtitle="Support global life sciences—donate to share knowledge!" link></v-list-item>
     </v-card>
 
     <v-dialog v-model="MPESAInputDialog" persistent max-width="540">
@@ -270,7 +213,7 @@ const review = computed(() => {
 
 // import axios from "axios";
 
-import { useUserStore } from "@/stores/users";
+import { useUserStore } from "@/stores/staff";
 const requestDGWaiverDialog = ref(false);
 
 import { useRouter } from "vue-router";
@@ -398,7 +341,7 @@ onMounted(async () => {
             intent: "CAPTURE",
             purchase_units: [
               {
-                reference_id: "NEMBio Donation",
+                reference_id: "Amane Hospital Donation",
                 amount: {
                   currency_code: "USD",
                   value: paidAmount.value,

@@ -5,19 +5,19 @@
 
     <h2>1. About Us</h2>
     <p>
-        NEMBio is a scholar network and resource sharing Web app created for
+        Amane Hospital is a scholar network and resource sharing Web app created for
       students and faculty of higher learning institutions in Kenya ,with focus
       in the health sciences domain.
     </p>
 
     <h2>2. Definitions</h2>
     <p>
-      <strong>2.1</strong> Any mention of “  NEMBio” or “we” throughout this
-      Agreement is in reference to   NEMBio Web app as described above.
+      <strong>2.1</strong> Any mention of “  Amane Hospital” or “we” throughout this
+      Agreement is in reference to   Amane Hospital Web app as described above.
     </p>
     <p>
       <strong>2.2</strong> Our “Services” are defined as any and all services
-      and products offered by   NEMBio including (but not limited to) content and
+      and products offered by   Amane Hospital including (but not limited to) content and
       technology services, as well as web and mobile applications.
     </p>
     <p>
@@ -38,9 +38,9 @@
     </p>
     <p>
       <strong>2.6</strong> “User Data” refers to the personal data processed by
-        NEMBio as a processor or sub-processor for, and on behalf of, the
+        Amane Hospital as a processor or sub-processor for, and on behalf of, the
       Organization for which you have purchased access to the Services, or the
-      personal data processed by   NEMBio as a data controller if you are an
+      personal data processed by   Amane Hospital as a data controller if you are an
       individual customer purchasing access for yourself or a child for whom you
       have parental responsibility.
     </p>
@@ -67,10 +67,10 @@
       defined by the Data Protection Laws.
     </p>
 
-    <h2>3. Your Agreement With   NEMBio</h2>
+    <h2>3. Your Agreement With   Amane Hospital</h2>
     <p>
       <strong>3.1</strong> There exists a legally binding agreement
-      (“Agreement”) as outlined in this document between a User and   NEMBio that
+      (“Agreement”) as outlined in this document between a User and   Amane Hospital that
       begins when the User first purchases access to any of the Services, that
       the User must comply with. By using any of our Services, the User agrees
       to the terms and conditions outlined in this document.
@@ -90,7 +90,7 @@
       you elsewhere or implied in any way will apply.
     </p>
 
-    <h2>4. Access to   NEMBio Services</h2>
+    <h2>4. Access to   Amane Hospital Services</h2>
     <p>
       <strong>4.1</strong> If you purchase access to the Services on behalf of
       an Organization and its Users, you acknowledge that you are an authorized
@@ -103,7 +103,7 @@
       necessary to use the Services.
     </p>
 
-    <h2>5. Your Use of   NEMBio Services</h2>
+    <h2>5. Your Use of   Amane Hospital Services</h2>
     <p>
       <strong>5.1</strong> If you purchase access to the Services on behalf of
       an Organization or for multiple Users, you are responsible for ensuring
@@ -112,7 +112,7 @@
     </p>
     <p>
       <strong>5.2</strong> If you believe there has been any security breach or
-      other unauthorized use of the Services, you must immediately inform   NEMBio
+      other unauthorized use of the Services, you must immediately inform   Amane Hospital
       by emailing <a href="mailto:info@nem.bio">info@nem.bio</a>.
     </p>
     <p>
@@ -128,7 +128,7 @@
     <h2>6. Intellectual Property Rights</h2>
     <p>
       <strong>6.1</strong> Upon receiving your payment of the fees corresponding
-      to the Service(s) you purchase,   NEMBio will grant you a non-exclusive
+      to the Service(s) you purchase,   Amane Hospital will grant you a non-exclusive
       non-transferable license for the term of your Agreement (subject to Clause
       6.3 below) to retrieve and display materials delivered as part of the
       Services (“Content”) on a digital device such as a smartphone or computer
@@ -177,11 +177,11 @@
       </li>
       <li>Use the website to send any chain emails, spam, or junk,</li>
       <li>
-        Disrupt or interfere with the   NEMBio website or any Services linked to
+        Disrupt or interfere with the   Amane Hospital website or any Services linked to
         it,
       </li>
       <li>
-        Introduce any viruses or any other properties into the   NEMBio website or
+        Introduce any viruses or any other properties into the   Amane Hospital website or
         any Services linked to it,
       </li>
       <li>Reveal their password to anyone else,</li>
@@ -199,21 +199,21 @@
 
     <h2>7. Fees</h2>
     <p>
-      <strong>7.1</strong> Access to and use of   NEMBio does not generally require
+      <strong>7.1</strong> Access to and use of   Amane Hospital does not generally require
       direct payment. However, if your case requires so, you agree to pay us the
       fees (“Fees”) for the Service(s) you purchase, as outlined on the purchase
       pages for the Service(s) or in our invoice to you. You may choose to pay
       using a credit card, e-wallet, or cash aggregator. You may pay using other
-      methods provided you have explicit prior written agreement from   NEMBio.
+      methods provided you have explicit prior written agreement from   Amane Hospital.
     </p>
     <p>
-      <strong>7.2</strong>   NEMBio will only make the Services available to you
+      <strong>7.2</strong>   Amane Hospital will only make the Services available to you
       once your payment has been received (or if you are using a credit card,
       your payment has been authorized).
     </p>
     <p>
       <strong>7.3</strong> In the event that you do not pay any Fees by the due
-      date as specified on the invoice,   NEMBio reserves the right to charge you
+      date as specified on the invoice,   Amane Hospital reserves the right to charge you
       daily interest at a rate of 4% per annum above the current base rate of
       NatWest Bank on all overdue amounts until the amount is paid.
     </p>

@@ -18,7 +18,7 @@ dashboard:
 
     papers: Journal Club
     poster: Posters
-    poll: NEMBio Polls
+    poll: Amane Hospital Polls
     tasks: Assignment Tasks
 
     events: Events
@@ -26,7 +26,7 @@ dashboard:
 
     programming: Computational Methods
     consults: Research Consultation
-    donate: Donate to NEMBio
+    donate: Donate to Amane Hospital
     logout: Logout
   main:
     dashboard-overview: Overview

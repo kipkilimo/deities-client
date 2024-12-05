@@ -18,7 +18,7 @@ dashboard:
 
     papers: Club de lecture
     poster: Posters
-    poll: Sondages NEMBio
+    poll: Sondages Amane Hospital
     tasks: Tâches assignées
 
     events: Événements
@@ -26,7 +26,7 @@ dashboard:
 
     programming: Méthodes computationnelles
     consults: Consultation en recherche
-    donate: Faire un don à NEMBio
+    donate: Faire un don à Amane Hospital
     logout: Déconnexion
   main:
     dashboard-overview: Vue d'ensemble

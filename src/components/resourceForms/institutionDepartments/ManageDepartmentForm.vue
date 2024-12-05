@@ -168,7 +168,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useDepartmentStore } from "@/stores/departments";
-import { useUserStore } from "@/stores/users";
+import { useUserStore } from "@/stores/staff";
 const emailValidation = (value) => {
   const emailArray = value.split(",").map((email) => email.trim());
 

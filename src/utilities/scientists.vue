@@ -72,7 +72,7 @@
 import { ref, onBeforeMount, computed, watch } from "vue";
 // Import the array of notableFigures
 import notableFigures from "@/data/scientists";
-import { useUserStore } from "@/stores/users";
+import { useUserStore } from "@/stores/staff";
 import { emit } from "process";
 
 const userStore = useUserStore();

@@ -90,8 +90,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { usePaperStore } from "@/stores/papers";
-import { useUserStore } from "@/stores/users";
+import { usePaperStore } from "@/stores/visits";
+import { useUserStore } from "@/stores/staff";
 import axios from "axios";
 import DateTime from "@/components/commonResourceCreateItems/formItems/DateTimePicker.vue";
 

@@ -139,7 +139,7 @@
 <script setup>
 import { ref, onBeforeMount, onMounted, watch } from "vue";
 
-import { useResourceStore } from "@/stores/resources";
+import { useResourceStore } from "@/stores/patients";
 const userId = ref(localStorage.getItem("sessionId")); // Retrieve userId from local storage
 const addDepartmentDialog = ref(false);
 const addDiscussionGroupDialog = ref(false);
@@ -153,7 +153,7 @@ const manageDiscussionGroupDialog = ref(false);
 
 import CryptoJS from "crypto-js";
 
-import { useUserStore } from "@/stores/users";
+import { useUserStore } from "@/stores/staff";
 import PaymentsManagementTable from "@/components/admin/Components/PaymentsManagementTable.vue";
 onBeforeMount(async () => {
   const userStore = useUserStore();

@@ -79,7 +79,7 @@ import RichTextEditor from "@/components/commonResourceCreateItems/formItems/Ric
 const topicText = ref<string>(
   `<h2 style="text-align: center">Wipe and add your article content here</h2>`
 );
-import { useResourceStore } from "@/stores/resources";
+import { useResourceStore } from "@/stores/patients";
 const resourceStore = useResourceStore();
 const metaDialog = ref(true);
 const language = ref("");

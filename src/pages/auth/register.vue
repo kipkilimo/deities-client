@@ -1,54 +1,24 @@
 <template>
   <v-card class="login-card mt-4 ml-2" elevation="4" outlined rounded>
     <v-card-title class="text-center">
-      <v-img  @click="goHome"
-        style="height: 12rem;cursor: pointer"
-        src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png"
-      />
+      <v-img @click="goHome" style="height: 12rem;cursor: pointer"
+        src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png" />
       <h5 class="mt-4 mr-11" style="color: #777777">
-        Create NEMBio Learning Account
+        Create Amane Hospital Learning Account
       </h5>
     </v-card-title>
     <v-card-text>
       <v-form @submit.prevent="submitRegister">
         <v-row>
           <v-col cols="6">
-            <v-text-field
-              color="primary"
-              v-model="firstName"
-              label="Firstname"
-              required
-              autofocus
-            /> </v-col
-          ><v-col cols="6">
-            <v-text-field
-              color="primary"
-              v-model="lastName"
-              label="Lastname"
-              required
-              autofocus
-            />
+            <v-text-field color="primary" v-model="firstName" label="Firstname" required autofocus /> </v-col><v-col
+            cols="6">
+            <v-text-field color="primary" v-model="lastName" label="Lastname" required autofocus />
           </v-col>
         </v-row>
-        <v-text-field
-          color="primary"
-          v-model="email"
-          label="Email"
-          required
-          autofocus
-        />
-        <v-text-field
-          v-model="password"
-          :type="showPassword ? 'text' : 'password'"
-          label="Password"
-          :append-icon="
-            showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
-          "
-          @input="validatePassword"
-          :rules="passwordRules"
-          @click:append="togglePassword"
-          required
-        />
+        <v-text-field color="primary" v-model="email" label="Email" required autofocus />
+        <v-text-field v-model="password" :type="showPassword ? 'text' : 'password'" label="Password" :append-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
+          " @input="validatePassword" :rules="passwordRules" @click:append="togglePassword" required />
         <h4>
           Choose your favorite scientist to build your username (optional).
           <br />
@@ -56,13 +26,11 @@
           <strong color="indigo darken-3">
             {{
               userStore.username.length < 1 ? "None" : userStore.username
-            }}</strong
-          >
+            }}</strong>
           <v-card-actions>
             <v-spacer />
             <v-btn class="mt-2" variant="text" @click="selectIcon = true">
-              <v-icon class="mr-2">mdi-person</v-icon>Select A Scientist</v-btn
-            >
+              <v-icon class="mr-2">mdi-person</v-icon>Select A Scientist</v-btn>
             <v-spacer />
           </v-card-actions>
         </h4>
@@ -71,45 +39,26 @@
         <v-row class="mt-1">
           <v-col cols="12" class="mt-2">
             <v-card-text class=""> By registering, I agree to </v-card-text>
-            <v-btn
-              variant="text"
-              class="ml-2"
-              size="x-small"
-              @click="(agreeToTermsDialog = true), (agreeToTerms = false)"
-            >
-              <v-icon class="mr-2">mdi-note-check</v-icon> NEMBio Terms of Use
-              and Privacy Statement</v-btn
-            >
+            <v-btn variant="text" class="ml-2" size="x-small"
+              @click="(agreeToTermsDialog = true), (agreeToTerms = false)">
+              <v-icon class="mr-2">mdi-note-check</v-icon> Amane Hospital Terms of Use
+              and Privacy Statement</v-btn>
           </v-col>
         </v-row>
         <v-divider />
         <div class="d-flex justify-space-between mt-2">
-          <v-card-actions
-            ><v-spacer />
-            <v-btn
-              :disabled="
+          <v-card-actions><v-spacer />
+            <v-btn :disabled="
                 isButtonDisabled1 || (isButtonDisabled2 && !agreeToTerms)
-              "
-              type="submit"
-              color="primary"
-              style="width: 13.5rem; background-color: #8fc0c5"
-              :loading="registerLoading"
-            >
+              " type="submit" color="primary" style="width: 13.5rem; background-color: #8fc0c5"
+              :loading="registerLoading">
               <v-icon class="mr-sm">mdi-location-enter</v-icon> Register
             </v-btn>
             <v-spacer />
 
             <v-tooltip location="top">
               <template v-slot:activator="{ props }">
-                <v-btn
-                  color="primary"
-                  icon
-                  class="ml-7"
-                  height="30"
-                  variant="outlined"
-                  v-bind="props"
-                  to="/auth/login"
-                >
+                <v-btn color="primary" icon class="ml-7" height="30" variant="outlined" v-bind="props" to="/auth/login">
                   <v-icon>mdi-login-variant</v-icon>
                 </v-btn>
               </template>
@@ -118,45 +67,34 @@
             <v-spacer />
           </v-card-actions>
         </div>
-      </v-form> </v-card-text
-    ><v-divider />
+      </v-form> </v-card-text><v-divider />
 
     <div v-if="loginError">
-      <v-alert
-        :text="loginError"
-        title="Registration error"
-        type="error"
-      ></v-alert>
+      <v-alert :text="loginError" title="Registration error" type="error"></v-alert>
     </div>
     <v-dialog max-width="75%" auto-height v-model="selectIcon">
       <Scientists @closeScientists="closeScientists()" />
     </v-dialog>
 
-    <v-dialog max-width="700" persistent v-model="agreeToTermsDialog"
-      ><v-card class="ma-2 ml-2">
+    <v-dialog max-width="700" persistent v-model="agreeToTermsDialog"><v-card class="ma-2 ml-2">
         <Terms />
         <v-divider />
         <template v-slot:actions>
           <v-spacer></v-spacer>
 
-          <v-btn
-            variant="outlined"
-            width="9rem"
-            @click="(agreeToTermsDialog = false), (agreeToTerms = true)"
-          >
+          <v-btn variant="outlined" width="9rem" @click="(agreeToTermsDialog = false), (agreeToTerms = true)">
             <v-icon class="mr-4">mdi-note-check</v-icon> Agree
           </v-btn>
 
           <v-btn color="red" @click="leavePage"> Disagree and Leave </v-btn>
         </template>
-      </v-card></v-dialog
-    >
+      </v-card></v-dialog>
   </v-card>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed, watch } from "vue";
-import { useUserStore } from "../../stores/users";
+import { useUserStore } from "../../stores/staff";
 
 const userStore = useUserStore();
 

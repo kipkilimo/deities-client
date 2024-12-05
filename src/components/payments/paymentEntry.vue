@@ -3,7 +3,7 @@
     <!-- <v-card title="Publication Credits Required.">
         <v-card-text>
           <p class="pb-4">
-            NEMBio requires publishers to purchase publication credits in
+            Amane Hospital requires publishers to purchase publication credits in
             advance.
           </p>
 
@@ -28,22 +28,13 @@
           <v-avatar color="surface-light" size="36">🧾</v-avatar>
         </template>
 
-        <template v-slot:title> NEMBio publication credits </template>
+        <template v-slot:title> Amane Hospital publication credits </template>
 
         <template v-slot:append>
-          <v-tooltip
-            text="You can add materials for your discussion groups for FREE on NEMBio."
-            location="left"
-          >
-            <template v-slot:activator="{ props }"
-              ><v-btn
-                class="text-none"
-                v-bind="props"
-                color="primary"
-                text="Request waiver"
-                variant="text"
-                slim
-              ></v-btn>
+          <v-tooltip text="You can add materials for your discussion groups for FREE on Amane Hospital."
+            location="left">
+            <template v-slot:activator="{ props }"><v-btn class="text-none" v-bind="props" color="primary"
+                text="Request waiver" variant="text" slim></v-btn>
             </template>
           </v-tooltip>
         </template>
@@ -57,26 +48,14 @@
           {{ useUserStore().user.personalInfo.publication_credits }}
         </div>
 
-        <v-progress-linear
-          bg-color="surface-variant"
-          class="mb-6"
-          color="primary"
-          height="10"
-          :model-value="useUserStore().user.personalInfo.publication_credits"
-          rounded="pill"
-        ></v-progress-linear>
+        <v-progress-linear bg-color="surface-variant" class="mb-6" color="primary" height="10"
+          :model-value="useUserStore().user.personalInfo.publication_credits" rounded="pill"></v-progress-linear>
 
         <v-card-title class="ml-0">
-          USD 1 for 100 NEMBio publication credits used as follows:
+          USD 1 for 100 Amane Hospital publication credits used as follows:
         </v-card-title>
         <v-row>
-          <v-col
-            v-for="(publication, index) in publication_credit_charges"
-            :key="index"
-            cols="12"
-            sm="6"
-            md="4"
-          >
+          <v-col v-for="(publication, index) in publication_credit_charges" :key="index" cols="12" sm="6" md="4">
             <v-card>
               <v-card-subtitle>{{ publication.type }}</v-card-subtitle>
               <v-card-text>Credit cost: {{ publication.credits }}</v-card-text>
@@ -87,23 +66,13 @@
       <v-divider></v-divider>
 
       <v-card-actions class="justify-center px-6 py-3">
-        <v-btn
-          class="flex-grow-1 text-none"
-          color="blue-darken-4"
-          rounded="0"
-          variant="plain"
-          @click="creditBalanceDialog = false"
-        >
+        <v-btn class="flex-grow-1 text-none" color="blue-darken-4" rounded="0" variant="plain"
+          @click="creditBalanceDialog = false">
           Cancel Publication Process
         </v-btn>
 
-        <v-btn
-          class="text-white flex-grow-1 text-none"
-          color="blue-darken-4"
-          rounded="0"
-          variant="flat"
-          @click="creditBalanceDialog = false"
-        >
+        <v-btn class="text-white flex-grow-1 text-none" color="blue-darken-4" rounded="0" variant="flat"
+          @click="creditBalanceDialog = false">
           <v-icon class="mr-6">mdi-wallet-giftcard</v-icon> Purchase Publication
           Credits
         </v-btn>
@@ -114,10 +83,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onBeforeMount, watch } from "vue";
-import { useResourceStore } from "../../stores/resources"; // Replace with actual path
+import { useResourceStore } from "../../stores/patients"; // Replace with actual path
 const userId = ref(localStorage.getItem("sessionId")); // Retrieve userId from local storage
 const creditBalanceDialog = ref(false);
-import { useUserStore } from "@/stores/users";
+import { useUserStore } from "@/stores/staff";
 const resourceStore = useResourceStore();
 import worldRegions from "../../data/languages";
 import staticResourcesData from "../../data/staticResources";

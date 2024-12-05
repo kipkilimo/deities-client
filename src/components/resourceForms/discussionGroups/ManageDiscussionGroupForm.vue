@@ -131,8 +131,8 @@
 </template>
 <script setup>
 import { ref, watch, onMounted } from "vue";
-import { useDiscusionGroupsStore } from "@/stores/discussionGroups";
-import { useUserStore } from "@/stores/users";
+import { useDiscusionGroupsStore } from "@/stores/reports";
+import { useUserStore } from "@/stores/staff";
 
 const form = ref({
   name: "",

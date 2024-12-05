@@ -10,7 +10,7 @@
 </template>
 <script setup>
 import { ref, computed } from "vue";
-import { useResourceStore } from "@/stores/resources";
+import { useResourceStore } from "@/stores/patients";
 
 const resourceStore = useResourceStore();
 

@@ -153,7 +153,7 @@ const manageDiscussionGroupDialog = ref(false);
 
 import CryptoJS from "crypto-js";
 
-import { useUserStore } from "@/stores/users";
+import { useUserStore } from "@/stores/staff";
 import PaymentsManagementTable from "@/components/admin/Components/PaymentsManagementTable.vue";
 onBeforeMount(async () => {
   const userStore = useUserStore();

@@ -8,7 +8,7 @@
 <script setup>
 import ParticipantEnrollRequest from "@/components/paperdiveiterator/ParticipantEnrollRequest.vue";
 // import PapersIterator from '@/components/paperdiveiterator/RecentPapers.vue'
-// /home/arasofea/Desktop/MEVN/ts-apps/NEMBio/client/src/components/paperdiveiterator/ParticipantEnrollRequest.vue
+// /home/arasofea/Desktop/MEVN/ts-apps/Amane Hospital/client/src/components/paperdiveiterator/ParticipantEnrollRequest.vue
 </script>
 
 <style scoped>

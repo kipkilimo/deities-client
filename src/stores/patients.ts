@@ -66,7 +66,7 @@ export const useResourceStore = defineStore("resource", {
     showTopics: true,
 
     surveyLikertQuestion:
-      "What is your take on NEMBio, 'The Hub for Interactive Life Sciences Research Tools.', after the introduction given?",
+      "What is your take on Amane Hospital, 'The Hub for Interactive Life Sciences Research Tools.', after the introduction given?",
     surveyLikertOptions: [
       { label: "Waste of time" },
       { label: "Neutral" },

@@ -171,7 +171,7 @@
 
 <script setup>
 import { ref, watch } from "vue";
-import { useResourceStore } from "../../../stores/resources"; // Replace with actual path
+import { useResourceStore } from "../../../stores/patients"; // Replace with actual path
 
 const resourceStore = useResourceStore();
 // Stepper and form state

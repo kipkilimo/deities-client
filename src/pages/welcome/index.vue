@@ -54,7 +54,7 @@
                 medical and life sciences research.
               </p>
               <br />
-              The NEMBio web app has been developed to serve medical and life
+              The Amane Hospital web app has been developed to serve medical and life
               sciences students,researchers and professionals who wish to learn
               more about biostatistics,epidemiology and research methods. The
               site contains carefully selected and reviewed training materials
@@ -95,7 +95,7 @@
             <v-toolbar-title
               color="#3d7187"
               class="mb-1 font-weight-black text-left"
-              >Objectives of the NEMBio Platform</v-toolbar-title
+              >Objectives of the Amane Hospital Platform</v-toolbar-title
             >
             <v-list-item
               no-action

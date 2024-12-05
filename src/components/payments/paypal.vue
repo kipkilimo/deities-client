@@ -2,27 +2,11 @@
   <v-container>
     <!-- -->
 
-    <v-alert
-      border="top"
-      type="warning"
-      variant="outlined"
-      prominent
-      class="ml-38 mt-4"
-      width="72%"
-      v-if="error"
-    >
+    <v-alert border="top" type="warning" variant="outlined" prominent class="ml-38 mt-4" width="72%" v-if="error">
       {{ error }}
     </v-alert>
 
-    <v-alert
-      border="top"
-      v-if="success"
-      type="success"
-      class="ml-38 mt-4"
-      width="72%"
-      variant="outlined"
-      prominent
-    >
+    <v-alert border="top" v-if="success" type="success" class="ml-38 mt-4" width="72%" variant="outlined" prominent>
       {{ success }}
     </v-alert>
     <!-- <div v-if="error">
@@ -38,63 +22,34 @@
     </div> -->
 
     <v-row>
-      <v-col
-        align-right
-        cols="5"
-        style="text-align: left !important; margin-left: 5px"
-      >
+      <v-col align-right cols="5" style="text-align: left !important; margin-left: 5px">
         Date: {{ createdAt() }}
         <br />
       </v-col>
-      <v-col
-        align-right
-        cols="5"
-        v-if="
+      <v-col align-right cols="5" v-if="
           useUserStore().user.role === 'STUDENT' &&
           useUserStore().user.discussion_groups &&
           useUserStore().user.discussion_groups[0].discussionGroupId.length ===
             12
-        "
-        style="text-align: right !important; margin-left: 5px"
-      >
+        " style="text-align: right !important; margin-left: 5px">
         <v-chip variant="outlined" class="ma-1" rounded="2">
-          <v-tooltip
-            text="You can add resources for your discussion groups for FREE on NEMBio."
-            location="top"
-          >
-            <template v-slot:activator="{ props }"
-              ><v-btn
-                class="text-none"
-                v-bind="props"
-                color="primary"
-                prepend-icon="mdi-wallet-giftcard"
-                text="Request waiver"
-                @click="requestDGWaiverDialog = true"
-                variant="text"
-                slim
-              ></v-btn>
+          <v-tooltip text="You can add resources for your discussion groups for FREE on Amane Hospital." location="top">
+            <template v-slot:activator="{ props }"><v-btn class="text-none" v-bind="props" color="primary"
+                prepend-icon="mdi-wallet-giftcard" text="Request waiver" @click="requestDGWaiverDialog = true"
+                variant="text" slim></v-btn>
             </template>
           </v-tooltip>
         </v-chip>
         <br />
       </v-col>
-      <v-col
-        align-right
-        cols="5"
-        v-if="
-          useUserStore().user.role === 'FACULTY' &&
-          useUserStore().user.departments &&
-          useUserStore().user.departments[0].departmentId.length === 12
-        "
-        style="text-align: right !important; margin-left: 5px"
-      >
+      <v-col align-right cols="5" v-if="
+        useUserStore().user.role === 'FACULTY' &&
+        useUserStore().user.departments &&
+        useUserStore().user.departments[0].departmentId.length === 12
+      " style="text-align: right !important; margin-left: 5px">
         <v-chip variant="outlined" class="ma-1" rounded="2">
-          <v-tooltip
-            text="You can add resources for your discussion groups for FREE on NEMBio."
-            location="top"
-          >
-            <template v-slot:activator="{ props }"
-              ><v-chip rounded="2" v-bind="props" variant="rounded" slim>
+          <v-tooltip text="You can add resources for your discussion groups for FREE on Amane Hospital." location="top">
+            <template v-slot:activator="{ props }"><v-chip rounded="2" v-bind="props" variant="rounded" slim>
                 My Department ID:
                 {{ useUserStore().user.departments[0].departmentId }}
               </v-chip>
@@ -112,54 +67,20 @@
         <v-form v-model="isFormValid" lazy-validation>
           <v-row>
             <v-col cols="12" sm="12">
-              <v-select
-                v-model="selectedAmount"
-                :hint="`Credit USD ${selectedAmount}.00`"
-                :items="selectItems"
-                :rules="nameRules"
-                :disabled="sliderActive == true || departmentId.length === 12"
-                ref="selectNow"
-                @input="onSelectChange"
-                item-title="state"
-                item-value="abbr"
-                label="Select"
-                density="compact"
-                persistent-hint
-                return-object
-                single-line
-              ></v-select>
+              <v-select v-model="selectedAmount" :hint="`Credit USD ${selectedAmount}.00`" :items="selectItems"
+                :rules="nameRules" :disabled="sliderActive == true || departmentId.length === 12" ref="selectNow"
+                @input="onSelectChange" item-title="state" item-value="abbr" label="Select" density="compact"
+                persistent-hint return-object single-line></v-select>
               <br />
-              <v-slider
-                v-model="selectedAmount"
-                :value="selectedAmount"
-                color="indigo"
-                ref="slider"
-                @input="onSliderChange"
-                @click="onSliderChange"
-                track-color="grey"
-                :min="`${departmentId.length === 12 ? '250' : '1'}`"
-                max="2000"
-                hide-details
-                step="1"
-              >
+              <v-slider v-model="selectedAmount" :value="selectedAmount" color="indigo" ref="slider"
+                @input="onSliderChange" @click="onSliderChange" track-color="grey"
+                :min="`${departmentId.length === 12 ? '250' : '1'}`" max="2000" hide-details step="1">
                 <template v-slot:prepend>
-                  <v-btn
-                    size="small"
-                    variant="text"
-                    icon="mdi-minus"
-                    color="orange"
-                    @click="decrement"
-                  ></v-btn>
+                  <v-btn size="small" variant="text" icon="mdi-minus" color="orange" @click="decrement"></v-btn>
                 </template>
 
                 <template v-slot:append>
-                  <v-btn
-                    size="small"
-                    variant="text"
-                    icon="mdi-plus"
-                    color="teal"
-                    @click="increment"
-                  ></v-btn>
+                  <v-btn size="small" variant="text" icon="mdi-plus" color="teal" @click="increment"></v-btn>
                 </template>
               </v-slider>
               <v-spacer></v-spacer>
@@ -180,30 +101,16 @@
         <v-form v-model="isFormValid" lazy-validation>
           <v-row>
             <v-col cols="12" sm="12">
-              <v-text-field
-                density="compact"
-                placeholder="Payment type"
-                disabled
-                label="Payment type"
+              <v-text-field density="compact" placeholder="Payment type" disabled label="Payment type"
                 :prepend-inner-icon="
                   departmentId.length === 12
                     ? 'mdi-account-multiple-check-outline'
                     : 'mdi-account-check-outline'
-                "
-                variant="outlined"
-                v-model="transactionEntity"
-                :rules="nameRules"
-              ></v-text-field>
+                " variant="outlined" v-model="transactionEntity" :rules="nameRules"></v-text-field>
               <br />
-              <v-text-field
-                density="compact"
-                placeholder="Department ID"
-                label="Department ID"
-                prepend-inner-icon="mdi-barcode-scan"
-                variant="outlined"
-                v-model="departmentId"
-                :rules="uuidRules"
-              ></v-text-field>
+              <v-text-field density="compact" placeholder="Department ID" label="Department ID"
+                prepend-inner-icon="mdi-barcode-scan" variant="outlined" v-model="departmentId"
+                :rules="uuidRules"></v-text-field>
             </v-col>
           </v-row>
         </v-form>
@@ -232,32 +139,19 @@
           <!-- PayPal container -->
 
           <!-- SSL logo -->
-          <v-img
-            max-height="3rem"
-            class="mt-8"
-            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/csq_media/images/ssl.png"
-            alt="SSL"
-          ></v-img>
+          <v-img max-height="3rem" class="mt-8"
+            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/csq_media/images/ssl.png" alt="SSL"></v-img>
 
           <!-- Secure Payment with PayPal -->
-          <v-img
-            max-height="5.4rem"
-            class="mt-3"
+          <v-img max-height="5.4rem" class="mt-3"
             src="https://a2z-v0.s3.eu-central-1.amazonaws.com/secure-payment-with-paypal.png"
-            alt="Secure Payment"
-          ></v-img>
+            alt="Secure Payment"></v-img>
           <!-- PayPal container will be rendered here -->
 
           <!-- M-Pesa container -->
 
-          <v-img
-            max-height="7.2rem"
-            style="cursor: pointer"
-            v-if="selectedAmount < 1710"
-            @click="showMpesaIcon"
-            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/1200px-M-PESA_LOGO-01.svg.png"
-            alt="M-Pesa"
-          ></v-img>
+          <v-img max-height="7.2rem" style="cursor: pointer" v-if="selectedAmount < 1710" @click="showMpesaIcon"
+            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/1200px-M-PESA_LOGO-01.svg.png" alt="M-Pesa"></v-img>
 
           <!--<v-img
             max-height="7.2rem"
@@ -268,16 +162,9 @@
           ></v-img> -->
         </v-col>
         <v-col cols="3" class="d-flex justify-space-between">
-          <v-container
-            max-height="7.2rem"
-            max-width="6rem"
-            style="cursor: pointer"
-          >
-            <div
-              id="paypal-button-container"
-              class="paypal-button-small mt-5 mb-5"
-            ></div> </v-container
-        ></v-col>
+          <v-container max-height="7.2rem" max-width="6rem" style="cursor: pointer">
+            <div id="paypal-button-container" class="paypal-button-small mt-5 mb-5"></div>
+          </v-container></v-col>
       </v-row>
     </v-card-actions>
     <v-dialog v-model="MPESAInputDialog" persistent max-width="540">
@@ -296,7 +183,7 @@ import { ref, onMounted, nextTick, reactive, watch } from "vue";
 import { usePaymentsStore } from "@/stores/payments";
 // import axios from "axios";
 
-import { useUserStore } from "@/stores/users";
+import { useUserStore } from "@/stores/staff";
 const requestDGWaiverDialog = ref(false);
 
 import { useRouter } from "vue-router";
@@ -455,7 +342,7 @@ onMounted(async () => {
             intent: "CAPTURE",
             purchase_units: [
               {
-                reference_id: "NEMBio Publication Credits",
+                reference_id: "Amane Hospital Publication Credits",
                 amount: {
                   currency_code: "USD",
                   value: paidAmount,

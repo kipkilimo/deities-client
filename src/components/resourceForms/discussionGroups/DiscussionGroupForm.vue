@@ -67,7 +67,7 @@
 
 <script setup>
 import { ref, reactive } from "vue";
-import { useDiscusionGroupsStore } from "@/stores/discussionGroups";
+import { useDiscusionGroupsStore } from "@/stores/reports";
 
 const createdBy = localStorage.getItem("sessionId");
 const emailValidation = (value) => {

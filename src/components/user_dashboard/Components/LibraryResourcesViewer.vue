@@ -129,7 +129,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeMount, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
-import { useResourceStore } from "@/stores/resources";
+import { useResourceStore } from "@/stores/patients";
 const loading = ref(false);
 
 const router = useRouter();

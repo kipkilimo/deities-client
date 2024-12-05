@@ -62,7 +62,7 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 
-import { useUserStore } from "../../stores/users";
+import { useUserStore } from "../../stores/staff";
 
 const userStore = useUserStore();
 import { useRouter } from "vue-router";

@@ -18,7 +18,7 @@ dashboard:
 
     papers: النادي العلمي
     poster: الملصقات
-    poll: استطلاعات NEMBio
+    poll: استطلاعات Amane Hospital
     tasks: مهام الواجبات
 
     events: الأحداث
@@ -26,7 +26,7 @@ dashboard:
 
     programming: الطرق الحسابية
     consults: استشارة بحثية
-    donate: تبرع لـ NEMBio
+    donate: تبرع لـ Amane Hospital
     logout: تسجيل الخروج
   main:
     dashboard-overview: نظرة عامة

@@ -102,7 +102,7 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import { useResourceStore } from "../../../stores/resources"; //
+import { useResourceStore } from "../../../stores/patients"; //
 const resourceStore = useResourceStore();
 
 const valid = ref(false);

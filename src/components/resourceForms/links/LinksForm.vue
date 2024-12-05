@@ -28,7 +28,7 @@
 
 <script setup>
 import { ref } from "vue";
-import { useResourceStore } from "@/stores/resources";
+import { useResourceStore } from "@/stores/patients";
 
 const resourceStore = useResourceStore();
 const urlInputs = ref(Array(5).fill(""));

@@ -5,7 +5,7 @@
 
     <h2>What Does This Privacy Policy Cover?</h2>
     <p>
-      This Privacy Policy explains how NEMBio Web app (hereinafter NEMBio)
+      This Privacy Policy explains how Amane Hospital Web app (hereinafter Amane Hospital)
       collects and uses personal information in relation to the products and
       services that are linked to this Policy. These products and services shall
       be referred to as our “Services” for the rest of this Policy.
@@ -18,21 +18,21 @@
       referred to as “Individuals” in this Policy).
     </p>
     <p>
-      In this Policy, a “User” is defined as any person making use of NEMBio’s
+      In this Policy, a “User” is defined as any person making use of Amane Hospital’s
       Services, including employees and students of Organizations that have
-      purchased NEMBio’s Services, as well as Individuals who have purchased
-      NEMBio’s Services themselves. In each case, we may have to collect “User
+      purchased Amane Hospital’s Services, as well as Individuals who have purchased
+      Amane Hospital’s Services themselves. In each case, we may have to collect “User
       Data” (here defined as any personal information or data pertaining to any
-      User that is collected by, or on behalf of, NEMBio) in order to provide our
+      User that is collected by, or on behalf of, Amane Hospital) in order to provide our
       Services.
     </p>
     <p>
-      This Policy covers how NEMBio handles User Data as a data processor when
-      providing Services to Organizations. It also covers how NEMBio handles User
+      This Policy covers how Amane Hospital handles User Data as a data processor when
+      providing Services to Organizations. It also covers how Amane Hospital handles User
       Data as a data controller when providing Services to Individuals.
     </p>
 
-    <h2>NEMBio’s Commitment</h2>
+    <h2>Amane Hospital’s Commitment</h2>
     <p>
       Under the Regulations, civil registration registries cannot transfer
       personal data collected for civil registration purposes outside Kenya
@@ -44,14 +44,14 @@
       <li>Creating a safe and secure digital learning environment for you,</li>
       <li>
         Not sharing or selling your personal information to third parties that
-        are not directly involved in delivering NEMBio Services (unless we are
+        are not directly involved in delivering Amane Hospital Services (unless we are
         required to by law),
       </li>
       <li>
         Providing you with access to and control over the information you give
         us,
       </li>
-      <li>Not showing any external advertisements on NEMBio Services.</li>
+      <li>Not showing any external advertisements on Amane Hospital Services.</li>
     </ul>
     <p>
       We consider all User Data that we collect to be strictly confidential. In
@@ -63,20 +63,20 @@
 
     <h2>What If My Account Was Provided for Me by an Organization?</h2>
     <p>
-      If your access to NEMBio’s Services is provided to you by an Organization,
+      If your access to Amane Hospital’s Services is provided to you by an Organization,
       then the Organization is the data controller for any User Data uploaded or
       accessed by the Services. The Organization is responsible for ensuring it
-      has a legal basis for processing this data. NEMBio may process this data on
+      has a legal basis for processing this data. Amane Hospital may process this data on
       the Organization’s behalf as a data processor.
     </p>
 
-    <h2>What User Data Does NEMBio Collect and Store?</h2>
+    <h2>What User Data Does Amane Hospital Collect and Store?</h2>
     <p>
       In order to provide our Services effectively, there are a number of pieces
-      of information (User Data) that NEMBio needs to collect and store.
+      of information (User Data) that Amane Hospital needs to collect and store.
     </p>
     <p>
-      By subscribing to our Services, you consent to NEMBio storing and
+      By subscribing to our Services, you consent to Amane Hospital storing and
       processing the following information about you:
     </p>
     <ul>
@@ -85,7 +85,7 @@
       <li>Country of residence,</li>
       <li>Phone number (for authentication and SMS notifications),</li>
       <li>
-        Usage of NEMBio’s Services, such as the pages you visit and the actions
+        Usage of Amane Hospital’s Services, such as the pages you visit and the actions
         you take,
       </li>
       <li>Education-specific data such as enrollment, grade, and term,</li>
@@ -98,19 +98,19 @@
     <p>
       Organizations are responsible for ensuring that any information they
       upload to the Services is accurate. Administrators, teachers, and tutors
-      that use NEMBio Services may also generate User Data. For example, NEMBio
+      that use Amane Hospital Services may also generate User Data. For example, Amane Hospital
       Services may track learner assignment scores, responses to interactive
       exercises, grades, and more. This data can be compiled into reports in
-      some NEMBio Services. NEMBio is not responsible for the disclosure of such
+      some Amane Hospital Services. Amane Hospital is not responsible for the disclosure of such
       data by Users.
     </p>
     <p>
-      For more information on what data will be collected by specific NEMBio
+      For more information on what data will be collected by specific Amane Hospital
       Services, please contact
       <a href="mailto:info@nem.bio">info@nem.bio</a>.
     </p>
 
-    <h2>How Do NEMBio Services Collect User Data?</h2>
+    <h2>How Do Amane Hospital Services Collect User Data?</h2>
     <p>We collect the information that forms your User Data when:</p>
     <ul>
       <li>
@@ -146,14 +146,14 @@
       >.
     </p>
 
-    <h2>Who Will NEMBio Share My Data With?</h2>
+    <h2>Who Will Amane Hospital Share My Data With?</h2>
     <p>
       We do not sell any User Data. We also do not share any User Data with any
-      third parties not directly involved in the delivery of NEMBio Services,
+      third parties not directly involved in the delivery of Amane Hospital Services,
       unless required to by law.
     </p>
     <p>
-      NEMBio may release User Data if it has a good faith belief that access,
+      Amane Hospital may release User Data if it has a good faith belief that access,
       use, preservation, or disclosure of such information is reasonably
       necessary to:
     </p>
@@ -172,11 +172,11 @@
       </li>
       <li>
         Protect against imminent harm to the rights, property, or safety of
-        NEMBio, its users, or the public as required or permitted by law.
+        Amane Hospital, its users, or the public as required or permitted by law.
       </li>
     </ul>
     <p>
-      We may also have to share User Data if NEMBio becomes involved in a merger,
+      We may also have to share User Data if Amane Hospital becomes involved in a merger,
       acquisition, or any form of sale of some or all of its assets. The legal
       basis for such a transfer would be our legitimate interests. You would be
       given notice of the proposed transfer at the relevant time and the option
@@ -192,16 +192,16 @@
       purposes of data privacy regulations.
     </p>
 
-    <h2>What Laws and Regulations Does NEMBio Follow When Handling My Data?</h2>
+    <h2>What Laws and Regulations Does Amane Hospital Follow When Handling My Data?</h2>
     <p>
-      When you purchase access to NEMBio’s Services or when we contact you for
+      When you purchase access to Amane Hospital’s Services or when we contact you for
       marketing purposes, we act as a data controller. Following the European
       General Data Protection Regulation, we are required to inform you of the
       legal basis for handling your User Data. We may use User Data:
     </p>
     <ul>
       <li>
-        To enter into a contract with you (such as when you purchase NEMBio’s
+        To enter into a contract with you (such as when you purchase Amane Hospital’s
         Services),
       </li>
       <li>
@@ -221,20 +221,20 @@
       When we handle User Data on behalf of an Organization, the Organization is
       the data controller and will establish the legal basis for handling your
       User Data. If you have any questions regarding this, please contact the
-      Organization that has provided you with the use of NEMBio’s Services on
+      Organization that has provided you with the use of Amane Hospital’s Services on
       your behalf.
     </p>
 
-    <h2>Will NEMBio Send Me Marketing Communications, and How Can I Opt Out?</h2>
+    <h2>Will Amane Hospital Send Me Marketing Communications, and How Can I Opt Out?</h2>
     <p>
       We may use the contact details provided by Users of our Services to inform
-      Users about other Services on offer from NEMBio unless the User chooses to
+      Users about other Services on offer from Amane Hospital unless the User chooses to
       opt out.
     </p>
     <p>
       Marketing communications will not be sent to any User that has opted out
       of receiving them. Users may opt out of receiving marketing communications
-      at any time. All marketing communications sent by NEMBio will contain an
+      at any time. All marketing communications sent by Amane Hospital will contain an
       “Unsubscribe” link at the end of the communication.
     </p>
 
@@ -271,9 +271,9 @@
       or Organization’s access to our Services.
     </p>
 
-    <h2>How Long Will NEMBio Keep My Data?</h2>
+    <h2>How Long Will Amane Hospital Keep My Data?</h2>
     <p>
-      We will keep your User Data for as long as you are a NEMBio customer and
+      We will keep your User Data for as long as you are a Amane Hospital customer and
       for any duration after this time where your data is required for
       processing in order to fulfill our Services, unless the law requires or
       permits longer.
@@ -291,7 +291,7 @@
       personal data collected for civil registration purposes outside Kenya
       without the written approval of the DPC. The Data Protection (General)
       Regulations, 2021 elaborate in more detail transfer of personal data
-      outside Kenya. requirements and substantially follow NEMBio’s Privacy
+      outside Kenya. requirements and substantially follow Amane Hospital’s Privacy
       Policy.
     </p>
     <p>
@@ -308,7 +308,7 @@
       registries cannot transfer personal data collected for civil registration
       purposes outside Kenya without the written approval of the DPC. The Data
       Protection (General) Regulations, 2021 elaborate in more detail transfer
-      of personal data outside Kenya. compliance, NEMBio has standard contractual
+      of personal data outside Kenya. compliance, Amane Hospital has standard contractual
       clauses in place where necessary. For example, companies in the US are
       registered with Privacy Shield.
     </p>
@@ -346,16 +346,16 @@
       may no longer be able to offer you our Services.
     </p>
     <p>
-      If you have access to NEMBio Services through your Organization and you
+      If you have access to Amane Hospital Services through your Organization and you
       have queries or concerns, then please contact the administrator for the
-      Organization. If you directly purchased access to NEMBio Services as an
+      Organization. If you directly purchased access to Amane Hospital Services as an
       Individual customer, then you can contact us with your request using the
       contact details given at the end of this Privacy Policy. We will consider
       and act upon any request in accordance with any applicable data protection
       laws.
     </p>
     <p>
-      If your access to NEMBio Services was purchased by yourself, a parent, or a
+      If your access to Amane Hospital Services was purchased by yourself, a parent, or a
       guardian, and you are unhappy with our privacy practices, you may have the
       right to complain to the Information Commissioner (if you are based in the
       Kenya), or to your local data protection supervisory authority.
@@ -367,12 +367,12 @@
       always clearly display the date on which the latest update was made.
     </p>
 
-    <h2>How Can I Contact NEMBio?</h2>
+    <h2>How Can I Contact Amane Hospital?</h2>
     <p>
       If you have any queries about our Privacy Policy, please contact us at:
     </p>
     <p>
-      NEMBio Web app<br />
+      Amane Hospital Web app<br />
       Email: <a href="mailto:info@nem.bio">info@nem.bio</a>
     </p>
   </div>

@@ -122,7 +122,7 @@ import { ref, computed } from "vue";
 import { VTimePicker } from "vuetify/labs/VTimePicker";
 
 import axios from "axios";
-import { useResourceStore } from "@/stores/resources";
+import { useResourceStore } from "@/stores/patients";
 const success = ref(null);
 const errorMessage = ref(null);
 const clearParticipants = ref(false);

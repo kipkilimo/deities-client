@@ -143,7 +143,7 @@ import {
   nextTick,
   onMounted,
 } from "vue";
-import { useResourceStore } from "@/stores/resources";
+import { useResourceStore } from "@/stores/patients";
 const resources = ref([]);
 const isLoading = ref(false);
 

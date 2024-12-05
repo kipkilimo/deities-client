@@ -64,7 +64,7 @@
 
 <script setup>
 import { ref, computed, onBeforeMount } from "vue";
-import { useResourceStore } from "../../../stores/resources";
+import { useResourceStore } from "../../../stores/patients";
 import staticResourcesData from "@/data/staticResources";
 const isLoading = ref(false);
 

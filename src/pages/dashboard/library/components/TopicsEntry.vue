@@ -88,7 +88,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import { useResourceStore } from "@/stores/resources";
+import { useResourceStore } from "@/stores/patients";
 import titlesData from "@/data/topics";
 
 const resourceStore = useResourceStore();

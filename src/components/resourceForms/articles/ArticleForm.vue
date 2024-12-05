@@ -41,7 +41,7 @@ import {
   VuetifyViewer,
 } from "vuetify-pro-tiptap";
 import "vuetify-pro-tiptap/style.css";
-import { useResourceStore } from "@/stores/resources";
+import { useResourceStore } from "@/stores/patients";
 
 const resourceStore = useResourceStore();
 

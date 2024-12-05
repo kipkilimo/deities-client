@@ -124,7 +124,7 @@
 
 <script setup>
 import { ref, reactive } from "vue";
-import { useResourceStore } from "@/stores/resources";
+import { useResourceStore } from "@/stores/patients";
 import qstnIdGen from "../../../utilities/accessTokenGenerator";
 
 const resourceStore = useResourceStore();

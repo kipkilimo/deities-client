@@ -293,7 +293,7 @@ v-if="userStore.user && userStore.user.personalInfo.username" -->
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeMount } from "vue";
 import { useI18n } from "vue-i18n";
-import { useUserStore } from "@/stores/users";
+import { useUserStore } from "@/stores/staff";
 import { useRouter, useRoute } from "vue-router";
 
 import PublisherExams from "@/components/resourcePlayers/test/PublisherExams.vue";
@@ -301,7 +301,7 @@ import PublisherExams from "@/components/resourcePlayers/test/PublisherExams.vue
 import partners from "@/data/partnersSponsors";
 
 import PublisherAssignments from "@/components/resourcePlayers/tasks/PublisherAssignments.vue";
-import { useResourceStore } from "@/stores/resources";
+import { useResourceStore } from "@/stores/patients";
 
 const isComputingRoute = ref(false);
 const route = useRoute();
