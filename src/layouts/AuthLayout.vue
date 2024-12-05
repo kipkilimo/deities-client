@@ -2,20 +2,14 @@
   <v-row>
     <v-col cols="12" md="4">
       <div><router-view /></div>
-
+      <!-- 
       <h3 color="#777777" class="ml-2 mt-2 mb-2 text-left">
-        {{ titlize(currentPartner.partnerType) }} Partner
-      </h3>
+        {{ titlize(currentPartner.partnerType) }}
+      </h3> -->
 
       <v-divider class="mt-1" />
       <div class="ma-4 d-flex justify-center">
-        <v-img
-          class="bg-white"
-          :src="currentPartner.logo"
-          max-width="85%" 
-          max-height="27.5vh"
-          contain
-        ></v-img>
+        <v-img class="bg-white" :src="currentPartner.logo" max-width="85%" max-height="27.5vh" contain></v-img>
       </div>
 
       <p class="text-center">
@@ -24,14 +18,10 @@
     </v-col>
 
     <v-col cols="12" md="8">
-      <v-img
-        class="ma-sm"
-        :src="currentEvent.posterUrl"
-        width="100%"
-        max-height="95vh"
-      />
+      <v-img class="ma-sm" src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Amane_Logo_Final.png" width="100%"
+        max-height="95vh" />
       <v-card-subtitle class="text-center mt-2">
-        <i>An example event by {{ currentEvent.organizerName }}</i>
+        <i>Amane Cottage Hospital</i>
       </v-card-subtitle>
     </v-col>
   </v-row>

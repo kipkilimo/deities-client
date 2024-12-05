@@ -4,7 +4,7 @@
       <v-img @click="goHome" style="height: 12rem;cursor: pointer"
         src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png" />
       <h5 class="mt-4 mr-11" style="color: #777777">
-        Create Amane Hospital Learning Account
+        Create Amane Hospital Account
       </h5>
     </v-card-title>
     <v-card-text>
@@ -94,9 +94,9 @@
 
 <script lang="ts" setup>
 import { ref, computed, watch } from "vue";
-import { useUserStore } from "../../stores/staff";
+import { useStaffStore } from "../../stores/staff";
 
-const userStore = useUserStore();
+const userStore = useStaffStore();
 
 import { useRouter } from "vue-router";
 import Scientists from "@/utilities/scientists.vue";

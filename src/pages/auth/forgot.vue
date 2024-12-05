@@ -1,8 +1,7 @@
 <template>
   <v-card class="reset-card mt-4 ml-2" elevation="4" outlined rounded>
     <v-card-title class="text-center">
-      <v-img style="height: 12rem"
-        src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png" />
+      <v-img style="height: 12rem" src="https://cloudclinic.me/ada/images/logo/cloud-clinic-logo-clean-new-1.png" />
       <h3 class="mt-4 mr-11" style="color: #777777">Request password reset</h3>
     </v-card-title>
     <v-card-text>
@@ -62,9 +61,9 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 
-import { useUserStore } from "../../stores/staff";
+import { useStaffStore } from "../../stores/staff";
 
-const userStore = useUserStore();
+const staffStore = useStaffStore();
 import { useRouter } from "vue-router";
 const router = useRouter();
 
@@ -104,7 +103,7 @@ const submitReset = async () => {
   }
   resetLoading.value = true; // Indicate reset in progress
   try {
-    await userStore.requestPasswordReset(email.value);
+    await staffStore.requestPasswordReset(email.value);
     // Handle successful reset (e.g., redirect to home page)
     resetSuccess.value = `A password reset link was sent to ${maskEmail(email.value)}`;
     resetLoading.value = false; // Indicate reset in progress

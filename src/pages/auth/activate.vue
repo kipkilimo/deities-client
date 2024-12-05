@@ -66,9 +66,9 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
 
-import { useUserStore } from "../../stores/staff";
+import { useStaffStore } from "../../stores/staff";
 
-const userStore = useUserStore();
+const userStore = useStaffStore();
 import { useRouter } from "vue-router";
 const router = useRouter();
 import { useRoute } from 'vue-router';

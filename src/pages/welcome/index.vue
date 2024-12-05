@@ -4,26 +4,21 @@
     <v-row class="hero-section align-center" justify="center">
       <v-col cols="12" class="text-center">
         <v-img
-          src="https://scitechdaily.com/images/DNA-Technology-Concept.gif"
-          class="hero-image"
-          cover
-          :aspect-ratio="1"
-        >
+          src="https://cdn.dribbble.com/users/1129235/screenshots/10762000/media/ace6e95b814e602a1b5a0527a54af10f.gif"
+          class="hero-image" cover :aspect-ratio="1">
           <v-container class="hero-content">
-            <h1 class="headline title-text">
-              NEMB<span class="io-text"><i>io</i></span>
+            <h1 style="color:#63bb45;" class="headline title-text">
+              Amane<span class="io-text"><i>Hospital</i></span>
             </h1>
-            <h2 class="headline subtitle-text">
-              Advancing Life Sciences Research in Africa
+            <h2 style="color:#1fcaff;" class="headline subtitle-text">
+              Accessible Care, Healthier Communities
             </h2>
-            <v-btn
-              class="cta-button"
-              size="x-large"
-              @click="scrollToCallToAction"
-            >
-              <v-icon>mdi-login</v-icon>
-              Continue to the Application
-            </v-btn>
+            <v-img @click="navigateToDonate" height="6rem" style="cursor:pointer;"
+              src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot_from_2024-12-05_21-46-15-removebg-preview.png"></v-img>
+            <!-- <v-btn class="cta-button" color="#c2529d" size="x-large" @click="scrollToCallToAction">
+              <v-icon>mdi-cloud-lock-outline</v-icon>
+              CloudClinic HMS Access
+            </v-btn> -->
           </v-container>
         </v-img>
       </v-col>
@@ -35,48 +30,45 @@
         <v-card max-height="28rem">
           <v-row>
             <v-col cols="12" md="4">
-              <v-img
-                src="https://img.freepik.com/premium-vector/green-medical-seamless-pattern_74102-633.jpg"
-              />
+              <v-img src="https://img.freepik.com/premium-vector/green-medical-seamless-pattern_74102-633.jpg" />
             </v-col>
             <v-col cols="12" md="8">
               <v-card-title class="text-center">
-                About NEMB<span class="io-text"><i>io</i></span>
+                About Amane<span class="io-text"><i>Hospital</i></span>
               </v-card-title>
               <v-card-subtitle class="text-center">
-                Epidemiology | Biostatistics | Research Methods | Seminar Series
+                Outpatient Care | Inpatient Services | Mother & Baby | Surgical Services
               </v-card-subtitle>
-              <p class="pa-2">
-                Welcome to the Nairobi Epidemiology and Biostatistical Methods
-                Colloquium, a Life Sciences focused web application hub for
-                learning Epidemiology, Biostatistics, and Research Methods.
-                Developed to serve students, researchers, and professionals in
-                medical and life sciences research.
-              </p>
-              <br />
-              The Amane Hospital web app has been developed to serve medical and life
-              sciences students,researchers and professionals who wish to learn
-              more about biostatistics,epidemiology and research methods. The
-              site contains carefully selected and reviewed training materials
-              especially suited for a non-statistician audience. This site is
-              being developed in close collaboration with members of the
-              Biostatistics, Epidemiology and Research Methods faculty of the
-              University of Nairobi, School of Public and Global Health.
-              <br />
-              <br />
-              <p>
-                This app is particularly useful for medical researchers who have
-                little training in statistics and need a refresher on essential
-                statistical tools and concepts. It offers accessible
-                explanations of key statistical methods without being burdened
-                by unnecessary formulas, equations, symbols, or technical
-                jargon. Within these pages, researchers will find
-                straightforward access to fundamental tools that are commonly
-                applied in medical research with graded complexity. This easy
-                access allows better understanding of statistical analyses and
-                fostering accurate interpretation of research results.
-              </p>
-              <br />
+              <div class="section">
+                <p>
+                  Amane Hospital is a state-of-the-art healthcare facility nestled in the heart of Burumba Estate,
+                  Busia. Our mission is to deliver accessible, high-quality healthcare that empowers individuals to lead
+                  healthier, more fulfilling lives. From preventive screenings to specialized care, Amane Hospital is
+                  equipped with modern medical technology and staffed by a team of highly skilled doctors, nurses, and
+                  healthcare professionals committed to excellence in patient care.
+                </p>
+                <br />
+                <p>
+                  In the area of primary care, our dedicated team offers personalized services that prioritize patient
+                  wellness through routine check-ups, chronic disease management, and health education. Our OB/GYN
+                  department provides a full spectrum of women's health services, including prenatal care,
+                  family planning, and treatment for gynecological conditions, ensuring that women at every stage of
+                  life receive the specialized care they deserve.
+                </p>
+                <br />
+                <p>
+                  For patients requiring surgical intervention, Amane
+                  Hospital offers a range of general and specialized
+                  surgical procedures performed in a safe and sterile environment. Our surgical team combines expertise
+                  with compassion, ensuring that every patient feels supported throughout their journey to recovery.
+
+
+                  At Amane Hospital, we believe in building lasting relationships with our patients and the community we
+                  serve. Together, we strive to create a healthier, thriving Burumba Estate. Whether you need a routine
+                  check-up, specialized care, or advice on maintaining a healthy lifestyle, Amane Hospital is here to
+                  serve you. Welcome to your partner in health and well-being.
+                </p>
+              </div>
             </v-col>
           </v-row>
         </v-card>
@@ -87,23 +79,14 @@
     <v-card>
       <v-row>
         <v-img
-          src="https://t3.ftcdn.net/jpg/08/15/66/88/360_F_815668853_eK0a2dGY6OEbDD5joOPUD4GuYVGGiLj1.jpg"
-        ></v-img>
+          src="https://thumbs.dreamstime.com/b/health-care-abstract-design-icon-background-eps-vector-52199756.jpg"></v-img>
         <v-divider vertical></v-divider>
         <v-col cols="12" md="8">
           <v-list density="compact" no-action>
-            <v-toolbar-title
-              color="#3d7187"
-              class="mb-1 font-weight-black text-left"
-              >Objectives of the Amane Hospital Platform</v-toolbar-title
-            >
-            <v-list-item
-              no-action
-              v-for="(item, i) in objectives"
-              :key="i"
-              :value="item"
-              color="primary"
-            >
+            <v-toolbar-title color="#3d7187" class="mb-1 font-weight-black text-left">Focus Services of the Amane
+              Hospital
+            </v-toolbar-title>
+            <v-list-item no-action v-for="(item, i) in objectives" :key="i" :value="item" color="primary">
               <template v-slot:prepend>
                 <v-icon :icon="item.icon"></v-icon>
               </template>
@@ -117,12 +100,7 @@
 
     <!-- Research Cards Section -->
     <v-row class="py-5" justify="center">
-      <v-col
-        v-for="(card, index) in researchCards"
-        :key="index"
-        cols="12"
-        md="4"
-      >
+      <v-col v-for="(card, index) in hospitalCards" :key="index" cols="12" md="4">
         <v-card class="research-card">
           <v-img :src="card.image" height="200px" cover />
           <v-card-title>{{ card.title }}</v-card-title>
@@ -133,18 +111,11 @@
     </v-row>
 
     <!-- Partners Section -->
-    <v-card
-      class="mx-auto d-flex flex-column align-center justify-center"
-      width="100%"
-    >
+    <v-card class="mx-auto d-flex flex-column align-center justify-center" width="100%">
       <v-carousel height="24rem" cycle :show-arrows="false" hide-delimiters>
         <v-carousel-item v-for="(partner, index) in partners" :key="index">
           <div class="d-flex justify-center align-center">
-            <img
-              :src="partner.logo"
-              :alt="partner.fullname"
-              class="partner-logo"
-            />
+            <img style="height:18rem;" :src="partner.logo" :alt="partner.fullname" class="partner-logo" />
           </div>
           <v-card-subtitle class="text-center">{{
             partner.fullname
@@ -162,21 +133,23 @@
             <v-btn @click="scrollToTop">
               <v-icon>mdi-arrow-up</v-icon> Back to Top
             </v-btn>
-            <v-btn @click="scrollToCallToAction">
-              <v-icon>mdi-login</v-icon> Continue to the Application
+            <v-btn @click="scrollToCallToAction" color="#c2529d">
+              <v-icon>mdi-cloud-lock-outline</v-icon> CloudClinic HMS Access
             </v-btn>
             <v-spacer />
           </v-card-actions>
-          <p>
-            &copy; {{ currentYear }} Nairobi Epidemiology and Biostatistical
-            Methods Colloquium. All rights reserved.
+          <p> Burumba Estate, Busia,KE. 📞+254713412265 💬 0700378241 📧 amanecottagehospital@gmail.com
+
           </p>
+          <v-img @click="navigateToDonate" height="6rem" style="cursor:pointer;"
+            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot_from_2024-12-05_21-46-15-removebg-preview.png"></v-img>
         </v-col>
       </v-row>
     </v-footer>
 
+
     <div class="text-caption" style="text-align: center">
-      Concept, design & crafted by NKSM Creations.
+      &copy; {{ currentYear }} Amane Cottage Hospital. All rights reserved.
     </div>
   </v-container>
 </template>
@@ -185,40 +158,44 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import partners from "../../data/partnersSponsors";
-import { researchCards } from "@/data/researchCards";
+import { hospitalCards } from "@/data/researchCards";
+const router = useRouter()
+function navigateToDonate() {
+  router.push("/donate");
+}
 const objectives = [
   {
-    text: "Gain an introduction to the principles of epidemiology and biostatistics.",
-    icon: "mdi-book-open-page-variant",
+    text: "Provide compassionate primary care for individuals and families.",
+    icon: "mdi-heart-outline",
   },
   {
-    text: "Learn to design, plan, and conduct research studies effectively.",
-    icon: "mdi-pencil-ruler",
+    text: "Deliver comprehensive OB/GYN services for women's health.",
+    icon: "mdi-human-female",
   },
   {
-    text: "Master basic statistical methods for analyzing research data.",
-    icon: "mdi-chart-bar-stacked",
+    text: "Perform safe and specialized surgical procedures.",
+    icon: "mdi-bandage",
   },
   {
-    text: "Understand core concepts of study design and data collection.",
-    icon: "mdi-database-outline",
+    text: "Offer community health screenings for early disease detection.",
+    icon: "mdi-hospital-box-outline",
   },
   {
-    text: "Develop skills to present findings in conferences and publications.",
-    icon: "mdi-presentation-play",
+    text: "Promote wellness through preventive care and education.",
+    icon: "mdi-school-outline",
   },
   {
-    text: "Foster Good Epidemiological Practice (GEP) in real-world settings.",
-    icon: "mdi-check-circle-outline",
+    text: "Build lasting relationships to enhance community health.",
+    icon: "mdi-account-group-outline",
   },
 ];
 
-const currentYear = ref(new Date().getFullYear());
-const router = useRouter();
+
+const currentYear = ref(new Date().getFullYear());  
 
 const scrollToCallToAction = () => {
   // @ts-ignore
-  window.location = "/dashboard/library";
+  window.location = "/auth/login";
 };
 
 const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
@@ -241,12 +218,12 @@ const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 }
 .title-text {
   color: #fff;
-  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
   font-size: clamp(3rem, 5vw, 6rem);
 }
 .subtitle-text {
   color: #fff;
-  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
   font-size: clamp(1.5rem, 3vw, 2.5rem);
 }
 .call-to-action {

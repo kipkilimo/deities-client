@@ -72,10 +72,10 @@
 import { ref, onBeforeMount, computed, watch } from "vue";
 // Import the array of notableFigures
 import notableFigures from "@/data/scientists";
-import { useUserStore } from "@/stores/staff";
+import { useStaffStore } from "@/stores/staff";
 import { emit } from "process";
 
-const userStore = useUserStore();
+const userStore = useStaffStore();
 function handleChipClick(scientist) {
   userStore.username = scientist.name; 
 }

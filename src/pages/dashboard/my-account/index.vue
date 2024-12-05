@@ -24,9 +24,9 @@ import AccountSummary from "./AccountSummary.vue";
 Chart.register(LineElement, CategoryScale, LinearScale, Title);
 
 import { useRouter } from "vue-router";
-import { useUserStore } from "@/stores/staff";
+import { useStaffStore } from "@/stores/staff";
 import AdminDashboardItems from "./AdminDashboardItems.vue";
-const user = useUserStore().user;
+const user = useStaffStore().user;
 // State variables
 const isLoading = ref(false);
 const isError = ref(null);

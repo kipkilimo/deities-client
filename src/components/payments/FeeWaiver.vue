@@ -61,7 +61,7 @@ import { usePaymentsStore } from "@/stores/payments";
 import { ref } from "vue";
 import { DateTime } from "luxon";
 
-import { useUserStore } from "@/stores/staff";
+import { useStaffStore } from "@/stores/staff";
 const userId = localStorage.getItem("sessionId");
 const DOLLAR_RATE = import.meta.env.VITE_DOLLAR_RATE;
 
@@ -73,7 +73,7 @@ const idRules = [
     "ID must be 11 characters long and alphanumeric", // Matches exactly 11 characters, upper/lowercase letters and digits
 ];
 
-const dgId = ref(useUserStore().user.discussion_groups[0].discussionGroupId);
+const dgId = ref(useStaffStore().user.discussion_groups[0].discussionGroupId);
 const success = ref(null);
 const error = ref(null);
 const isLoading = ref(false);

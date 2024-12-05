@@ -1,33 +1,33 @@
-export const researchCards = [
+export const hospitalCards = [
   {
-    title: "Epidemiology: Patterns of disease and exposure",
-    subtitle: "How often diseases occur in different groups of people and why?",
+    title: "Comprehensive Primary Care",
+    subtitle: "Personalized care for individuals and families.",
     image: {
-      src: "https://www.ohsu.edu/sites/default/files/2019-01/clin-epiicon.jpg",
+      src: "https://img.freepik.com/free-vector/nursing-home-doctor-composition-doctor-nurse-pair-up-monitor-her-health-take-old-ladys-blood-pressure-vector-illustration_1284-76415.jpg",
       height: "200px",
       aspectRatio: 1,
     },
-    text: "Epidemiology is the study of the patterns, causes, and effects of health and disease in patient populations and the relationships between exposures or treatments and health outcomes.",
+    text: "Our primary care services prioritize wellness through routine check-ups, chronic disease management, and health education tailored to the needs of our community.",
   },
   {
-    title: "Biostatistical Methods & Data Analysis",
-    subtitle:
-      "Explore the art and science of collecting, analyzing, and interpreting data.",
+    title: "Specialized OB/GYN Services",
+    subtitle: "Supporting women's health at every stage of the experience.",
     image: {
-      src: "https://sph.umich.edu/biostat/biostat-virtual-admitted-day-experience/images/rshbanner.jpg",
+      src: "https://www.ankurahospitals.com/wp-content/uploads/2021/03/2021-03-01.png",
       height: "200px",
       aspectRatio: 1,
     },
-    text: "Biostatistics is the application of statistical techniques to scientific research in health-related fields, including medicine, biology, and public health, and the development of new tools to study these areas.",
+    text: "From prenatal care to family planning and treatment for gynecological conditions, our OB/GYN team is dedicated to providing comprehensive and compassionate care.",
   },
   {
-    title: "Research Methods",
-    subtitle: "Expand your knowledge in research methods.",
+    title: "Safe and Advanced Surgical Care",
+    subtitle: "Expert surgical services in a secure environment.",
     image: {
-      src: "https://blogassets.leverageedu.com/blog/wp-content/uploads/2020/03/28214113/Types-of-Research-Design.jpg",
+      src: "https://thumbs.dreamstime.com/b/flat-surgical-operation-two-surgeons-performing-surgical-operation-patients-body-flat-vector-illustration-253407389.jpg",
+      height: "200px",
       aspectRatio: 1,
     },
-    text: "The best method for your project largely depends on your topic, the type of data you will need, and the people or items from which you will be collecting data, including considerations for data accuracy and relevance.",
+    text: "Our surgical team offers a range of general and specialized procedures, combining expertise and compassion to ensure a smooth recovery for every patient.",
   },
 ];
-export default { researchCards };
+export default { hospitalCards };

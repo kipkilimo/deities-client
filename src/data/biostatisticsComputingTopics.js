@@ -1,6 +1,6 @@
 export const topics = {
     "Basic Topics": {
-        "Introduction to Programming Languages for Life Sciences Computing": {
+        "Introduction to Programming Languages for  Computing": {
             "condensed": "Intro to Programming for Data Science",
             "topics": [
                 "Programming syntax for data analysis",

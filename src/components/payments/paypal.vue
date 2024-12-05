@@ -27,11 +27,11 @@
         <br />
       </v-col>
       <v-col align-right cols="5" v-if="
-          useUserStore().user.role === 'STUDENT' &&
-          useUserStore().user.discussion_groups &&
-          useUserStore().user.discussion_groups[0].discussionGroupId.length ===
-            12
-        " style="text-align: right !important; margin-left: 5px">
+  useStaffStore().user.role === 'STUDENT' &&
+  useStaffStore().user.discussion_groups &&
+  useStaffStore().user.discussion_groups[0].discussionGroupId.length ===
+  12
+" style="text-align: right !important; margin-left: 5px">
         <v-chip variant="outlined" class="ma-1" rounded="2">
           <v-tooltip text="You can add resources for your discussion groups for FREE on Amane Hospital." location="top">
             <template v-slot:activator="{ props }"><v-btn class="text-none" v-bind="props" color="primary"
@@ -43,15 +43,15 @@
         <br />
       </v-col>
       <v-col align-right cols="5" v-if="
-        useUserStore().user.role === 'FACULTY' &&
-        useUserStore().user.departments &&
-        useUserStore().user.departments[0].departmentId.length === 12
+        useStaffStore().user.role === 'FACULTY' &&
+        useStaffStore().user.departments &&
+        useStaffStore().user.departments[0].departmentId.length === 12
       " style="text-align: right !important; margin-left: 5px">
         <v-chip variant="outlined" class="ma-1" rounded="2">
           <v-tooltip text="You can add resources for your discussion groups for FREE on Amane Hospital." location="top">
             <template v-slot:activator="{ props }"><v-chip rounded="2" v-bind="props" variant="rounded" slim>
                 My Department ID:
-                {{ useUserStore().user.departments[0].departmentId }}
+                {{ useStaffStore().user.departments[0].departmentId }}
               </v-chip>
             </template>
           </v-tooltip>
@@ -183,7 +183,7 @@ import { ref, onMounted, nextTick, reactive, watch } from "vue";
 import { usePaymentsStore } from "@/stores/payments";
 // import axios from "axios";
 
-import { useUserStore } from "@/stores/staff";
+import { useStaffStore } from "@/stores/staff";
 const requestDGWaiverDialog = ref(false);
 
 import { useRouter } from "vue-router";

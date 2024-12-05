@@ -4,12 +4,12 @@
       <v-alert :text="loginError" title="Login error" type="error"></v-alert>
     </div>
     <h3 class="mt-4 mr-11 ml-2" style="color: #777777">
-      Amane Hospital Learning Login
+      Amane Hospital Staff Login
     </h3>
     <v-divider />
     <v-card-title class="text-center mb-2">
       <v-img @click="goHome" style="height: 12rem; cursor: pointer"
-        src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png" />
+        src="https://cloudclinic.me/ada/images/logo/cloud-clinic-logo-clean-new-1.png" />
     </v-card-title>
     <v-card-text>
       <v-form @submit.prevent="submitLoginPathway">
@@ -33,8 +33,8 @@
 
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
-              <v-btn :disabled="!usingPassword || password.length >= 6" :color="isEmailValid ? 'green' : 'primary'" icon
-                height="30" variant="outlined" v-bind="props" @click="sendOneTimeSignInKey">
+              <v-btn disabled :color="isEmailValid ? 'green' : 'primary'" icon height="30" variant="outlined"
+                v-bind="props">
                 <v-icon>{{
                     isEmailValid
                       ? "mdi-send-variant-clock-outline"
@@ -51,7 +51,7 @@
           </v-tooltip>
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
-              <v-btn v-bind="props" color="primary" icon height="30" variant="outlined" to="/auth/register">
+              <v-btn disabled v-bind="props" color="primary" icon height="30" variant="outlined" to="/auth/register">
                 <v-icon>mdi-account-plus</v-icon>
               </v-btn>
             </template>
@@ -75,7 +75,7 @@
           <v-tooltip location="bottom">
             <template v-slot:activator="{ props }">
               <v-img v-bind="props" @click="orcIDAuthenticate"
-                src="https://blog.noyam.org/wp-content/uploads/2021/02/noyamblog17.jpg"
+                src="https://www.softimpact.net/newsimages/News-224-636632023302815635.png"
                 style="height: 4.5rem; cursor: pointer" />
             </template>
             <span>Signin with your ORCID</span>
@@ -88,13 +88,13 @@
 
 <script lang="ts" setup>
 import { ref, computed } from "vue";
-import { useUserStore } from "../../stores/staff";
+import { useStaffStore } from "../../stores/staff";
 import Cookies from "js-cookie";
 
 import { useRouter } from "vue-router";
 const router = useRouter();
 
-const userStore = useUserStore();
+const staffStore = useStaffStore();
 const usingPassword = ref(true);
 
 const email = ref("");
@@ -125,121 +125,29 @@ const isPasswordValid = computed(
 // Computed property to enable or disable the login button
 const canLogin = computed(() => isEmailValid.value && isPasswordValid.value);
 
-const sendOneTimeSignInKey = async () => {
-  if (email.value === "") {
-    return false;
-  }
-  loginLoading.value = true; // Indicate login in progress
-  try {
-    await userStore.singleSignInRequest(email.value);
-    //@ts-ignore
-    if (userStore.user.personalInfo.activatedAccount === false) {
-      router.push("/auth/activate");
-      return;
-    }
-    usingPassword.value = false;
-    loginLoading.value = false;
-  } catch (error) {
-    loginError.value = "Check your credentials."; // Set error message
-    let errorMessage = loginError.value;
 
-    function isGraphQLError(
-      err: unknown
-    ): err is { graphQLErrors: Array<{ message: string }> } {
-      return (
-        typeof err === "object" &&
-        err !== null &&
-        "graphQLErrors" in err &&
-        Array.isArray((err as any).graphQLErrors)
-      );
-    }
-
-    if (isGraphQLError(error)) {
-      if (error.graphQLErrors.length > 0) {
-        errorMessage = error.graphQLErrors[0].message;
-      }
-    } else if (error instanceof Error && error.message) {
-      errorMessage = error.message;
-    }
-
-    loginError.value = errorMessage;
-    setTimeout(() => {
-      window.location.reload();
-    }, 8100);
-  }
-};
 
 function submitLoginPathway() {
   if (usingPassword.value === true) {
     submitLogin();
     return;
   }
-  submitSingleSigninLogin();
 }
-const submitSingleSigninLogin = async () => {
-  loginLoading.value = true; // Indicate login in progress
-  try {
-    await userStore.singleSigninLogin(accessKey.value);
-    //@ts-ignore
-    if (userStore.user.personalInfo.activatedAccount === false) {
-      router.push("/auth/activate");
-      return;
-    }
-    const token = userStore.token;
-    // @ts-ignore
-    // @ts-ignore
 
-    // @ts-ignore
-    const expirationDate = new Date();
-    expirationDate.setDate(expirationDate.getDate() + 7);
-
-    // @ts-ignore
-    Cookies.set("authToken", token, { expires: expirationDate });
-
-    router.push("/dashboard/library");
-  } catch (error) {
-    loginError.value = "Check your credentials."; // Set error message
-    let errorMessage = loginError.value;
-
-    function isGraphQLError(
-      err: unknown
-    ): err is { graphQLErrors: Array<{ message: string }> } {
-      return (
-        typeof err === "object" &&
-        err !== null &&
-        "graphQLErrors" in err &&
-        Array.isArray((err as any).graphQLErrors)
-      );
-    }
-
-    if (isGraphQLError(error)) {
-      if (error.graphQLErrors.length > 0) {
-        errorMessage = error.graphQLErrors[0].message;
-      }
-    } else if (error instanceof Error && error.message) {
-      errorMessage = error.message;
-    }
-
-    loginError.value = errorMessage;
-    setTimeout(() => {
-      window.location.reload();
-    }, 420000);
-  }
-};
 const orcIDAuthenticate = async () => {
   loginLoading.value = true; // Indicate login in progress
   try {
-    await userStore.login(email.value, password.value);
+    await staffStore.login(email.value, password.value);
     //@ts-ignore
-    if (userStore.user.personalInfo.activatedAccount === false) {
+    if (staffStore.user.personalInfo.activatedAccount === false) {
       router.push("/auth/activate");
       return;
     }
-    const token = userStore.token;
+    const token = staffStore.token;
     // @ts-ignore
     Cookies.set("authToken", token, { expires: 7 }); // Expires in 7 days
 
-    router.push("/dashboard/library");
+    router.push("/dashboard/services");
   } catch (error) {
     loginError.value = "Check your credentials."; // Set error message
     let errorMessage = loginError.value;
@@ -272,17 +180,17 @@ const orcIDAuthenticate = async () => {
 const submitLogin = async () => {
   loginLoading.value = true; // Indicate login in progress
   try {
-    await userStore.login(email.value, password.value);
+    await staffStore.login(email.value, password.value);
     //@ts-ignore
-    if (userStore.user.personalInfo.activatedAccount === false) {
+    if (staffStore.user.personalInfo.activatedAccount === false) {
       router.push("/auth/activate");
       return;
     }
-    const token = userStore.token;
+    const token = staffStore.token;
     // @ts-ignore
     Cookies.set("authToken", token, { expires: 7 }); // Expires in 7 days
 
-    router.push("/dashboard/library");
+    router.push("/dashboard/services");
   } catch (error) {
     loginError.value = "Check your credentials."; // Set error message
     let errorMessage = loginError.value;

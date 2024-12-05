@@ -146,7 +146,7 @@ const handlePublicationCreditsPaymentViaMpesa = async () => {
     setTimeout(() => {
       isLoading.value = false;
 
-      window.location.href = "/dashboard/library";
+      window.location.href = "/dashboard/services";
       success.value = null;
     }, 4200);
   } catch (err) {

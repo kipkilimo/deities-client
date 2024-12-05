@@ -1,43 +1,22 @@
 <template>
   <v-card class="reset-card mt-4 ml-2" elevation="4" outlined rounded>
     <v-card-title class="text-center">
-      <v-img
-        style="height: 12rem"
-        src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot+from+2024-10-22+16-31-16.png"
-      />
+      <v-img style="height: 12rem" src="https://cloudclinic.me/ada/images/logo/cloud-clinic-logo-clean-new-1.png" />
       <h3 class="mt-4 mr-11" style="color: #777777">Password Reset</h3>
     </v-card-title>
     <v-card-text>
       <v-form @submit.prevent="submitReset">
         <v-container>
-          <v-text-field
-            v-model="password"
-            :type="showPassword ? 'text' : 'password'"
-            label="Password"
-            :append-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
-            @click:append="togglePassword"
-            :rules="passwordRules"
-            required
-          />
-          <v-text-field
-            v-model="confirm"
-            :type="showConfirmPassword ? 'text' : 'password'"
-            label="Confirm Password"
+          <v-text-field v-model="password" :type="showPassword ? 'text' : 'password'" label="Password"
+            :append-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'" @click:append="togglePassword"
+            :rules="passwordRules" required />
+          <v-text-field v-model="confirm" :type="showConfirmPassword ? 'text' : 'password'" label="Confirm Password"
             :append-icon="showConfirmPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
-            @click:append="toggleConfirmPassword"
-            :rules="confirmRules"
-            required
-          />
+            @click:append="toggleConfirmPassword" :rules="confirmRules" required />
         </v-container>
 
         <div class="d-flex justify-space-between mt-4">
-          <v-btn
-            :disabled="isFormInvalid"
-            style="width: 15rem"
-            type="submit"
-            color="primary"
-            :loading="resetLoading"
-          >
+          <v-btn :disabled="isFormInvalid" style="width: 15rem" type="submit" color="primary" :loading="resetLoading">
             <v-icon class="mr-sm">mdi-location-enter</v-icon> Reset Password
           </v-btn>
           <v-tooltip location="top">
@@ -59,18 +38,18 @@
 
 <script lang="ts" setup>
 import { ref, computed, onMounted } from "vue";
-import { useUserStore } from "../../stores/staff";
+import { useStaffStore } from "../../stores/staff";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
-const userStore = useUserStore();
+const staffStore = useStaffStore();
 const router = useRouter();
 
 const activationToken = ref('');
 const password = ref("");
 const confirm = ref("");
 const resetLoading = ref(false);
-const resetError = ref(""); 
+const resetError = ref("");
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
@@ -106,19 +85,16 @@ const isFormInvalid = computed(() => {
 
 const submitReset = async () => {
   resetLoading.value = true;
-  resetError.value = ""; 
+  resetError.value = "";
 
   try {
-    await userStore.resetPassword(activationToken.value, password.value);
-    if (userStore.user?.personalInfo.activatedAccount === false) {
-      router.push("/auth/activate");
-    } else {
-      router.push("/dashboard/overview");
-    }
+    await staffStore.resetPassword(activationToken.value, password.value);
+
+    router.push("/auth/login");
   } catch (error) {
     resetError.value = "Failed to reset password.";
   } finally {
-    resetLoading.value = false; 
+    resetLoading.value = false;
   }
 };
 </script>
@@ -130,3 +106,8 @@ const submitReset = async () => {
   padding: 24px;
 }
 </style>
+
+<route lang="yaml">
+meta:
+  layout: AuthLayout
+</route>

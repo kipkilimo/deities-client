@@ -17,7 +17,7 @@
 
           <v-list-subheader class="font-weight-black text-high-emphasis"
             >{{
-              useUserStore().user.personalInfo.publication_credits || "0"
+              useStaffStore().user.personalInfo.publication_credits || "0"
             }}
             Publication Credits</v-list-subheader
           >
@@ -45,11 +45,11 @@
       <v-card-text class="text-medium-emphasis pa-3">
         <div class="text-h5 font-weight-black mb-2">
           My publication credits:
-          {{ useUserStore().user.personalInfo.publication_credits }}
+          {{ useStaffStore().user.personalInfo.publication_credits }}
         </div>
 
         <v-progress-linear bg-color="surface-variant" class="mb-6" color="primary" height="10"
-          :model-value="useUserStore().user.personalInfo.publication_credits" rounded="pill"></v-progress-linear>
+          :model-value="useStaffStore().user.personalInfo.publication_credits" rounded="pill"></v-progress-linear>
 
         <v-card-title class="ml-0">
           USD 1 for 100 Amane Hospital publication credits used as follows:
@@ -86,7 +86,6 @@ import { ref, computed, onBeforeMount, watch } from "vue";
 import { useResourceStore } from "../../stores/patients"; // Replace with actual path
 const userId = ref(localStorage.getItem("sessionId")); // Retrieve userId from local storage
 const creditBalanceDialog = ref(false);
-import { useUserStore } from "@/stores/staff";
 const resourceStore = useResourceStore();
 import worldRegions from "../../data/languages";
 import staticResourcesData from "../../data/staticResources";
@@ -124,10 +123,7 @@ type Subject = "Epidemiology" | "Biostatistics" | "Research Methods";
 const resourceEnums = Object.values(resourceType).map(
   (resource) => resource.name
 );
-onBeforeMount(async () => {
-  const userStore = useUserStore();
-  await userStore.getCurrentUser(userId.value || "");
-});
+
 // Define the form data
 const formData = ref({
   title: "Poisson distribution",
@@ -145,7 +141,7 @@ const formData = ref({
 });
 const user_credits = ref(
   // @ts-ignore
-  Number(useUserStore().user.personalInfo.publication_credits)
+  Number(useStaffStore().user.personalInfo.publication_credits)
 );
 // Watch for changes in resourceType
 watch(
@@ -194,7 +190,6 @@ type TopicsStructure = {
 import rawTopics from "../../data/topics";
 
 // Cast the imported topics to the appropriate type
-const topics: TopicsStructure = rawTopics;
 
 // Initialize refs with proper typing
 // @ts-ignore
@@ -203,28 +198,7 @@ const selectedLevel = ref("");
 const selectedTopic = ref("");
 
 // Computed property to get the subjects for v-select
-const subjects = computed(() => {
-  return Object.keys(topics) as Subject[]; // Cast to Subject[]
-});
 
-// Computed property to get the levels of complexity based on the selected subject
-const complexityLevels = computed(() => {
-  if (selectedSubject.value) {
-    const subjectTopics = topics[selectedSubject.value];
-    return Object.keys(subjectTopics);
-  }
-  return [];
-});
-
-// Computed property to filter topics based on selected subject and level of complexity
-const filteredTopics = computed(() => {
-  if (selectedSubject.value && selectedLevel.value) {
-    const subject = selectedSubject.value as Subject;
-    const level = selectedLevel.value as keyof (typeof topics)[Subject];
-    return topics[subject][level] || [];
-  }
-  return [];
-});
 
 // Methods to reset child selections when parent is changed
 function resetLevelAndTopics() {

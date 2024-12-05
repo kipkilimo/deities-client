@@ -39,7 +39,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
         });
         console.log(result);
         setTimeout(() => {
-          window.location.href = "/dashboard/library";
+          window.location.href = "/dashboard/services";
         }, 1800);
       } catch (error) {
         console.error("MPESA Payment error: ", error);
@@ -47,7 +47,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
           localStorage.removeItem("currentUser");
           const router = useRouter();
 
-          window.location.href = "/dashboard/library";
+          window.location.href = "/dashboard/services";
         }, 1800);
       }
     },
@@ -101,7 +101,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
           },
         });
 
-        window.location.href = "/dashboard/library";
+        window.location.href = "/dashboard/services";
       } catch (error) {
         console.error("MPESA Payment error: ", error);
       }
@@ -151,7 +151,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
         });
         console.log(result);
         setTimeout(() => {
-          window.location.href = "/dashboard/library";
+          window.location.href = "/dashboard/services";
         }, 1800);
       } catch (error) {
         console.error("PayPal Payment error: ", error);
@@ -257,7 +257,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
         });
         console.log(result);
         setTimeout(() => {
-          window.location.href = "/dashboard/library";
+          window.location.href = "/dashboard/services";
         }, 1800);
       } catch (error) {
         console.error("PayPal Payment error: ", error);

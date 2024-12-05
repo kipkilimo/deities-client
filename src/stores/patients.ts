@@ -63,20 +63,7 @@ export const useResourceStore = defineStore("resource", {
     prediction: "",
 
     currentSubjectArea: "Epidemiology", // Research Methods, Biostatistics
-    showTopics: true,
-
-    surveyLikertQuestion:
-      "What is your take on Amane Hospital, 'The Hub for Interactive Life Sciences Research Tools.', after the introduction given?",
-    surveyLikertOptions: [
-      { label: "Waste of time" },
-      { label: "Neutral" },
-      { label: "Needs radical surgery" },
-      {
-        label:
-          "Just minor modifications and it is good to go - These are my suggestions (write on provided paper).",
-      },
-      { label: "Excellent proposition. Can't wait to try it!" },
-    ],
+    showTopics: true, 
     exams: "",
     exam: "",
     tasks: "",

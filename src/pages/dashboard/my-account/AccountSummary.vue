@@ -153,10 +153,10 @@ const manageDiscussionGroupDialog = ref(false);
 
 import CryptoJS from "crypto-js";
 
-import { useUserStore } from "@/stores/staff";
+import { useStaffStore } from "@/stores/staff";
 import PaymentsManagementTable from "@/components/admin/Components/PaymentsManagementTable.vue";
 onBeforeMount(async () => {
-  const userStore = useUserStore();
+  const userStore = useStaffStore();
   await userStore.getCurrentUser(userId.value || "");
 });
 
@@ -229,7 +229,7 @@ function closeDialog() {
   addDepartmentDialog.value = false;
   manageDepartmentDialog.value = false;
 }
-const user = useUserStore().user;
+const user = useStaffStore().user;
 // Import the CryptoJS library2222222
 function generateMD5Hash(size = 200) {
   // Generate a random string
@@ -238,7 +238,7 @@ function generateMD5Hash(size = 200) {
     Math.random().toString(36).substring(2, 15);
 
   // Create the MD5 hash of the random email (using the random string as email)
-  const emailHash = CryptoJS.MD5(useUserStore().user.personalInfo.email);
+  const emailHash = CryptoJS.MD5(useStaffStore().user.personalInfo.email);
 
   // Construct the Gravatar URL
   // https://www.gravatar.com/avatar/${emailHash}?s=${size}&d=identicon
