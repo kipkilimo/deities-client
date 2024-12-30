@@ -17,14 +17,12 @@
           append-inner-icon="mdi-email-lock-outline" />
 
         <v-text-field variant="outlined" v-model="password" :type="showPassword ? 'text' : 'password'" label="Password"
-          v-if="usingPassword" :append-inner-icon="
-            showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
-          " @click:append-inner="togglePassword" required />
+          v-if="usingPassword" :append-inner-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
+            " @click:append-inner="togglePassword" required />
 
         <v-text-field variant="outlined" v-model="accessKey" :type="showPassword ? 'text' : 'password'"
-          label="Access Pin" hint="Enter access pin emailed to you." v-if="!usingPassword" :append-inner-icon="
-            showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
-          " @click:append-inner="togglePassword" required />
+          label="Access Pin" hint="Enter access pin emailed to you." v-if="!usingPassword" :append-inner-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
+            " @click:append-inner="togglePassword" required />
 
         <div class="d-flex justify-space-between mt-4">
           <v-btn :disabled="!canLogin" style="width: 12rem" type="submit" color="primary" :loading="loginLoading">
@@ -36,10 +34,10 @@
               <v-btn disabled :color="isEmailValid ? 'green' : 'primary'" icon height="30" variant="outlined"
                 v-bind="props">
                 <v-icon>{{
-                    isEmailValid
-                      ? "mdi-send-variant-clock-outline"
-                      : "mdi-cloud-key-outline"
-                  }}
+  isEmailValid
+    ? "mdi-send-variant-clock-outline"
+    : "mdi-cloud-key-outline"
+}}
                 </v-icon>
               </v-btn>
             </template>
@@ -182,8 +180,8 @@ const submitLogin = async () => {
   try {
     await staffStore.login(email.value, password.value);
     //@ts-ignore
-    if (staffStore.user.personalInfo.activatedAccount === false) {
-      router.push("/auth/activate");
+    if (staffStore.token === null) {
+      router.push("/welcome");
       return;
     }
     const token = staffStore.token;
@@ -217,7 +215,7 @@ const submitLogin = async () => {
     loginError.value = errorMessage;
     setTimeout(() => {
       window.location.reload();
-    }, 420000);
+    }, 4200);
   }
 };
 </script>

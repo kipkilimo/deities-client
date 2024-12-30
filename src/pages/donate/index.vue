@@ -2,9 +2,9 @@
     <v-container>
         <v-row class="mb-1">
             <v-col cols="8">
-                <v-card>
+                <v-card height="34rem">
                     <v-carousel :show-arrows="false" show-arrows="hover" cycle hide-delimiter-background>
-                        <v-carousel-item v-for="(item, i) in items" :key="i" :src="item.src" contain></v-carousel-item>
+                        <v-carousel-item v-for="(item, i) in items" :key="i" :src="item.src" fit></v-carousel-item>
                     </v-carousel>
                 </v-card>
             </v-col>
@@ -41,25 +41,50 @@
           </v-card-item> -->
 
                     <v-card-text class="py-0">
-                        <v-row align="center" no-gutters>
+                        <template v-if="newestPayment">
+                            <v-row align="center" no-gutters>
+                                <v-col class="text-h4 text-blue-darken-3" cols="12">
+                                    <div>${{ convertToUSD(newestPayment) }} 🗳️</div>
 
-                            <v-col class="text-h4 text-blue-darken-3" cols="12">
-                                <div class="">${{ convertToUSD(newestPayment) }} 🗳️</div>
+                                    <v-row>
+                                        <v-col cols="6">
+                                            <v-select :items="selectItems" v-model="selectedAmount" density="compact"
+                                                label="Select a donation amount"></v-select>
+                                        </v-col>
 
-                                <v-row>
-                                    <v-col cols="6">
-                                        <v-select :items="selectItems" v-model="selectedAmount" density="compact"
-                                            label="Select a donation amount"></v-select>
-                                    </v-col>
+                                        <v-col cols="6">
+                                            <v-text-field v-model="inputAmount" density="compact" :rules="donationRules"
+                                                label="Option 2: Enter donation amount"></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                </v-col>
+                            </v-row>
+                        </template>
 
-                                    <v-col cols="6">
-                                        <v-text-field v-model="inputAmount" density="compact" :rules="donationRules"
-                                            label="Option 2: Enter donation amount"></v-text-field>
-                                    </v-col>
-                                </v-row>
-                            </v-col>
-                        </v-row>
+                        <template v-else>
+                            <v-row align="center" justify="center">
+                                <v-col cols="12" class="text-center">
+                                    <div class="text-subtitle-1 text-grey-darken-2">
+                                        No recent payment information is available. Please select or enter a donation
+                                        amount.
+                                    </div>
+
+                                    <v-row class="mt-4">
+                                        <v-col cols="6">
+                                            <v-select :items="selectItems" v-model="selectedAmount" density="compact"
+                                                label="Select a donation amount"></v-select>
+                                        </v-col>
+
+                                        <v-col cols="6">
+                                            <v-text-field v-model="inputAmount" density="compact" :rules="donationRules"
+                                                label="Option 2: Enter donation amount"></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                </v-col>
+                            </v-row>
+                        </template>
                     </v-card-text>
+
 
                     <v-divider></v-divider>
 
@@ -127,7 +152,7 @@
             <v-divider></v-divider>
 
             <v-list-item append-icon="mdi-chevron-right" lines="two"
-                subtitle="Support global life sciences—donate to share knowledge!" link></v-list-item>
+                subtitle="Support Amane Hospital, a medical facility in Burumba Estate, Busia," link></v-list-item>
         </v-card>
 
         <v-dialog v-model="MPESAInputDialog" persistent max-width="540">
@@ -147,17 +172,20 @@ import {
     watch,
 } from "vue";
 import { usePaymentsStore } from "@/stores/payments";
-const nembioDonations = ref([]);
+const amaneDonations = ref([]);
 const store = usePaymentsStore();
 const MPESAInputDialog = ref(false);
 // Data and reactive properties
 const items = ref([
+    { src: "https://a2z-v0.s3.eu-central-1.amazonaws.com/Amane_Logo_Final.png" },
     {
         src: "https://www.shutterstock.com/image-photo/energy-bill-paper-forms-on-260nw-1393818824.jpg",
     },
+    { src: "https://a2z-v0.s3.eu-central-1.amazonaws.com/Amane_Logo_Final.png" },
     {
         src: "https://cdni.iconscout.com/illustration/premium/thumb/medicines-illustration-download-in-svg-png-gif-file-formats--drugs-medicine-pills-tablets-lifestyle-during-coronavirus-pack-healthcare-medical-illustrations-2532586.png?f=webp",
     },
+    { src: "https://a2z-v0.s3.eu-central-1.amazonaws.com/Amane_Logo_Final.png" },
     { src: "https://img.freepik.com/premium-vector/worker-repair-washing-machine_24911-67069.jpg" },
 ]);
 const targetAmount = ref(68702.0);
@@ -166,11 +194,11 @@ const receivedDonations = ref(0);
 const newestPayment = ref({});
 onBeforeMount(async () => {
     await store.fetchDonations();
-    nembioDonations.value = store.payments;
-    newestPayment.value = nembioDonations.value.sort(
+    amaneDonations.value = store.payments;
+    newestPayment.value = amaneDonations.value.sort(
         (a, b) => Number(b.createdAt) - Number(a.createdAt)
     )[0];
-    receivedDonations.value = getTotalAmountInUSD(nembioDonations.value);
+    receivedDonations.value = getTotalAmountInUSD(amaneDonations.value);
 });
 
 function convertToUSD(payment) {
@@ -525,5 +553,5 @@ onMounted(async () => {
 
 <route lang="yaml">
 meta:
-  layout: DashboardLayout
+  layout: HomeLayout
 </route>

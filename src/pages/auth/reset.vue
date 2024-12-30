@@ -69,8 +69,8 @@ const toggleConfirmPassword = () => {
 // Password length validation rules
 const passwordRules = [
   (v: string) => !!v || 'Password is required',
-  (v: string) => (v && v.length >= 6) || 'Password must be at least 6 characters long',
-  (v: string) => (v && v.length <= 12) || 'Password must not exceed 12 characters'
+  (v: string) => (v && v.length >= 8) || 'Password must be at least 8 characters long',
+  (v: string) => (v && v.length <= 16) || 'Password must not exceed 16 characters'
 ];
 
 // Confirm password validation rules
@@ -80,7 +80,7 @@ const confirmRules = [
 ];
 
 const isFormInvalid = computed(() => {
-  return !password.value || password.value.length < 6 || password.value.length > 12 || password.value !== confirm.value;
+  return !password.value || password.value.length < 8 || password.value.length > 16 || password.value !== confirm.value;
 });
 
 const submitReset = async () => {

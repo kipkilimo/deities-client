@@ -14,7 +14,7 @@
                     <v-btn color="primary" to="/welcome" class="px-12 mx-1">
                         {{ $t('error.backToHome') }}
                     </v-btn>
-                    <v-btn color="secondary" to="/dashboard/overview" class="px-12">
+                    <v-btn color="secondary" to="/dashboard/services" class="px-12">
                         {{ $t('error.backToDashboard') }}
                     </v-btn>
                 </div>

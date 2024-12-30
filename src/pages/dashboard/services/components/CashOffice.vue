@@ -55,24 +55,41 @@
                                 <v-spacer></v-spacer>
                                 <v-icon color="disabled" icon="mdi-crosshairs-gps" start></v-icon>
 
-                                <v-icon :disabled="billItems.length === 0" color="#949cf7" icon="mdi-printer-outline"
-                                    @click="printPDF(visit), printingNow = true" size="x-small"></v-icon>
+                                <v-icon :disabled="billItems.length === 0" color="#949cf7"
+                                    icon="mdi-invoice-list-outline" @click="selectVisit(visit, 'INVOICE')"
+                                    size="medium"></v-icon>
 
                                 <span class="text-caption text-medium-emphasis ms-1 font-weight-light">
-                                    Print invoice
+                                    View invoice
                                 </span>
-                                <v-btn :disabled="billItems.length === 0" class="mr-11" icon="mdi-printer-outline"
-                                    variant="text" @click="printPDF(visit), printingNow = true"></v-btn>
+                                <v-btn :disabled="billItems.length === 0" class="mr-11" icon="mdi-invoice-list-outline"
+                                    variant="text" @click="selectVisit(visit, 'INVOICE')"></v-btn>
 
                                 <v-spacer></v-spacer>
+
+                                <span class="text-caption text-h2-emphasis ms-1 font-weight-regular"
+                                    v-if="visit.invoices.length && visit.invoices.some(invoice => invoice.paid === true)">
+                                    Print receipt
+                                </span>
+                                <v-btn
+                                    v-if="visit.invoices.length && visit.invoices.some(invoice => invoice.paid === true)"
+                                    class="mr-11" icon="mdi-printer-outline" variant="text"
+                                    @click="selectVisit(visit, 'RECEIPT')"></v-btn>
+
                                 <v-spacer></v-spacer>
 
 
-                                <v-btn class="me-2 text-none" color="#4f545c"
+                                <v-btn class="me-2 text-none" color="#ff0079"
                                     prepend-icon="mdi-invoice-text-check-outline" variant="flat"
-                                    @click="selectVisit(visit), invoiceStore.createNewInvoice = true"
-                                    v-if="staffStore.staff && staffStore.staff.role === 'ADMINISTRATIVE' || staffStore.staff && staffStore.staff.role === 'RECORDS' && visit.invoices.length === 0">
-                                    Bill Client
+                                    @click="selectVisit(visit, ''), showPaymentsDialog = true"
+                                    v-if="visit.invoices.length && visit.invoices.some(invoice => invoice.paid === false)">
+                                    Request Payment
+                                </v-btn>
+                                <v-btn class="me-2 text-none" color="#ff0079"
+                                    prepend-icon="mdi-invoice-text-check-outline" variant="flat"
+                                    @click="selectVisit(visit, ''), showInsuranceClaimDialog = true"
+                                    v-if="visit.invoices.length && visit.invoices.some(invoice => invoice.paid === false)">
+                                    Debit Insurance
                                 </v-btn>
 
                                 <v-btn disabled color="red" class="text-none" prepend-icon="mdi-account-cancel"
@@ -225,8 +242,7 @@
 
                                 <v-spacer></v-spacer>
 
-                                <v-btn icon="mdi-card-account-details-outline" variant="text"
-                                    @click="selectVisit(visit)"></v-btn>
+                                <v-btn icon="mdi-card-account-details-outline" variant="text"></v-btn>
 
                                 <v-btn class="me-2 text-none" color="#4f545c"
                                     prepend-icon="mdi-invoice-text-check-outline" variant="flat">
@@ -246,6 +262,98 @@
             </v-row>
 
         </v-container>
+        <v-dialog v-model="printingReceiptNow" width="27rem">
+            <v-card with="81mm">
+
+                <div id="pdf"
+                    style="font-family: monospace; font-size: 12px; max-width: 80mm; margin: 0 auto; text-align: left;">
+                    <!-- Header Section -->
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <img src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Amane_Logo_Final.png" alt="Amane Logo"
+                            style="height: 50px; margin-bottom: 5px;" />
+                        <h3 style="margin: 0; font-size: 14px;">Amane Cottage Hospital</h3>
+                        <p style="margin: 0;">PO BOX 61 Busia KE 50400</p>
+                        <p style="margin: 0;">Tel: +254 713 412 265</p>
+                        <p style="margin: 0;">amanecottagehospital@gmail.com</p>
+                    </div>
+
+                    <!-- Invoice Details -->
+                    <h4 style="margin: 5px 0; text-align: center; text-transform: uppercase; font-size: 14px;">
+                        Visit {{ visitStore.currentVisit.visitNumber }}
+                    </h4>
+                    <h5 style="margin: 5px 0; text-align: center;">Service point: {{ visitStore.currentVisit.doctor }}
+                    </h5>
+
+                    <p>Patient: {{ visitStore.currentVisit.patient.personalInfo.fullName }}</p>
+                    <p>Receipt Number: {{ activePayment.transactionReferenceNumber }}</p>
+                    <p>
+                        Date: {{
+                            new Intl.DateTimeFormat('en-GB', {
+                                weekday: 'short', // Abbreviated weekday name (e.g., Tue)
+                                day: 'numeric', // Single digit day (e.g., 6)
+                                month: 'short', // Abbreviated month name (e.g., Aug)
+                                year: 'numeric', // Full year (e.g., 2014)
+                                hour: 'numeric', // Hour without leading zero (e.g., 1)
+                                minute: '2-digit', // Two-digit minute (e.g., 07)
+                                second: '2-digit', // Two-digit second (e.g., 04)
+                                hour12: true // 12-hour format with AM/PM
+                            }).format(new Date(Number(activePayment.createdAt)))
+                        }}
+                    </p>
+
+
+
+                    <!-- Invoice Table -->
+                    <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid black;">
+                                <th style="text-align: left;">Item</th>
+                                <th style="text-align: right;">Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item, index) in JSON.parse(activeInvoice.items)" :key="index"
+                                style="border-bottom: 1px solid #ddd;">
+                                <td>{{ index + 1 }}. {{ item["__EMPTY"] }}</td>
+                                <td style="text-align: right;">{{ item["__EMPTY_1"] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 style="text-align: right; border-top: 1px solid black; padding-top: 5px;">
+                        Total Paid: KES {{ Number((activePayment.paidAmount)).toFixed(2) }}
+                    </h4>
+
+                    <div style="text-align: center; margin-top: 10px;">
+                        <p style="margin: 0;">Thank you for your payment.</p>
+                        <p style="margin: 0;">COUNTY SQUARE BUSINESS SOLUTIONS</p>
+                        <p style="margin: 0;">Feedback: +254700378241</p>
+                    </div>
+                </div>
+                <v-divider />
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <div class="pa-2 d-flex align-center">
+                        <v-spacer></v-spacer>
+                        <v-icon color="disabled" icon="mdi-crosshairs-gps" start></v-icon>
+
+                        <v-icon color="#949cf7" icon="mdi-printer-outline"
+                            @click="printReceiptPDF(visitStore.currentVisit)" size="x-small"></v-icon>
+
+                        <span class="text-caption text-medium-emphasis ms-1 font-weight-light">
+                            Print receipt
+                        </span>
+                        <v-btn class="mr-11" icon="mdi-printer-outline" variant="text"
+                            @click="printReceiptPDF(visitStore.currentVisit)"></v-btn>
+
+                        <v-spacer></v-spacer>
+                    </div>
+                    <v-spacer></v-spacer>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+
         <v-dialog v-model="printingNow" width="27rem">
             <v-card with="81mm">
                 <div id="pdf"
@@ -328,6 +436,16 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="showPaymentsDialog" width="65%" persistent>
+            <v-card>
+                <paypal />
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="showInsuranceClaimDialog" width="65%" persistent>
+            <v-card>
+                <insurance />
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 
@@ -344,8 +462,12 @@ import { useVisitStore } from "@/stores/visits"; // Import the visit store
 const visitStore = useVisitStore();
 const canShowVisits = ref(false) //computed(() => visitStore.canShowVisits);
 
-const printingNow = ref(false) //computed(() => visitStore.canShowVisits);
+const printingNow = ref(false) //computed(() => visitStore.canShowVisits); printingReceiptNow
+const showPaymentsDialog = ref(false)
+const showInsuranceClaimDialog = ref(false)
+const printingReceiptNow = ref(false) //computed(() => visitStore.canShowVisits); printingReceiptNow
 
+const activePayment = ref({})// activeInvoiceRaw[0]
 
 const activeInvoice = ref({})// activeInvoiceRaw[0]
 const billItems = ref([])
@@ -363,32 +485,67 @@ onBeforeMount(async () => {
 
     console.log({ visit: visitStore.visits[0] })
 
-    const activeInvoiceRaw = visitStore.visits[0].invoices.filter((invoice) => {
-        return invoice.paid === false
-    })
+    const latestInvoice = visitStore.visits[0].invoices.reduce((latest, current) => {
+        return new Date(current.createdAt) > new Date(latest.createdAt) ? current : latest;
+    });
 
-    if (visitStore.visits[0].invoices.length > 0) {
-        activeInvoice.value = activeInvoiceRaw[0]
-        billItems.value = JSON.parse(activeInvoiceRaw[0].items)
+
+    if (latestInvoice) {
+        activeInvoice.value = latestInvoice
+        billItems.value = JSON.parse(latestInvoice.items)
     }
-
 
 
     canShowVisits.value = true
 
 });
 
-async function selectVisit(visit) {
+async function selectVisit(visit, type) {
     selectedVisit.value = visit;
-    await visitStore.setActiveVisit(visit);
+    visitStore.setActiveVisit(visit);
+    const printVisit = visit;
+    const visitPayments = printVisit.payments
+    // Find the last created payment
+    const lastCreatedPayment = visitPayments.reduce((latest, current) => {
+        return new Date(current.createdAt) > new Date(latest.createdAt) ? current : latest;
+    });
+    activePayment.value = lastCreatedPayment
+    activeInvoice.value = printVisit.invoices.find(
+        invoice => invoice.id === activePayment.value.invoice.id
+    );
+    billItems.value = JSON.parse(activeInvoice.value.items)
+    if (type === 'RECEIPT') {
+        printingReceiptNow.value = true
+        return
+    }
+    printingNow.value = true
+
 }
 const printPDF = async (visit) => {
-    await visitStore.setActiveVisit(visit);
+    // visitStore.setActiveVisit(visit);
     const element = document.getElementById("pdf");
 
     const options = {
         margin: [5, 5],
         filename: `Invoice_${visitStore.currentVisit.patient.personalInfo.fullName}_${visitStore.currentVisit.visitNumber}.pdf`,
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    };
+
+    await html2pdf()
+        .set(options)
+        .from(element)
+        .save()
+};
+
+const printReceiptPDF = async () => {
+
+
+    const element = document.getElementById("pdf");
+
+    const options = {
+        margin: [5, 5],
+        filename: `Receipt${visitStore.currentVisit.patient.personalInfo.fullName}_${activePayment.value.transactionReferenceNumber}.pdf`,
         html2canvas: { scale: 2 },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
     };

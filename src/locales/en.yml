@@ -1,70 +1,52 @@
 hero:
-  title: Start your project with Vuetify 3 faster than ever
+  title: Manage Amane Hospital efficiently with Vuetify 3
   subtitle: >-
-    This template is opinionated and comes with a lot of features out of the
-    box. It is meant to be a starting point for your project.
+    This dashboard template is designed to streamline hospital operations,
+    improve patient care, and enhance administrative efficiency.
   getStarted: Get Started
   github: Github
   login: Login
 
-  dashboard: Dashboard
-  features:
-    title: Features
 dashboard:
+  hero: 
+    title: Hospital Dashboard
+    subtitle: >-
+      Monitor and manage hospital operations efficiently with real-time data and insights.
   sidebar:
-    epidemiology: Epidemiology
-    biostatistics: Biostatistics
-    research-methods: Research Methods
-
-    papers: Journal Club
-    poster: Posters
-    poll: Amane Hospital Polls
-    tasks: Assignment Tasks
-
-    events: Events
-    library: Resource Center
-
-    programming: Computational Methods
-    consults: Research Consultation
-    donate: Donate to Amane Hospital
+    patients: Patient Records
+    appointments: Appointments
+    doctors: Doctor Directory
+    wards: Ward Management
+    diagnostics: Diagnostics & Labs
+    pharmacy: Pharmacy Inventory
+    billing: Billing & Payments
+    staff: Staff Management
+    reports: Reports & Analytics
+    events: Hospital Events
+    resources: Resource Center
+    emergency: Emergency Cases
+    outreach: Community Outreach
+    donate: Support Amane Hospital
     logout: Logout
   main:
-    dashboard-overview: Overview
-    total-publications: Total publications
+    overview: Overview
+    activePatients: Active Patients
+    totalDoctors: Total Doctors
+    occupancyRate: Ward Occupancy Rate
+    diagnosticsCompleted: Diagnostics Completed
     revenue: Revenue
-    rating: Average rating
-    publishingFrequency: Publishing frequency
-    publicationsInfo: Publications information
-    publicationModel: Publication Level
-    publicationType: Publication Type
-    publicationReach: Publication Reach
-    publicationDuration: Publication Duration
-    age: Published
+    satisfactionRating: Patient Satisfaction
+    outpatientVisits: Outpatient Visits
+    inpatientAdmissions: Inpatient Admissions
+    dischargeRate: Discharge Rate
+    avgStayDuration: Average Stay Duration
+
+features:
+  title: Hospital Features
+
 error:
   pageNotFound: Page not found
   pageNotFoundDescription: >-
-    The page you are looking for might have been removed had its name changed or
-    is temporarily unavailable.
+    The page you are looking for might have been moved, had its name changed, or is temporarily unavailable.
   backToHome: Back to home
   backToDashboard: Back to dashboard
-# {
-#     title: t("dashboard.sidebar.epidemiology"),
-#     tooltip: "Explore epidemiology resources",
-#     value: "epidemiology",
-#     iconClass: "mdi-virus me-4 text-xl",
-#     path: "/dashboard/epidemiology",
-# },
-# {
-#     title: t("dashboard.sidebar.biostatistics"),
-#     tooltip: "Access biostatistics tools and resources",
-#     value: "biostatistics",
-#     iconClass: "mdi-chart-bar me-4 text-xl",
-#     path: "/dashboard/biostatistics",
-# },
-# {
-#     title: t("dashboard.sidebar.research-methods"),
-#     tooltip: "Learn about research methodologies",
-#     value: "research-methods",
-#     iconClass: "mdi-lightbulb-question-outline me-4 text-xl",
-#     path: "/dashboard/research-methods",
-# },

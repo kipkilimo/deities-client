@@ -1,8 +1,11 @@
 <template>
   <v-app v-if="readyView" full-height>
     <v-layout full-height>
+
+
       <!-- App Bar -->
       <v-app-bar class="">
+
         <router-link :to="route.path.includes('computing') ? '/dashboard/services' : '/welcome'
           " class="px-8 flex items-center w-64">
           <v-img src="https://cloudclinic.me/ada/images/logo/cloud-clinic-logo-clean-new-1.png" width="180"
@@ -18,23 +21,40 @@
         <!-- User Controls v-if="staffStore.staff && staffStore.staff.personalInfo.fullName"
 v-if="staffStore.staff && staffStore.staff.personalInfo.fullName"
 v-if="staffStore.staff && staffStore.staff.personalInfo.fullName" -->
-        <v-text-field v-model="searchQuery" label="Search" size="small" variant="outlined" density="compact" rounded
-          class="mt-7" max-width="21rem" clearable append-inner-icon="mdi-magnify" @input="handleInput"></v-text-field>
+        <v-text-field :disabled="patientStore.loading" v-model="searchQuery" label="Search by patient ID" size="small"
+          variant="outlined" density="compact" rounded class="mt-7" max-width="21rem"
+          append-inner-icon="mdi-magnify"></v-text-field>
+        <v-progress-linear color="teal" indeterminate v-if="patientStore.loading"></v-progress-linear>
         <v-col cols="auto">
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
-              <v-btn v-bind="props" icon rounded density="comfortable">
-                <v-icon>mdi-note-plus-outline</v-icon>
+              <v-btn v-if="staffStore.staff && staffStore.staff.role === 'ADMINISTRATIVE'" v-bind="props" icon rounded
+                density="comfortable" @click="staffStore.addingStaff = true">
+                <v-icon>mdi-account-box-plus-outline</v-icon>
               </v-btn>
             </template>
             <span>{{
-              staffStore.staff && staffStore.staff.personalInfo.fullName
-                ? "Add a resource"
-                : "Add a resource | ⓘ Requires signing in"
-            }}
+  staffStore.staff && staffStore.staff.role === 'ADMINISTRATIVE'
+    ? "Add a staff member"
+    : "Add a staff | ⓘ Requires signing in"
+}}
             </span>
           </v-tooltip>
 
+
+          <v-tooltip location="top">
+            <template v-slot:activator="{ props }">
+              <v-btn
+                v-if="staffStore.staff && staffStore.staff.role === 'ADMINISTRATIVE' || staffStore.staff && staffStore.staff.role === 'RECORDS'"
+                v-bind="props" icon rounded density="comfortable" @click="patientStore.addingPatient = true">
+                <v-icon>mdi-account-injury-outline</v-icon>
+              </v-btn>
+            </template>
+            <span> Add a new patient
+            </span>
+          </v-tooltip>
+
+          <!-- 
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
               <v-btn v-bind="props" icon rounded class="ml-2" density="comfortable" @click="fetchPresentersTasks">
@@ -61,7 +81,7 @@ v-if="staffStore.staff && staffStore.staff.personalInfo.fullName" -->
                 : "Manage my exams | ⓘ Requires signing in"
             }}
             </span>
-          </v-tooltip>
+          </v-tooltip> -->
 
           <v-tooltip location="top">
             <template v-slot:activator="{ props }">
@@ -99,27 +119,27 @@ v-if="staffStore.staff && staffStore.staff.personalInfo.fullName" -->
             ? `https://ui-avatars.com/api/?name=${staffStore.staff.personalInfo.fullName}&background=0D8ABC&color=fff`
             : 'https://ui-avatars.com/api/?name=Guest&background=0D8ABC&color=fff'
   " :title="staffStore.staff && staffStore.staff.personalInfo.fullName
-    ? staffStore.staff.personalInfo.fullName
-    : 'Guest User'
+  ? staffStore.staff.personalInfo.fullName
+  : 'Guest User'
   " :subtitle="staffStore.staff && staffStore.staff.personalInfo.emailAddress
-    ? obfuscateEmail(staffStore.staff.personalInfo.emailAddress)
-    : 'guest@nem.bio'
+  ? obfuscateEmail(staffStore.staff.personalInfo.emailAddress)
+  : 'guest@nem.bio'
   " class="me-4" />
 
           <v-divider></v-divider>
-
+          <!-- v-bind="props" activator="parent" -->
           <v-list>
             <v-list-item v-for="item in sidebarItems" :key="item.value" :value="item.value" :to="item.path">
-              <v-tooltip activator="parent" location="bottom" class="custom-tooltip">
+              <v-tooltip location="bottom" class="custom-tooltip">
                 <template v-slot:activator="{ props }" v-show="rail">
-                  <div  v-bind="props" class="d-flex align-center">
+                  <div class="d-flex align-center">
                     <v-icon class="me-2">{{ item.iconClass }}</v-icon>
-                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    <v-list-item-title @click="reRouteRequest">{{ item.title }}</v-list-item-title>
                   </div>
                 </template>
-                <span class="custom-tooltip_content">{{
+                <!-- <span class="custom-tooltip_content">{{
                   getTooltipHighlight(item.tooltip)
-                }}</span>
+                }}</span> -->
               </v-tooltip>
             </v-list-item>
 
@@ -152,14 +172,24 @@ v-if="staffStore.staff && staffStore.staff.personalInfo.fullName" -->
       </v-main>
     </v-layout>
 
-    <!-- Dialogs 
-    <v-dialog v-model="resourceStore.showCreateStaffDialog" width="85%" min-height="84vh" persistent>
-      <v-card min-height="84vh" title="Add a new resource">
-        <StaffBaseForm />
-      </v-card>
+    <!-- Dialogs  -->
+    <v-dialog v-model="staffStore.addingStaff" width="65%" persistent>
+      <AddStaffMember />
+    </v-dialog>
+    <v-dialog v-model="patientStore.addingPatient" width="65%" persistent>
+      <AddNewPatient />
     </v-dialog>
 
-    <v-dialog v-model="resourceStore.showAddStaffCoverAndContentDialog" width="85%" height="84vh" persistent>
+    <v-dialog v-model="visitStore.createNewVisit" width="65%" persistent>
+      <AddNewVisit />
+    </v-dialog>
+    <v-dialog v-model="patientStore.noSearchMatch" width="65%">
+      <NoSearchMatch />
+    </v-dialog>
+    <v-dialog v-model="invoiceStore.createNewInvoice" width="65%" persistent>
+      <AddNewInvoice />
+    </v-dialog>
+    <!--  <v-dialog v-model="resourceStore.showAddStaffCoverAndContentDialog" width="85%" height="84vh" persistent>
       <v-card height="84vh" title="Add resource content">
         <StaffContentsHandler />
         <v-card-actions style="position: relative; padding: 0; margin: 0">
@@ -186,34 +216,77 @@ v-if="staffStore.staff && staffStore.staff.personalInfo.fullName" -->
 import { ref, computed, onMounted, onBeforeMount } from "vue";
 import { useI18n } from "vue-i18n";
 import { useStaffStore } from "@/stores/staff";
-import { useRouter, useRoute } from "vue-router";
+import { usePatientStore } from "@/stores/patients";
 
+import { useRouter, useRoute } from "vue-router";
+import { useInvoiceStore } from "@/stores/invoices";
+const invoiceStore = useInvoiceStore();
 
 import partners from "@/data/partnersSponsors";
+import { useVisitStore } from "@/stores/visits"; // Import the visit store
+
+const visitStore = useVisitStore();
+
 const staffStore = useStaffStore()
+const patientStore = usePatientStore()
 const isComputingRoute = ref(false);
 const route = useRoute();
+const router = useRouter();
+
 const readyView = ref(false);
-const userStore = useStaffStore();
 /**setCurrentSubjectArea(newSubject) */
 
 // Method to check if the current route includes 'dashboard/computing'
 
 
 const searchQuery = ref("");
-let debounceTimer: string | number | NodeJS.Timeout | undefined;
+// reRouteRequest
+const reRouteRequest = () => {
+  if (staffStore.staff && staffStore.staff.role !== 'ADMINISTRATIVE') {
+    setTimeout(() => {
+      router.push('/dashboard/services')
+    }, 90);
+    return true
+  }
 
-const handleInput = () => {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => {
-    onUserPaused(searchQuery.value);
-  }, 300); // 300ms delay
+  return true
 };
+const handleInput = async () => {
+  try {
+    console.log("Finding patient with ID:", searchQuery.value);
+    // Ensure `searchQuery` has a valid value before making the call
+    if (searchQuery.value.length !== 6) {
+      return;
+    }
+    // Call the backend through patientStore
+    const result = await patientStore.handleGetPatientById(searchQuery.value);
 
-const onUserPaused = (query: string) => {
-  console.log("User paused. Searching for:", query);
-  // Add your logic here, e.g., API call, filtering, etc.
+    // Check if the result is valid and update the store
+    if (result !== null) {
+      visitStore.createNewVisit = true;
+      patientStore.noSearchMatch = false; // Reset no-match flag
+    } else {
+      patientStore.noSearchMatch = true; // Set no-match flag
+    }
+
+    console.log("User paused. Search result:", result);
+  } catch (error) {
+    // Handle potential errors from the API or store method
+    console.error("Error during patient search:", error);
+    patientStore.noSearchMatch = true; // Treat as no match if there's an error
+  }
 };
+// Watch for changes in `searchQuery` and trigger `handleInput` when it's exactly 6 chars
+// Watch the `searchQuery` directly
+watch(searchQuery, () => {
+  if (searchQuery.value.length !== 6) {
+    return;
+  }
+  if (searchQuery.value.length === 6) {
+    handleInput();
+    searchQuery.value = ""
+  }
+});
 const currentIndex = ref(Math.floor(Math.random() * partners.length));
 
 // Set the current partner and event based on the random index
@@ -243,7 +316,7 @@ onMounted(() => {
   // Set an interval to change the partner and event every 12 seconds
   const intervalId = setInterval(() => {
     changePartner();
-  }, 45000);
+  }, 15000);
 
   onBeforeUnmount(() => {
     clearInterval(intervalId);
@@ -274,7 +347,7 @@ onBeforeMount(async () => {
       readyView.value = true;
       return;
     }
-    // await userStore.getCurrentUser(storedUser);
+    await staffStore.getCurrentUser(storedUser);
     readyView.value = true;
   }
 });
@@ -282,7 +355,6 @@ onMounted(async () => {
   // await fetchPoll();
 });
 const { t, locale } = useI18n();
-const router = useRouter();
 
 const drawer = ref(true);
 const rail = ref(false);
@@ -295,78 +367,81 @@ const evalPollPath = ref("/poll/participant");
 
 const sidebarItems = computed(() => [
   {
-    title: t("dashboard.sidebar.epidemiology"),
-    tooltip: "Explore epidemiology resources",
-    value: "epidemiology",
-    iconClass: "mdi-account-multiple-outline",
-    path: "/dashboard/services",
+    title: t("dashboard.sidebar.patients"),
+    tooltip: "Manage and view patient records",
+    value: "patients",
+    iconClass: "mdi-account-outline me-4 text-xl",
+    path: "/dashboard/patients",
   },
   {
-    title: t("dashboard.sidebar.biostatistics"),
-    tooltip: "Access biostatistics tools and resources",
-    value: "biostatistics",
-    iconClass: "mdi-chart-histogram me-4 text-xl",
-    path: "/dashboard/services",
+    title: t("dashboard.sidebar.appointments"),
+    tooltip: "Schedule and manage patient appointments",
+    value: "appointments",
+    iconClass: "mdi-calendar-clock-outline me-4 text-xl",
+    path: "/dashboard/appointments",
   },
   {
-    title: t("dashboard.sidebar.research-methods"),
-    tooltip: "Learn about research methodologies",
-    value: "research-methods",
-    iconClass: "mdi-bookshelf me-4 text-xl",
-    path: "/dashboard/services",
-  },
-
-  {
-    title: t("dashboard.sidebar.papers"),
-    tooltip: "Read and participate in interactive journal papers discussion",
-    value: "papers",
-    iconClass: "mdi-note-text-outline me-4 text-xl",
-    path: "/dashboard/papers",
-  },
-  {
-    title: t("dashboard.sidebar.poster"),
-    tooltip: "Create and share your posters for presentations",
-    value: "poster",
-    iconClass: "mdi-image-frame me-4 text-xl",
-    path: "/dashboard/poster",
-  },
-  {
-    title: t("dashboard.sidebar.poll"),
-    tooltip: "Create and participate in LIVE polls",
-    value: "poll",
-    iconClass: "mdi-ballot-recount-outline me-4 text-xl",
-    path: evalPollPath.value, // Use the dynamic path here
-  },
-  {
-    title: t("dashboard.sidebar.events"),
-    tooltip: "View and schedule events",
-    value: "events",
-    iconClass: "mdi-calendar-multiple-check me-4 text-xl",
-    path: "/dashboard/events",
+    title: t("dashboard.sidebar.doctors"),
+    tooltip: "View and manage doctor directory",
+    value: "doctors",
+    iconClass: "mdi-doctor me-4 text-xl",
+    path: "/dashboard/doctors",
   },
 
   {
-    title: t("dashboard.sidebar.programming"),
-    tooltip: "Learn and practice programming",
-    value: "programming",
-    iconClass: "mdi-code-block-braces me-4 text-xl",
-    path: "/dashboard/computing",
+    title: t("dashboard.sidebar.diagnostics"),
+    tooltip: "Access diagnostics and lab results",
+    value: "diagnostics",
+    iconClass: "mdi-flask-outline me-4 text-xl",
+    path: "/dashboard/diagnostics",
   },
   {
-    title: t("dashboard.sidebar.consults"),
-    tooltip: "Consult experts and get advice at all stages of your study",
-    value: "consults",
-    iconClass: "mdi-timeline-question-outline me-4 text-xl",
-    path: "/dashboard/consults",
+    title: t("dashboard.sidebar.pharmacy"),
+    tooltip: "Manage pharmacy inventory and prescriptions",
+    value: "pharmacy",
+    iconClass: "mdi-pill me-4 text-xl",
+    path: "/dashboard/pharmacy",
   },
   {
-    title: t("dashboard.sidebar.donate"),
-    tooltip: "Support the life sciences—donate to share knowledge!",
-    value: "donate",
-    iconClass: "mdi-wallet-giftcard me-4 text-xl",
-    path: "/donate",
+    title: t("dashboard.sidebar.billing"),
+    tooltip: "Handle patient billing and payments",
+    value: "billing",
+    iconClass: "mdi-cash-register me-4 text-xl",
+    path: "/dashboard/billing",
+  },
+  {
+    title: t("dashboard.sidebar.staff"),
+    tooltip: "View and manage staff details",
+    value: "staff",
+    iconClass: "mdi-account-group-outline me-4 text-xl",
+    path: "/dashboard/staff",
+  },
+  {
+    title: t("dashboard.sidebar.reports"),
+    tooltip: "Generate and view hospital reports",
+    value: "reports",
+    iconClass: "mdi-chart-line me-4 text-xl",
+    path: "/dashboard/reports",
+  },
+
+  {
+    title: t("dashboard.sidebar.emergency"),
+    tooltip: "Track and manage emergency cases",
+    value: "emergency",
+    iconClass: "mdi-alert-circle-outline me-4 text-xl",
+    path: "/dashboard/emergency",
+  },
+
+
+  {
+    title: t("dashboard.sidebar.logout"),
+    tooltip: "Log out of your account",
+    value: "logout",
+    iconClass: "mdi-logout me-4 text-xl",
+    path: "/logout",
   },
 ]);
+
 
 function obfuscateEmail(email: string) {
   const [localPart, domainPart] = email.split("@");
@@ -442,7 +517,7 @@ function logout() {
   try {
     wipeStorage();
 
-    // await userStore.logout();
+    // await staffStore.logout();
     router.push("/auth/login");
   } catch (error) {
     console.error("Logout failed:", error);

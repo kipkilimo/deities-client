@@ -1,1279 +1,302 @@
 import { defineStore } from "pinia";
 import { client } from "@/graphql/apolloClient"; // Replace with your Apollo Client instance
 import gql from "graphql-tag";
-import { useAlertsStore } from "./alerts"; // Import alerts store
 
-// Define the ResourceType enum
-export enum ResourceType {
-  AUDIO = "AUDIO",
-  VIDEO = "VIDEO",
-  IMAGES = "IMAGES",
-  DOCUMENT = "DOCUMENT",
-  MIXED = "MIXED",
-  TEXT = "TEXT",
-  PRESENTATION = "PRESENTATION",
-  EVENT = "EVENT",
-  DATASET = "DATASET",
-  LINK = "LINK",
-  POLL = "POLL",
-  TEST = "TEST",
-  POSTER = "POSTER",
-  ARTICLE = "ARTICLE",
-  OPPORTUNITY = "OPPORTUNITY",
-  TASK = "TASK",
+interface Location {
+  city?: string;
+  state?: string;
+  country?: string;
 }
 
-interface Option {
-  label: string;
+interface NextOfKin {
+  fullName: string;
+  relationSpecify: string;
+  phoneNumber: string;
+  emailAddress?: string;
+  homeAddress: string;
+  areaChief?: string;
+  nearestSchool?: string;
 }
 
-type ID = string; // or type ID = number; based on your use case
-
-interface Resource {
+interface PatientPersonalInfo {
   id: string;
-  title: string;
-  description: string;
-  content: string;
-  targetRegion: string;
-  targetCountry: string;
-  slug: string;
-  language: string;
-  contentType: string;
-  viewsNumber: number;
-  likesNumber: number;
-  sharesNumber: number;
-  subject: string;
-  topic: string;
-  rating: string;
-  participants: string;
-  sessionId: string;
-  accessKey: string;
-  keywords: string;
-  coverImage: string;
-  isPublished: boolean;
-  averageRating: number;
-  reviews: string;
-  createdBy: ID;
-  createdAt: string;
-  updatedAt: string;
+  patientId: string;
+  fullName: string;
+  emailAddress: string;
+  phoneNumber: string;
+  yearOfBirth: string;
+  gender?: string;
+  profilePicture?: string;
+  address?: Location;
+  bio?: string;
+  registrationDate: string;
+  insuranceRegNumber?: string;
 }
 
-export const useResourceStore = defineStore("resource", {
+interface Patient {
+  id: string;
+  personalInfo: PatientPersonalInfo;
+  nextOfKin: NextOfKin;
+}
+
+export const usePatientStore = defineStore("patient", {
   state: () => ({
-    prediction: "",
-
-    currentSubjectArea: "Epidemiology", // Research Methods, Biostatistics
-    showTopics: true, 
-    exams: "",
-    exam: "",
-    tasks: "",
-    task: "",
-    activeTitle: "",
-    resource: {} as Resource,
-    resourceIsComputing: false,
-
-    showingResourceTitles: true,
-    showingResourceTitleItems: false,
-
-    resources: [] as Resource[],
-    filteredResources: [] as Resource[],
-    sortBy: "title" as keyof Resource,
-    filterByType: "" as string,
-    showAddResourceCoverAndContentDialog: false,
-    showCreateResourceDialog: false,
-    showExamsDialog: false,
-    showAssignmentsDialog: false,
+    noSearchMatch: false,
+    addingPatient: false,
+    patients: [] as Patient[],
+    patient: null as Patient | null,
+    loading: false,
   }),
   actions: {
-    // currentSubjectArea: "Epidemiology"
-    setCurrentSubjectArea(newSubject: string) {
-      console.log({ setting_subject: newSubject });
-      this.currentSubjectArea = newSubject;
-      this.showTopics = false;
-      setTimeout(() => {
-        this.showTopics = true;
-      }, 90);
-    },
-
-    setQuestion(newQuestion: string) {
-      this.surveyLikertQuestion = newQuestion;
-    },
-
-    setOptions(newOptions: Option[]) {
-      this.surveyLikertOptions = newOptions;
-    },
-
-    setResources(resources: Resource[]) {
-      this.resources = resources;
-      this.filteredResources = resources;
-    },
-    setResource(resource: Resource) {
-      this.resource = resource;
-    },
-    sortResources() {
-      this.filteredResources.sort((a, b) => {
-        if (a[this.sortBy] < b[this.sortBy]) return -1;
-        if (a[this.sortBy] > b[this.sortBy]) return 1;
-        return 0;
-      });
-    },
-    filterResources() {
-      if (this.filterByType) {
-        this.filteredResources = this.resources.filter(
-          (resource) => resource.contentType === this.filterByType
-        );
-      } else {
-        this.filteredResources = this.resources;
-      }
-      this.sortResources();
-    },
-    async getAllTestResources(id: string) {
-      const resourceQuery = gql`
-        query ($id: ID!) {
-          getResource(id: $id) {
-            id
-            title
-            description
-            targetRegion
-            targetCountry
-            slug
-            language
-            contentType
-            viewsNumber
-            likesNumber
-            sharesNumber
-            subject
-            topic
-            rating
-            sessionId
-            accessKey
-            keywords
-            coverImage
-            isPublished
-            averageRating
-            reviews
-            createdBy {
-              id
-
-              personalInfo {
-                username
-                email
-                scholarId
-                fullName
-                activationToken
-                resetToken
-                tokenExpiry
-                activatedAccount
-              }
-              role
-            }
-            createdAt
-            updatedAt
-          }
-        }
-      `;
-
-      try {
-        const response = await client.query({
-          query: resourceQuery,
-          variables: { id },
-        });
-
-        const resource = response.data?.getResource;
-        if (resource) {
-          this.resource = resource;
-        } else {
-          throw new Error("Failed to fetch resource");
-        }
-      } catch (error) {
-        console.error("Error fetching resource:", error);
-      }
-    },
-    async getAllTaskResources() {
-      const GET_TASK_RESOURCES = gql`
+    async fetchAllPatients() {
+      const GET_ALL_PATIENTS = gql`
         query {
-          getAllTaskResources {
+          getAllPatients {
             id
-            title
-            description
-            targetRegion
-            targetCountry
-            sessionId
-            accessKey
-            slug
-            language
-            contentType
-            viewsNumber
-            likesNumber
-            sharesNumber
-            subject
-            topic
-            rating
-            keywords
-            coverImage
-            averageRating
-            createdBy {
-              id
-
-              personalInfo {
-                username
+            personalInfo {
+              patientId
+              fullName
+              emailAddress
+              phoneNumber
+              yearOfBirth
+              gender
+              profilePicture
+              address {
+                city
+                state
+                country
               }
+              bio
+              registrationDate
+              insuranceRegNumber
             }
-            createdAt
-            updatedAt
-          }
-        }
-      `;
-
-      try {
-        const response = await client.query({
-          query: GET_TASK_RESOURCES,
-        });
-
-        const resources = response.data.getAllTaskResources;
-        if (resources) {
-          this.resources = resources;
-        } else {
-          throw new Error("Failed to fetch task resources");
-        }
-      } catch (error) {
-        console.error("Error fetching task resources:", error);
-      }
-    },
-    async getClinicalPrediction() {
-      const CLINICAL_PREDICTION_MODEL = gql`
-        query {
-          getClinicalPrediction {
-            id
-            contentType
-          }
-        }
-      `;
-
-      try {
-        const response = await client.query({
-          query: CLINICAL_PREDICTION_MODEL,
-        });
-
-        const prediction = response.data.getClinicalPrediction;
-        if (prediction) {
-          this.prediction = prediction;
-        } else {
-          throw new Error("Failed to fetch prediction");
-        }
-      } catch (error) {
-        console.error("Error fetching resources:", error);
-      }
-    },
-    async getAllResources() {
-      const RESOURCE_SUMMARY_QUERY = gql`
-        query {
-          getAllResources {
-            id
-            contentType
-            title
-            viewsNumber
-            likesNumber
-            sharesNumber
-            subject
-            topic
-            averageRating
-            createdAt
-            isPublished
-          }
-        }
-      `;
-
-      try {
-        const response = await client.query({ query: RESOURCE_SUMMARY_QUERY });
-
-        const resources = response.data.getAllResources;
-        if (resources) {
-          this.resources = resources;
-        } else {
-          throw new Error("Failed to fetch resources");
-        }
-      } catch (error) {
-        console.error("Error fetching resources:", error);
-      }
-    },
-    async getAllTopicResourcesByTopic(resourceTitle: string) {
-      const GET_TOPIC_RESOURCES = gql`
-        query ($resourceTitle: String!) {
-          getAllTopicResourcesByTopic(resourceTitle: $resourceTitle) {
-            id
-            contentType
-            title
-            contentType
-            viewsNumber
-            likesNumber
-            sharesNumber
-            subject
-            topic
-            coverImage
-            averageRating
-            createdAt
-            keywords
-            description
-          }
-        }
-      `;
-
-      try {
-        this.resources = [];
-        const response = await client.query({
-          query: GET_TOPIC_RESOURCES,
-          variables: { resourceTitle },
-        });
-
-        const resources = response.data.getAllTopicResourcesByTopic;
-        if (resources) {
-          this.resources = resources;
-          this.showingResourceTitles = false;
-          this.showingResourceTitleItems = true;
-        } else {
-          throw new Error("Failed to fetch resources");
-        }
-      } catch (error) {
-        console.error("Error fetching resources:", error);
-      }
-    },
-    async getAllMockExams(resourceType: string) {
-      const GET_MOCK_EXAMS = gql`
-        query ($resourceType: String!) {
-          getAllMockExams(resourceType: $resourceType) {
-            id
-            title
-            description
-            examMetaInfo {
-              examDate
-              examStartTime
-              examDuration
-              examQuestionsSet
-              # examAnswersKey
-              examEndTime
-              selectedTypes
-              numberOfQuestions {
-                SCQ
-                MCQ
-                ATF
-                ETF
-                VSAQ
-                SAQ
-                LEQ
-              }
-              testMeta {
-                testType
-                numberOfQuestions
-              }
+            nextOfKin {
+              fullName
+              relationSpecify
+              phoneNumber
+              emailAddress
+              homeAddress
+              areaChief
+              nearestSchool
             }
-            subject
-            topic
-            createdBy {
-              id
-            }
-            createdAt
-            sessionId
-            accessKey
           }
         }
       `;
 
       try {
-        const response = await client.query({
-          query: GET_MOCK_EXAMS,
-          variables: { resourceType },
-        });
-
-        const exams = response.data.getAllMockExams;
-        if (exams) {
-          this.exams = JSON.stringify(exams);
-        } else {
-          throw new Error("Failed to fetch resource");
-        }
+        this.loading = true;
+        const response = await client.query({ query: GET_ALL_PATIENTS });
+        this.patients = response.data?.getAllPatients || [];
       } catch (error) {
-        console.error("Error fetching resource:", error);
+        console.error("Error fetching patients:", error);
+        throw new Error("Failed to fetch patients.");
+      } finally {
+        this.loading = false;
       }
     },
-    // getAllSpecificTypeResources
-    async getAllSpecificTypeResources(resourceType: string) {
-      const GET_RESOURCE_TYPE = gql`
-        query ($resourceType: String!) {
-          getAllSpecificTypeResources(resourceType: $resourceType) {
-            id
-            contentType
-            title
-            contentType
-            viewsNumber
-            likesNumber
-            sharesNumber
-            subject
-            topic
-            coverImage
-            averageRating
-            createdAt
-            keywords
-            description
+    async handleGetPatientById(patientId: string) {
+      const GET_PATIENT_BY_ID = gql`
+    query getPatientById($patientId: String!) {
+      getPatientById(patientId: $patientId) {
+        id
+        personalInfo {
+          patientId
+          fullName
+          emailAddress
+          phoneNumber
+          yearOfBirth
+          gender
+          profilePicture
+          address {
+            city
+            state
+            country
           }
+          bio
+          registrationDate
+          insuranceRegNumber
         }
-      `;
-
-      try {
-        const response = await client.query({
-          query: GET_RESOURCE_TYPE,
-          variables: { resourceType },
-        });
-        const resources = response.data.getAllSpecificTypeResources;
-        this.resources = resources;
-      } catch (error) {
-        console.error("Error fetching resources:", error);
+        nextOfKin {
+          fullName
+          relationSpecify
+          phoneNumber
+          emailAddress
+          homeAddress
+          areaChief
+          nearestSchool
+        }
       }
-    },
-    async getRecentResources(userId: string) {
-      this.resources = [];
-      const GET_RECENT_RESOURCES = gql`
-        query ($userId: String!) {
-          getRecentResources(userId: $userId) {
-            id
-            contentType
-            title
-            contentType
-            viewsNumber
-            likesNumber
-            sharesNumber
-            subject
-            topic
-            coverImage
-            averageRating
-            createdAt
-            keywords
-            description
-          }
-        }
-      `;
+    }
+  `;
+
+      this.loading = true; // Start loading
 
       try {
-        const response = await client.query({
-          query: GET_RECENT_RESOURCES,
-          variables: { userId },
-        });
-        const resources = response.data.getRecentResources;
-        this.resources = resources;
-      } catch (error) {
-        console.error("Error fetching resources:", error);
-      }
-    },
-    // library
-    async getLibraryResources(userId: string) {
-      this.resources = [];
-      const GET_LIBRARY_RESOURCES = gql`
-        query ($userId: String!) {
-          getLibraryResources(userId: $userId) {
-            id
-            contentType
-            title
-            contentType
-            viewsNumber
-            likesNumber
-            sharesNumber
-            subject
-            topic
-            coverImage
-            averageRating
-            createdAt
-            keywords
-            description
-          }
-        }
-      `;
-
-      try {
-        const response = await client.query({
-          query: GET_LIBRARY_RESOURCES,
-          variables: { userId },
-        });
-        const resources = response.data.getLibraryResources;
-        this.resources = resources;
-      } catch (error) {
-        console.error("Error fetching resources:", error);
-      }
-    },
-    // suggested getSuggestedResources(userId: string)
-    async getSuggestedResources(userId: string) {
-      this.resources = [];
-      const GET_SUGGESTED_RESOURCES = gql`
-        query ($userId: String!) {
-          getSuggestedResources(userId: $userId) {
-            id
-            contentType
-            title
-            contentType
-            viewsNumber
-            likesNumber
-            sharesNumber
-            subject
-            topic
-            coverImage
-            averageRating
-            createdAt
-            keywords
-            description
-          }
-        }
-      `;
-
-      try {
-        const response = await client.query({
-          query: GET_SUGGESTED_RESOURCES,
-          variables: { userId },
-        });
-        const resources = response.data.getSuggestedResources;
-        this.resources = resources;
-      } catch (error) {
-        console.error("Error fetching resources:", error);
-      }
-    },
-    async getUserTasks(userId: string) {
-      const GET_LATEST_TASKS = gql`
-        query ($userId: String!) {
-          getUserTasks(userId: $userId) {
-            id
-            title
-            description
-            content
-            sessionId
-            contentType
-            accessKey
-            coverImage
-            isPublished
-            createdBy {
-              id
-
-              personalInfo {
-                username
-                email
-                scholarId
-                fullName
-                activationToken
-                resetToken
-                tokenExpiry
-                activatedAccount
-              }
-              role
-            }
-            createdAt
-            updatedAt
-          }
-        }
-      `;
-
-      try {
-        const response = await client.query({
-          query: GET_LATEST_TASKS,
-          variables: { userId },
+        const { data } = await client.query({
+          query: GET_PATIENT_BY_ID,
+          variables: { patientId },
         });
 
-        const resources = response.data.getUserTasks;
-        // @ts-ignore
-        this.resources = resources;
+        this.patient = data.getPatientById || null;
+        return this.patient; // Return the patient data if successful
       } catch (error) {
-        this.resources = [];
-        console.error("Error fetching resource:", error);
+        console.error("Error fetching patient by ID:", error);
+        throw new Error("Failed to fetch patient.");
+      } finally {
+        this.loading = false; // Ensure loading is stopped in both success and failure cases
       }
-    },
-    async getPublisherLatestTasks(userId: string) {
-      const GET_LATEST_TASKS = gql`
-        query ($userId: String!) {
-          getPublisherLatestTasks(userId: $userId) {
-            assignmentType
-            assignmentTitle
-            assignmentDescription
-            assignmentDuration
-            assignmentDeadline
-            assignmentAnswersKey
-            assignmentTaskSet
-            id
-            title
-            coverImage
-            description
-            subject
-            topic
-            createdBy {
-              id
-            }
-            createdAt
-            sessionId
-            accessKey
-            participants
+    }
+
+    ,
+
+    async addPatient(
+      personalInfo,
+      nextOfKin
+    ) {
+      const ADD_PATIENT = gql`
+    mutation AddPatient(
+      $personalInfo: PatientPersonalInfoInput!
+      $nextOfKin: NextOfKinInput!
+    ) {
+      createPatient(
+        personalInfo: $personalInfo
+        nextOfKin: $nextOfKin
+      ) {
+        id
+        personalInfo {
+          fullName
+          emailAddress
+          phoneNumber
+          yearOfBirth
+          gender
+          address {
+            city
+            state
+            country
           }
+          bio
+          registrationDate
+          insuranceRegNumber
         }
-      `;
+        nextOfKin {
+          fullName
+          relationSpecify
+          phoneNumber
+          emailAddress
+          homeAddress
+          areaChief
+          nearestSchool
+        }
+      }
+    }
+  `;
 
       try {
-        const response = await client.query({
-          query: GET_LATEST_TASKS,
-          variables: { userId },
-        });
-
-        const tasks = response.data.getPublisherLatestTasks;
-        if (tasks) {
-          this.tasks = JSON.stringify(tasks);
-          this.showAssignmentsDialog = true;
-        } else {
-          throw new Error("Failed to fetch resource");
-        }
-      } catch (error) {
-        console.error("Error fetching resource:", error);
-      }
-    },
-    async getCurrentExam(sessionId: string, examType: string) {
-      const GET_CURRENT_EXAM = gql`
-        query ($sessionId: String!, $examType: String) {
-          getCurrentExam(sessionId: $sessionId, examType: $examType) {
-            id
-            title
-            participants
-            description
-            examMetaInfo {
-              examDate
-              examStartTime
-              examDuration
-              examQuestionsSet
-              # examAnswersKey
-              examEndTime
-              selectedTypes
-              numberOfQuestions {
-                SCQ
-                MCQ
-                ATF
-                ETF
-                VSAQ
-                SAQ
-                LEQ
-              }
-              testMeta {
-                testType
-                numberOfQuestions
-              }
-            }
-            subject
-            topic
-            createdBy {
-              id
-            }
-            createdAt
-            sessionId
-            accessKey
-          }
-        }
-      `;
-
-      try {
-        const response = await client.query({
-          query: GET_CURRENT_EXAM,
-          variables: { sessionId, examType },
-        });
-
-        const exam = response.data.getCurrentExam;
-        if (exam) {
-          this.exam = JSON.stringify(exam);
-        } else {
-          throw new Error("Failed to fetch resource");
-        }
-      } catch (error) {
-        console.error("Error fetching resource:", error);
-      }
-    },
-    setCurrentExam(exam: any) {
-      this.exam = JSON.stringify(exam);
-    },
-    setCurrentExams(exams: any) {
-      this.exams = JSON.stringify(exams);
-    },
-    async getPublisherLatestExams(userId: string) {
-      const GET_LATEST_EXAMS = gql`
-        query ($userId: String!) {
-          getPublisherLatestExams(userId: $userId) {
-            id
-            title
-            participants
-            description
-            examMetaInfo {
-              examDate
-              examStartTime
-              examDuration
-              examEndTime
-              selectedTypes
-              numberOfQuestions {
-                SCQ
-                MCQ
-                ATF
-                ETF
-                VSAQ
-                SAQ
-                LEQ
-              }
-              testMeta {
-                testType
-                numberOfQuestions
-              }
-            }
-            subject
-            topic
-            createdBy {
-              id
-            }
-            createdAt
-            sessionId
-            accessKey
-          }
-        }
-      `;
-
-      try {
-        const response = await client.query({
-          query: GET_LATEST_EXAMS,
-          variables: { userId },
-        });
-
-        const exams = response.data.getPublisherLatestExams;
-        if (exams) {
-          this.exams = JSON.stringify(exams);
-          this.showExamsDialog = true;
-        } else {
-          throw new Error("Failed to fetch resource");
-        }
-      } catch (error) {
-        console.error("Error fetching resource:", error);
-      }
-    },
-    async getPublisherLatestPoll(userId: string) {
-      const GET_LATEST_POLL = gql`
-        query ($userId: String!) {
-          getPublisherLatestPoll(userId: $userId) {
-            id
-            title
-            description
-            content
-            targetRegion
-            targetCountry
-            slug
-            language
-            contentType
-            viewsNumber
-            likesNumber
-            sharesNumber
-            subject
-            topic
-            rating
-            sessionId
-            accessKey
-            keywords
-            coverImage
-            isPublished
-            averageRating
-            reviews
-            createdBy {
-              id
-
-              personalInfo {
-                username
-                email
-                scholarId
-                fullName
-                activationToken
-                resetToken
-                tokenExpiry
-                activatedAccount
-              }
-              role
-            }
-            createdAt
-            updatedAt
-          }
-        }
-      `;
-
-      try {
-        const response = await client.query({
-          query: GET_LATEST_POLL,
-          variables: { userId },
-        });
-
-        const resource = response.data.getPublisherLatestPoll;
-        if (resource) {
-          this.resource = resource;
-        } else {
-          throw new Error("Failed to fetch resource");
-        }
-      } catch (error) {
-        console.error("Error fetching resource:", error);
-      }
-    },
-    // async GetPollDataAndResults($pollId: string) {
-
-    async GetPollDataAndResults(pollId: string) {
-      const GetPollDataAndResults = gql`
-        query ($pollId: String!) {
-          GetPollDataAndResults(pollId: $pollId) {
-            responses
-          }
-        }
-      `;
-
-      try {
-        const response = await client.query({
-          query: GetPollDataAndResults,
-          variables: { pollId },
-        });
-
-        const resource = response.data?.GetPollDataAndResults;
-        if (resource) {
-          this.resource = resource;
-        } else {
-          throw new Error("Failed to fetch resource");
-        }
-      } catch (error) {
-        console.error("Error fetching resource:", error);
-      }
-    },
-    async fetchComputingResource(topicParams: string) {
-      const FETCH_COMPUTING_RESOURCE = gql`
-        query ($topicParams: String!) {
-          fetchComputingResource(topicParams: $topicParams) {
-            id
-            title
-            description
-            content
-            targetRegion
-            targetCountry
-            slug
-            language
-            contentType
-            viewsNumber
-            likesNumber
-            sharesNumber
-            subject
-            topic
-            rating
-            sessionId
-            accessKey
-            keywords
-            coverImage
-            isPublished
-            averageRating
-            reviews
-            createdBy {
-              id
-
-              personalInfo {
-                username
-                email
-                scholarId
-                fullName
-                activationToken
-                resetToken
-                tokenExpiry
-                activatedAccount
-              }
-              role
-            }
-            createdAt
-            updatedAt
-          }
-        }
-      `;
-
-      try {
-        this.resource = {
-          id: "",
-          title: "",
-          description: "",
-          content: "",
-          targetRegion: "",
-          targetCountry: "",
-          slug: "",
-          language: "",
-          contentType: "",
-          viewsNumber: 0,
-          likesNumber: 0,
-          sharesNumber: 0,
-          subject: "",
-          topic: "",
-          rating: "",
-          sessionId: "",
-          accessKey: "",
-          keywords: "",
-          coverImage: "",
-          isPublished: false,
-          averageRating: 0,
-          reviews: "",
-          createdBy: "",
-          createdAt: "",
-          updatedAt: "",
-        } as Resource;
-        const response = await client.query({
-          query: FETCH_COMPUTING_RESOURCE,
-          variables: { topicParams },
-        });
-
-        const resource = response.data.fetchComputingResource;
-
-        if (resource !== null) {
-          this.resource = resource; // Clone the resource object
-        } else {
-          // If resource is null, initialize a new object with the desired contentType
-          this.resource.contentType = "COMPUTING";
-        }
-
-        return;
-      } catch (error) {
-        console.error("Error fetching resource:", error);
-      }
-    },
-    async fetchResource(id: string) {
-      const resourceQuery = gql`
-        query ($id: ID!) {
-          getResource(id: $id) {
-            id
-            title
-            description
-            content
-            targetRegion
-            targetCountry
-            slug
-            language
-            contentType
-            participants
-            viewsNumber
-            likesNumber
-            sharesNumber
-            subject
-            topic
-            rating
-            sessionId
-            accessKey
-            keywords
-            coverImage
-            isPublished
-            averageRating
-            reviews
-            createdBy {
-              id
-
-              personalInfo {
-                username
-                email
-                scholarId
-                fullName
-                activationToken
-                resetToken
-                tokenExpiry
-                activatedAccount
-              }
-              role
-            }
-            createdAt
-            updatedAt
-          }
-        }
-      `;
-
-      try {
-        const response = await client.query({
-          query: resourceQuery,
-          variables: { id },
-        });
-
-        const resource = response.data?.getResource;
-        if (resource) {
-          this.resource = resource;
-        } else {
-          throw new Error("Failed to fetch resource");
-        }
-      } catch (error) {
-        console.error("Error fetching resource:", error);
-      }
-    },
-    async fetchResources(filters: any = {}) {
-      const resourceQuery = gql`
-        query (
-          $title: String
-          $contentType: ResourceType
-          $targetRegion: String
-          $language: String
-          $subject: String
-          $topic: String
-        ) {
-          getResources(
-            title: $title
-            contentType: $contentType
-            targetRegion: $targetRegion
-            language: $language
-            subject: $subject
-            topic: $topic
-          ) {
-            id
-            title
-            description
-            targetRegion
-            targetCountry
-            sessionId
-            accessKey
-            slug
-            language
-            contentType
-            viewsNumber
-            likesNumber
-            sharesNumber
-            subject
-            topic
-            rating
-            keywords
-            coverImage
-            averageRating
-            createdBy {
-              id
-
-              personalInfo {
-                username
-              }
-            }
-            createdAt
-            updatedAt
-          }
-        }
-      `;
-
-      try {
-        const response = await client.query({
-          query: resourceQuery,
-          variables: filters,
-        });
-
-        const resources = response.data?.getResources;
-        if (resources) {
-          this.resources = resources;
-          this.setResources(resources);
-        } else {
-          throw new Error("Failed to fetch resources");
-        }
-      } catch (error) {
-        console.error("Error fetching resources:", error);
-      }
-    },
-    async togglePublicationStatus(resourceData: {
-      resourceStatus: string;
-      resourceId: string;
-    }) {
-      const TOGGLE_RESOURCE_STATUS = gql`
-        mutation TogglePublicationStatus(
-          $resourceStatus: String!
-          $resourceId: String!
-        ) {
-          togglePublicationStatus(
-            resourceStatus: $resourceStatus
-            resourceId: $resourceId
-          ) {
-            id
-            contentType
-            title
-          }
-        }
-      `;
-
-      try {
+        // Execute the GraphQL mutation
         const response = await client.mutate({
-          mutation: TOGGLE_RESOURCE_STATUS,
-          variables: resourceData,
+          mutation: ADD_PATIENT,
+          variables: {
+            personalInfo,
+            nextOfKin,
+          },
         });
 
-        // Update the resource with the response data
-        const newResource = response.data.togglePublicationStatus;
-        this.resource = newResource;
-      } catch (error) {
-        console.error("Error toggling publication status:", error);
-      }
-    },
+        // Extract data from the response
+        const createdPatient = response.data?.createPatient;
 
-    async createResource(resourceData: {
-      title: string;
-      description: string;
-      subject: string;
-      topic: string;
-      targetRegion: string;
-      targetCountry: string;
-      language: string;
-      contentType: string;
-      keywords?: string;
-      createdBy?: ID;
-    }) {
-      const CREATE_RESOURCE = gql`
-        mutation (
-          $title: String!
-          $description: String!
-          $subject: String!
-          $topic: String!
-          $targetRegion: String
-          $targetCountry: String
-          $language: String
-          $contentType: ResourceType!
-          $keywords: String!
-          $createdBy: ID!
-        ) {
-          createResource(
-            title: $title
-            description: $description
-            subject: $subject
-            topic: $topic
-            targetRegion: $targetRegion
-            targetCountry: $targetCountry
-            language: $language
-            contentType: $contentType
-            keywords: $keywords
-            createdBy: $createdBy
-          ) {
-            id
-            contentType
-            title
-          }
-        }
-      `;
-
-      try {
-        const response = await client.mutate({
-          mutation: CREATE_RESOURCE,
-          variables: resourceData,
-        });
-
-        const newResource = response.data.createResource;
-        this.resource = newResource;
-        this.resources.push(newResource);
-        this.resources = this.resources;
-      } catch (error) {
-        console.error("Error creating resource:", error);
-      }
-    },
-    //     //     addResourceFormContent(resourceDetails: String!): Resource!         // resourceContent,resourceId
-    async addResourceFormContent(resourceDetails: { resourceDetails: string }) {
-      const ADD_RESOURCE_FORM_INPUT = gql`
-        mutation ($resourceDetails: String!) {
-          addResourceFormContent(resourceDetails: $resourceDetails) {
-            id
-            contentType
-          }
-        }
-      `;
-
-      try {
-        const response = await client.mutate({
-          mutation: ADD_RESOURCE_FORM_INPUT,
-          variables: resourceDetails,
-        });
-
-        const newResource = response.data.addResourceFormContent;
-        this.resource = newResource;
-        this.resources.push(newResource);
-        this.resources = this.resources;
-      } catch (error) {
-        console.error("Error creating resource:", error);
-      }
-    },
-    async updateResource(id: string, resourceData: Partial<Resource>) {
-      const updateResourceMutation = gql`
-        mutation (
-          $id: ID!
-          $title: String
-          $description: String
-          $content: String
-          $targetRegion: String
-          $targetCountry: String
-          $slug: String
-          $language: String
-          $contentType: ResourceType
-          $viewsNumber: Int
-          $likesNumber: Int
-          $sharesNumber: Int
-          $rating: String
-          $subject: String
-          $topic: String
-          $sessionId: String
-          $accessKey: String
-          $keywords: [String]
-          $coverImage: String
-          $isPublished: Boolean
-          $averageRating: Float
-          $reviews: [String]
-        ) {
-          updateResource(
-            id: $id
-            title: $title
-            description: $description
-            content: $content
-            targetRegion: $targetRegion
-            targetCountry: $targetCountry
-            slug: $slug
-            language: $language
-            contentType: $contentType
-            viewsNumber: $viewsNumber
-            likesNumber: $likesNumber
-            sharesNumber: $sharesNumber
-            rating: $rating
-            subject: $subject
-            topic: $topic
-            sessionId: $sessionId
-            accessKey: $accessKey
-            keywords: $keywords
-            coverImage: $coverImage
-            isPublished: $isPublished
-            averageRating: $averageRating
-            reviews: $reviews
-          ) {
-            id
-            title
-            slug
-            language
-            contentType
-
-            reviews
-            createdBy {
-              id
-
-              personalInfo {
-                username
-                email
-                scholarId
-                activationToken
-                resetToken
-                tokenExpiry
-                activatedAccount
-              }
-              role
-            }
-            createdAt
-            updatedAt
-          }
-        }
-      `;
-
-      try {
-        const response = await client.mutate({
-          mutation: updateResourceMutation,
-          variables: { id, ...resourceData },
-        });
-
-        const updatedResource = response.data?.updateResource;
-        if (updatedResource) {
-          const index = this.resources.findIndex((res) => res.id === id);
-          if (index !== -1) {
-            this.resources[index] = updatedResource;
-          }
-          this.resource = updatedResource;
+        if (createdPatient) {
+          console.log("Patient created successfully:", createdPatient);
+          return createdPatient; // Return the created patient details
         } else {
-          throw new Error("Failed to update resource");
+          throw new Error("Failed to create patient");
         }
       } catch (error) {
-        console.error("Error updating resource:", error);
+        console.error("Add Patient error:", error);
+        throw new Error("Failed to create patient. Please try again.");
+      }
+    }
+    ,
+
+    async updatePatient(patientId: string, input: { personalInfo: PatientPersonalInfo; nextOfKin: NextOfKin }) {
+      const UPDATE_PATIENT = gql`
+        mutation UpdatePatient($patientId: String!, $input: UpdatePatientInput!) {
+          updatePatient(patientId: $patientId, input: $input) {
+            id
+            personalInfo {
+              patientId
+              fullName
+              emailAddress
+              phoneNumber
+              yearOfBirth
+              gender
+              profilePicture
+              address {
+                city
+                state
+                country
+              }
+              bio
+              registrationDate
+              insuranceRegNumber
+            }
+            nextOfKin {
+              fullName
+              relationSpecify
+              phoneNumber
+              emailAddress
+              homeAddress
+              areaChief
+              nearestSchool
+            }
+          }
+        }
+      `;
+
+      try {
+        this.loading = true;
+        const response = await client.mutate({
+          mutation: UPDATE_PATIENT,
+          variables: { patientId, input },
+        });
+        const updatedPatient = response.data?.updatePatient;
+        if (updatedPatient) {
+          const index = this.patients.findIndex((p) => p.id === patientId);
+          if (index !== -1) this.patients[index] = updatedPatient;
+          console.log("Patient updated successfully:", updatedPatient);
+        }
+      } catch (error) {
+        console.error("Error updating patient:", error);
+        throw new Error("Failed to update patient.");
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async deletePatient(patientId: string) {
+      const DELETE_PATIENT = gql`
+        mutation DeletePatientById($patientId: String!) {
+          deletePatientById(patientId: $patientId) {
+            id
+          }
+        }
+      `;
+
+      try {
+        this.loading = true;
+        const response = await client.mutate({
+          mutation: DELETE_PATIENT,
+          variables: { patientId },
+        });
+        const deletedPatientId = response.data?.deletePatientById?.id;
+        if (deletedPatientId) {
+          this.patients = this.patients.filter((p) => p.id !== deletedPatientId);
+          console.log("Patient deleted successfully:", deletedPatientId);
+        }
+      } catch (error) {
+        console.error("Error deleting patient:", error);
+        throw new Error("Failed to delete patient.");
+      } finally {
+        this.loading = false;
       }
     },
   },

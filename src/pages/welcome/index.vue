@@ -7,10 +7,10 @@
           src="https://cdn.dribbble.com/users/1129235/screenshots/10762000/media/ace6e95b814e602a1b5a0527a54af10f.gif"
           class="hero-image" cover :aspect-ratio="1">
           <v-container class="hero-content">
-            <h1 style="color:#63bb45;" class="headline title-text">
+            <h1 style="color:#1fcaff;" class="headline title-text">
               Amane<span class="io-text"><i>Hospital</i></span>
             </h1>
-            <h2 style="color:#1fcaff;" class="headline subtitle-text">
+            <h2 style="color:#63bb45;" class="headline subtitle-text">
               Accessible Care, Healthier Communities
             </h2>
             <v-img @click="navigateToDonate" height="6rem" style="cursor:pointer;"
@@ -30,7 +30,7 @@
         <v-card max-height="28rem">
           <v-row>
             <v-col cols="12" md="4">
-              <v-img src="https://img.freepik.com/premium-vector/green-medical-seamless-pattern_74102-633.jpg" />
+              <v-img src="https://www.health.gov.lk/wp-content/uploads/2022/11/hospital.png" />
             </v-col>
             <v-col cols="12" md="8">
               <v-card-title class="text-center">
@@ -117,40 +117,14 @@
           <div class="d-flex justify-center align-center">
             <img style="height:18rem;" :src="partner.logo" :alt="partner.fullname" class="partner-logo" />
           </div>
-          <v-card-subtitle class="text-center">{{
+          <v-card-subtitle class="text-center mt-4">{{
             partner.fullname
           }}</v-card-subtitle>
         </v-carousel-item>
       </v-carousel>
     </v-card>
 
-    <!-- Footer -->
-    <v-footer class="footer">
-      <v-row class="text-center">
-        <v-col cols="12">
-          <v-card-actions>
-            <v-spacer />
-            <v-btn @click="scrollToTop">
-              <v-icon>mdi-arrow-up</v-icon> Back to Top
-            </v-btn>
-            <v-btn @click="scrollToCallToAction" color="#c2529d">
-              <v-icon>mdi-cloud-lock-outline</v-icon> CloudClinic HMS Access
-            </v-btn>
-            <v-spacer />
-          </v-card-actions>
-          <p> Burumba Estate, Busia,KE. 📞+254713412265 💬 0700378241 📧 amanecottagehospital@gmail.com
 
-          </p>
-          <v-img @click="navigateToDonate" height="6rem" style="cursor:pointer;"
-            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/Screenshot_from_2024-12-05_21-46-15-removebg-preview.png"></v-img>
-        </v-col>
-      </v-row>
-    </v-footer>
-
-
-    <div class="text-caption" style="text-align: center">
-      &copy; {{ currentYear }} Amane Cottage Hospital. All rights reserved.
-    </div>
   </v-container>
 </template>
 
@@ -163,6 +137,9 @@ const router = useRouter()
 function navigateToDonate() {
   router.push("/donate");
 }
+
+const currentYear = ref(new Date().getFullYear());  
+
 const objectives = [
   {
     text: "Provide compassionate primary care for individuals and families.",
@@ -190,8 +167,6 @@ const objectives = [
   },
 ];
 
-
-const currentYear = ref(new Date().getFullYear());  
 
 const scrollToCallToAction = () => {
   // @ts-ignore

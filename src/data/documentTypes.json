@@ -1,0 +1,197 @@
+{
+    "roles": {
+        "AdministrativeStaff": {
+            "sections": [
+                {
+                    "title": "Administrative and Legal Documents",
+                    "fields": [
+                        {
+                            "label": "Admission Notes",
+                            "type": "textarea",
+                            "v_model": "admissionNotes",
+                            "placeholder": "Enter details of the admission reason, demographics, and initial assessment",
+                            "required": true
+                        },
+                        {
+                            "label": "Consent Forms",
+                            "type": "file",
+                            "v_model": "consentForms",
+                            "accept": ".pdf,.doc,.docx",
+                            "required": true
+                        },
+                        {
+                            "label": "Insurance or Billing Information",
+                            "type": "textarea",
+                            "v_model": "billingInfo",
+                            "placeholder": "Enter insurance or billing details"
+                        },
+                        {
+                            "label": "Referral Letters",
+                            "type": "file",
+                            "v_model": "referralLetters",
+                            "accept": ".pdf,.doc,.docx"
+                        }
+                    ]
+                }
+            ]
+        },
+        "Clinical": {
+            "sections": [
+                {
+                    "title": "Clinical Documentation",
+                    "fields": [
+                        {
+                            "label": "Progress Notes",
+                            "type": "textarea",
+                            "v_model": "progressNotes",
+                            "placeholder": "Enter daily notes including updates on diagnosis, treatment, and status",
+                            "required": true
+                        },
+                        {
+                            "label": "History and Physical Examination (H&P)",
+                            "type": "textarea",
+                            "v_model": "historyPhysicalExam",
+                            "placeholder": "Enter detailed medical history and initial physical examination",
+                            "required": true
+                        },
+                        {
+                            "label": "Consultation Notes",
+                            "type": "textarea",
+                            "v_model": "consultationNotes",
+                            "placeholder": "Enter consultation details from specialists"
+                        },
+                        {
+                            "label": "Discharge Notes",
+                            "type": "textarea",
+                            "v_model": "dischargeNotes",
+                            "placeholder": "Enter final observations and discharge instructions"
+                        }
+                    ]
+                }
+            ]
+        },
+        "Doctor": {
+            "sections": [
+                {
+                    "title": "Clinical Documentation",
+                    "fields": [
+                        {
+                            "label": "Progress Notes",
+                            "type": "textarea",
+                            "v_model": "progressNotes",
+                            "placeholder": "Enter daily notes including updates on diagnosis, treatment, and status",
+                            "required": true
+                        },
+                        {
+                            "label": "History and Physical Examination (H&P)",
+                            "type": "textarea",
+                            "v_model": "historyPhysicalExam",
+                            "placeholder": "Enter detailed medical history and initial physical examination",
+                            "required": true
+                        },
+                        {
+                            "label": "Consultation Notes",
+                            "type": "textarea",
+                            "v_model": "consultationNotes",
+                            "placeholder": "Enter consultation details from specialists"
+                        },
+                        {
+                            "label": "Discharge Notes",
+                            "type": "textarea",
+                            "v_model": "dischargeNotes",
+                            "placeholder": "Enter final observations and discharge instructions"
+                        }
+                    ]
+                }
+            ]
+        },
+        "Nurse": {
+            "sections": [
+                {
+                    "title": "Nursing Documentation",
+                    "fields": [
+                        {
+                            "label": "Nursing Notes",
+                            "type": "textarea",
+                            "v_model": "nursingNotes",
+                            "placeholder": "Enter observations and care details",
+                            "required": true
+                        },
+                        {
+                            "label": "Medication Administration Record (MAR)",
+                            "type": "table",
+                            "v_model": "medicationRecord",
+                            "columns": [
+                                "Medication",
+                                "Dosage",
+                                "Time Given",
+                                "Nurse Signature"
+                            ]
+                        },
+                        {
+                            "label": "Vital Signs Chart",
+                            "type": "table",
+                            "v_model": "vitalSigns",
+                            "columns": [
+                                "Date",
+                                "Time",
+                                "Temperature",
+                                "BP",
+                                "Pulse",
+                                "Respiratory Rate"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "Therapist": {
+            "sections": [
+                {
+                    "title": "Therapy and Allied Health Notes",
+                    "fields": [
+                        {
+                            "label": "Physical Therapy Notes",
+                            "type": "textarea",
+                            "v_model": "physicalTherapyNotes",
+                            "placeholder": "Enter assessment and progress in physical rehabilitation"
+                        },
+                        {
+                            "label": "Dietitian Notes",
+                            "type": "textarea",
+                            "v_model": "dietitianNotes",
+                            "placeholder": "Enter nutritional assessment and plans"
+                        }
+                    ]
+                }
+            ]
+        },
+        "DiagnosticStaff": {
+            "sections": [
+                {
+                    "title": "Diagnostic and Laboratory Reports",
+                    "fields": [
+                        {
+                            "label": "Radiology Reports",
+                            "type": "file",
+                            "v_model": "radiologyReports",
+                            "accept": ".pdf,.jpg,.png,.dcm"
+                        },
+                        {
+                            "label": "Laboratory Reports",
+                            "type": "file",
+                            "v_model": "labReports",
+                            "accept": ".pdf,.csv,.xls,.xlsx"
+                        },
+                        {
+                            "label": "ECG/EKG Reports",
+                            "type": "file",
+                            "v_model": "ecgReports",
+                            "accept": ".pdf,.jpg,.png"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

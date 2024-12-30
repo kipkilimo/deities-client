@@ -1,70 +1,37 @@
 <template>
   <div>
-    <v-card
-      class="mx-auto pa-8 pb-4"
-      elevation="8"
-      max-width="448"
-      rounded="lg"
-    >
+    <v-card class="mx-auto pa-8 pb-4" elevation="8" max-width="448" rounded="lg">
       <!-- Error alert -->
       <v-container>
-        <v-alert
-          border="top"
-          type="warning"
-          variant="outlined"
-          prominent
-          class="mt-4"
-          width="100%"
-          v-if="error"
-        >
+        <v-alert border="top" type="warning" variant="outlined" prominent class="mt-4" width="100%" v-if="error">
           {{ error }}
         </v-alert>
 
-        <v-alert
-          border="top"
-          v-if="success"
-          type="success"
-          class="mt-4"
-          width="100%"
-          variant="outlined"
-          prominent
-        >
+        <v-alert border="top" v-if="success" type="success" class="mt-4" width="100%" variant="outlined" prominent>
           {{ success }}
         </v-alert>
       </v-container>
 
       <!-- Image -->
-      <v-img
-        class="mx-auto my-2 mb-6"
-        max-width="18rem"
+      <v-img class="mx-auto my-2 mb-6" max-width="18rem"
         src="https://a2z-v0.s3.eu-central-1.amazonaws.com/0019616_lipanampesa-removebg-preview+(1).png"
-        alt="Invest"
-      ></v-img>
+        alt="Invest"></v-img>
 
       <!-- Subtitle -->
-      <div class="text-subtitle-1 text-medium-emphasis">Purchase Via MPESA</div>
+      <div class="text-subtitle-1 text-medium-emphasis">Payment Via MPESA</div>
 
       <!-- Form -->
       <v-form v-model="isFormValid" lazy-validation>
         <v-row>
           <v-col cols="12" sm="12">
             <!-- Phone Number Input -->
-            <v-text-field
-              density="compact"
-              placeholder="Safaricom mobile phone number"
-              label="MPESA phone number"
-              prepend-inner-icon="mdi-cellphone-text"
-              variant="outlined"
-              :disabled="isLoading"
-              v-model="phone_number"
-              :rules="phonenumberRules"
-            ></v-text-field>
+            <v-text-field density="compact" placeholder="Safaricom mobile phone number" label="MPESA phone number"
+              prepend-inner-icon="mdi-cellphone-text" variant="outlined" :disabled="isLoading" v-model="phone_number"
+              :rules="phonenumberRules"></v-text-field>
 
             <!-- MPESA instructions -->
             <v-card class="mb-12" color="surface-variant" variant="tonal">
-              <v-card-text
-                class="text-medium-emphasis text-caption indigo-text"
-              >
+              <v-card-text class="text-medium-emphasis text-caption indigo-text">
                 This process will initiate an MPESA transaction.
                 <p>
                   When prompted on your phone, enter your MPESA PIN and submit.
@@ -72,19 +39,10 @@
               </v-card-text>
             </v-card>
 
-            <!-- Initiate Purchase Button -->
-            <v-btn
-              block
-              rounded="4"
-              variant="tonal"
-              class="mb-8"
-              color="#2c9933"
-              size="large"
-              :disabled="phone_number.length < 9 || isLoading"
-              :loading="isLoading"
-              @click="handlePublicationCreditsPaymentViaMpesa"
-            >
-              Initiate Purchase
+            <!-- Initiate Payment Button -->
+            <v-btn block rounded="4" variant="tonal" class="mb-8" color="#2c9933" size="large"
+              :disabled="phone_number.length < 9 || isLoading" :loading="isLoading" @click="handleBillPaymentViaMpesa">
+              Initiate Payment
             </v-btn>
           </v-col>
         </v-row>
@@ -117,35 +75,31 @@ const success = ref(null);
 const error = ref(null);
 const isLoading = ref(false);
 const isFormValid = ref(true);
-const handlePublicationCreditsPaymentViaMpesa = async () => {
+const handleBillPaymentViaMpesa = async () => {
   const paymentsStore = usePaymentsStore();
   isLoading.value = true;
   try {
-    const retrievedPurchaseDetails = JSON.parse(
+    const retrievedPaymentDetails = JSON.parse(
       localStorage.getItem("creditPurchaseDetails") || "{}"
     );
-    console.log({ retrievedPurchaseDetails });
+    console.log({ retrievedPaymentDetails });
     var lastNine = phone_number.value.slice(-9);
     const phone_number_full = `254${lastNine}`;
     const vals = {
-      userId: userId,
+      beneficiary: retrievedPaymentDetails.beneficiary,
+      invoice: retrievedPaymentDetails.invoice,
+      paidAmount: retrievedPaymentDetails.paidAmount,
+      billingDepartment: retrievedPaymentDetails.billingDepartment,
+      billedItems: retrievedPaymentDetails.billedItems,
       paymentPhoneNumber: phone_number_full,
-      paidAmount: String(
-        (Number(retrievedDonationDetails.paidAmount) * DOLLAR_RATE).toFixed(0)
-      ),
-      departmentId: retrievedPurchaseDetails.departmentId,
-      transactionEntity: retrievedPurchaseDetails.payersName,
     };
 
-    const response =
-      await paymentsStore.publicationCreditsPaymentViaMpesa(vals);
-    console.log({ paymentResponse: response });
-    if (response.transactionReferenceNumber.length === 12) {
-      success.value = "Success. Publication credits have been updated.";
+    const result = await paymentsStore.handlePaymentViaMpesa(vals);
+    if (result) {
+      success.value = "Payment completed. Thank you!"
     }
     setTimeout(() => {
       isLoading.value = false;
-
       window.location.href = "/dashboard/services";
       success.value = null;
     }, 4200);

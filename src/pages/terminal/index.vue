@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h4>Dashboard</h4>
+    <Terminal />
   </div>
 </template>
 <script setup>
@@ -14,5 +14,5 @@ const staffStore = useStaffStore();
 
 <route lang="yaml">
 meta:
-  layout: DashboardLayout
+  layout: TerminalLayout
 </route>

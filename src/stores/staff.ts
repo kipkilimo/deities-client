@@ -17,7 +17,7 @@ interface PersonalInfo {
   fullName: string;
   emailAddress: string;
   phoneNumber: string;
-  yearOfBirth: number;
+  yearOfBirth: string;
   gender?: string;
   department: string;
   profilePicture?: string;
@@ -42,6 +42,7 @@ interface Staff {
 
 export const useStaffStore = defineStore("auth", {
   state: () => ({
+    addingStaff: false,
     staff: null as Staff | null,
     isLoggedIn: false,
     token: null as string | null,
@@ -107,6 +108,72 @@ export const useStaffStore = defineStore("auth", {
         throw new Error("Login failed");
       }
     },
+    async addStaffMember(
+      fullName: string,
+      emailAddress: string,
+      phoneNumber: string,
+      yearOfBirth: string,
+      department: string,
+      role: string
+    ) {
+      const ADD_STAFF_MEMBER = gql`
+        mutation AddStaffMember(
+          $fullName: String!
+          $emailAddress: String!
+          $phoneNumber: String!
+          $yearOfBirth: String!
+          $department: String!
+          $role: Role!
+        ) {
+          createStaff(
+            fullName: $fullName
+            emailAddress: $emailAddress
+            phoneNumber: $phoneNumber
+            yearOfBirth: $yearOfBirth
+            department: $department
+            role: $role
+          ) {
+            id
+            personalInfo {
+              fullName
+              emailAddress
+              phoneNumber
+              yearOfBirth
+              department
+            }
+            role
+          }
+        }
+      `;
+
+      try {
+        // Execute the GraphQL mutation
+        const response = await client.mutate({
+          mutation: ADD_STAFF_MEMBER,
+          variables: {
+            fullName,
+            emailAddress,
+            phoneNumber,
+            yearOfBirth,
+            department,
+            role,
+          },
+        });
+
+        // Extract data from the response
+        const createdStaff = response.data?.createStaff;
+
+        if (createdStaff) {
+          console.log("Staff member created successfully:", createdStaff);
+          return createdStaff; // Return the created staff details
+        } else {
+          throw new Error("Failed to create staff member");
+        }
+      } catch (error) {
+        console.error("Add Staff Member error:", error);
+        throw new Error("Failed to create staff member. Please try again.");
+      }
+    },
 
     async requestPasswordReset(emailAddress: string) {
       const REQUEST_PASSWORD_RESET = gql`
@@ -154,7 +221,6 @@ export const useStaffStore = defineStore("auth", {
         const staff = response.data?.requestPasswordReset?.staff;
         const accessToken = response.data?.requestPasswordReset?.accessToken;
 
-
         if (staff && accessToken) {
           this.isLoggedIn = true;
           this.token = accessToken;
@@ -172,7 +238,10 @@ export const useStaffStore = defineStore("auth", {
     async resetPassword(activationToken: string, password: string) {
       const RESET_PASSWORD = gql`
         mutation ResetPassword($activationToken: String!, $password: String!) {
-          resetPassword(activationToken: $activationToken, password: $password) {
+          resetPassword(
+            activationToken: $activationToken
+            password: $password
+          ) {
             accessToken
             staff {
               id

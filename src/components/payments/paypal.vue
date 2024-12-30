@@ -26,107 +26,145 @@
         Date: {{ createdAt() }}
         <br />
       </v-col>
-      <v-col align-right cols="5" v-if="
-  useStaffStore().user.role === 'STUDENT' &&
-  useStaffStore().user.discussion_groups &&
-  useStaffStore().user.discussion_groups[0].discussionGroupId.length ===
-  12
-" style="text-align: right !important; margin-left: 5px">
-        <v-chip variant="outlined" class="ma-1" rounded="2">
-          <v-tooltip text="You can add resources for your discussion groups for FREE on Amane Hospital." location="top">
+      <v-col align-right cols="5" style="text-align: right !important; margin-left: 5px">
+        <v-chip color="primary" variant="outlined" class="ma-1" rounded="2">
+          <v-tooltip
+            text="Bill waivers for inpatients will only be effected upon approval of the management of Amane Hospital. No OPD waivers."
+            location="top">
             <template v-slot:activator="{ props }"><v-btn class="text-none" v-bind="props" color="primary"
-                prepend-icon="mdi-wallet-giftcard" text="Request waiver" @click="requestDGWaiverDialog = true"
+                prepend-icon="mdi-handshake-outline" text="Request waiver" @click="requestDGWaiverDialog = true"
                 variant="text" slim></v-btn>
             </template>
           </v-tooltip>
         </v-chip>
         <br />
       </v-col>
-      <v-col align-right cols="5" v-if="
-        useStaffStore().user.role === 'FACULTY' &&
-        useStaffStore().user.departments &&
-        useStaffStore().user.departments[0].departmentId.length === 12
-      " style="text-align: right !important; margin-left: 5px">
+      <!-- <v-col align-right cols="5" style="text-align: right !important; margin-left: 5px">
         <v-chip variant="outlined" class="ma-1" rounded="2">
           <v-tooltip text="You can add resources for your discussion groups for FREE on Amane Hospital." location="top">
             <template v-slot:activator="{ props }"><v-chip rounded="2" v-bind="props" variant="rounded" slim>
                 My Department ID:
-                {{ useStaffStore().user.departments[0].departmentId }}
               </v-chip>
             </template>
           </v-tooltip>
         </v-chip>
         <br />
-      </v-col>
+      </v-col> -->
     </v-row>
 
     <v-divider></v-divider>
     <br />
     <v-row>
-      <v-col cols="6">
-        <v-form v-model="isFormValid" lazy-validation>
-          <v-row>
-            <v-col cols="12" sm="12">
-              <v-select v-model="selectedAmount" :hint="`Credit USD ${selectedAmount}.00`" :items="selectItems"
-                :rules="nameRules" :disabled="sliderActive == true || departmentId.length === 12" ref="selectNow"
-                @input="onSelectChange" item-title="state" item-value="abbr" label="Select" density="compact"
-                persistent-hint return-object single-line></v-select>
-              <br />
-              <v-slider v-model="selectedAmount" :value="selectedAmount" color="indigo" ref="slider"
-                @input="onSliderChange" @click="onSliderChange" track-color="grey"
-                :min="`${departmentId.length === 12 ? '250' : '1'}`" max="2000" hide-details step="1">
-                <template v-slot:prepend>
-                  <v-btn size="small" variant="text" icon="mdi-minus" color="orange" @click="decrement"></v-btn>
-                </template>
 
-                <template v-slot:append>
-                  <v-btn size="small" variant="text" icon="mdi-plus" color="teal" @click="increment"></v-btn>
+      <v-col cols="6">
+        <v-card class="mx-auto pa-2" max-width="96%">
+          <div v-if="billItems && billItems.length > 0">
+            <v-list>
+              <v-list-subheader>BILLED ITEMS</v-list-subheader>
+              <v-list-item v-for="(item, i) in billItems" :key="i" :value="item" color="primary" rounded="xl">
+                <template v-slot:prepend>
+                  <v-icon icon="mdi-invoice-list-outline"></v-icon>
                 </template>
-              </v-slider>
-              <v-spacer></v-spacer>
-              <p>
-                {{
-                  departmentId.length === 12
-                    ? "Annual subscription fee"
-                    : "Custom amount"
-                }}:<strong>{{ `$ ${selectedAmount}` }}.00</strong>
-                <i>(NB: Click (-) or + to activate slider)</i>
-              </p>
-            </v-col>
-          </v-row>
-        </v-form>
+                <v-list-item-title>
+                  {{ i + 1 }}. {{ item.__EMPTY }} ----------- {{ item.__EMPTY_1 }}/=
+                </v-list-item-title>
+              </v-list-item>
+              <v-divider />
+              <h4 style="text-align: right; border-top: 1px solid black; padding-top: 5px;">
+                Total: KES {{ total.toFixed(2) }}
+              </h4>
+            </v-list>
+          </div>
+          <div v-else>
+            No billed items available.
+          </div>
+        </v-card>
       </v-col>
+
+
+
+
       <v-divider max-length="4rem" vertical></v-divider>
       <v-col cols="6">
-        <v-form v-model="isFormValid" lazy-validation>
-          <v-row>
-            <v-col cols="12" sm="12">
-              <v-text-field density="compact" placeholder="Payment type" disabled label="Payment type"
-                :prepend-inner-icon="
-                  departmentId.length === 12
-                    ? 'mdi-account-multiple-check-outline'
-                    : 'mdi-account-check-outline'
-                " variant="outlined" v-model="transactionEntity" :rules="nameRules"></v-text-field>
-              <br />
-              <v-text-field density="compact" placeholder="Department ID" label="Department ID"
-                prepend-inner-icon="mdi-barcode-scan" variant="outlined" v-model="departmentId"
-                :rules="uuidRules"></v-text-field>
-            </v-col>
-          </v-row>
-        </v-form>
-        <br />
-        <v-divider></v-divider>
-        <p>
-          <strong>Entity name</strong>:
-          {{
-            transactionEntity.length > 1 ? transactionEntity : "Not added yet"
-          }}. <strong>Department ID</strong>:
-          {{ departmentId.length === 12 ? departmentId : "Not added" }}.
-          <br /><strong>Amount (USD) </strong>:
-          {{ activeOption == 0 ? selectedAmount : selectedAmount }} |
-          <strong>Publication Credits </strong>:
-          {{ activeOption == 0 ? selectedAmount * 100 : selectedAmount * 100 }}
-        </p>
+        <v-card outlined>
+          <v-card-title class="text-h6 font-weight-bold">
+            {{ visitStore.currentVisit.patient.personalInfo.fullName }}
+          </v-card-title>
+          <v-card-subtitle>
+            <strong>Patient ID:</strong>
+            {{ visitStore.currentVisit.patient.personalInfo.patientId }}
+          </v-card-subtitle>
+          <v-divider class="my-2"></v-divider>
+          <v-card-text>
+            <v-list dense>
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon>mdi-gender-male-female</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <strong>Gender:</strong>
+                  {{ visitStore.currentVisit.patient.personalInfo.gender }}
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon>mdi-calendar</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <strong>Year of Birth:</strong>
+                  {{ visitStore.currentVisit.patient.personalInfo.yearOfBirth }}
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon>mdi-email</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <strong>Email Address:</strong>
+                  {{ visitStore.currentVisit.patient.personalInfo.emailAddress }}
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon>mdi-phone</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <strong>Phone Number:</strong>
+                  {{ visitStore.currentVisit.patient.personalInfo.phoneNumber }}
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon>mdi-account-heart</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <strong>Next of Kin:</strong>
+                  {{ visitStore.currentVisit.patient.nextOfKin.fullName }} ({{
+                    visitStore.currentVisit.patient.nextOfKin.relationSpecify
+                  }})
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon>mdi-home</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <strong>Home Address:</strong>
+                  {{ visitStore.currentVisit.patient.nextOfKin.homeAddress }}
+                </v-list-item-content>
+              </v-list-item>
+
+              <v-list-item>
+                <v-list-item-icon>
+                  <v-icon>mdi-account-tie</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <strong>Doctor:</strong> {{ visitStore.currentVisit.doctor }}
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+        </v-card>
       </v-col>
     </v-row>
     <v-divider></v-divider>
@@ -139,19 +177,20 @@
           <!-- PayPal container -->
 
           <!-- SSL logo -->
-          <v-img max-height="3rem" class="mt-8"
+          <v-img @click="showMpesaIcon" max-height="3rem" class="mt-8"
             src="https://a2z-v0.s3.eu-central-1.amazonaws.com/csq_media/images/ssl.png" alt="SSL"></v-img>
 
           <!-- Secure Payment with PayPal -->
-          <v-img max-height="5.4rem" class="mt-3"
+          <v-img @click="showMpesaIcon" max-height="5.4rem" class="mt-3"
             src="https://a2z-v0.s3.eu-central-1.amazonaws.com/secure-payment-with-paypal.png"
             alt="Secure Payment"></v-img>
           <!-- PayPal container will be rendered here -->
 
           <!-- M-Pesa container -->
 
-          <v-img max-height="7.2rem" style="cursor: pointer" v-if="selectedAmount < 1710" @click="showMpesaIcon"
-            src="https://a2z-v0.s3.eu-central-1.amazonaws.com/1200px-M-PESA_LOGO-01.svg.png" alt="M-Pesa"></v-img>
+          <v-img max-height="7.2rem" class="ml-11" style="cursor: pointer" v-if="selectedAmount < 1710"
+            @click="showMpesaIcon" src="https://a2z-v0.s3.eu-central-1.amazonaws.com/1200px-M-PESA_LOGO-01.svg.png"
+            alt="M-Pesa"></v-img>
 
           <!--<v-img
             max-height="7.2rem"
@@ -161,14 +200,14 @@
             alt="M-Pesa"
           ></v-img> -->
         </v-col>
-        <v-col cols="3" class="d-flex justify-space-between">
-          <v-container max-height="7.2rem" max-width="6rem" style="cursor: pointer">
-            <div id="paypal-button-container" class="paypal-button-small mt-5 mb-5"></div>
+        <v-col v-show="1 < 0" cols="3" class="d-flex justify-space-between">
+          <v-container v-show="1 < 0" max-height="7.2rem" max-width="6rem" style="cursor: pointer">
+            <div v-show="1 < 0" id="paypal-button-container" class="paypal-button-small mt-5 mb-5"></div>
           </v-container></v-col>
       </v-row>
     </v-card-actions>
     <v-dialog v-model="MPESAInputDialog" persistent max-width="540">
-      <MPESAInput />
+      <MPESABillPayment />
     </v-dialog>
 
     <v-dialog v-model="requestDGWaiverDialog" max-width="75rem" persistent>
@@ -179,17 +218,31 @@
 <script setup>
 // import { mapActions } from "pinia";
 
-import { ref, onMounted, nextTick, reactive, watch } from "vue";
+import { ref, onBeforeMount, onMounted, nextTick, reactive, watch } from "vue";
 import { usePaymentsStore } from "@/stores/payments";
 // import axios from "axios";
-
 import { useStaffStore } from "@/stores/staff";
+import { useInvoiceStore } from "@/stores/invoices";
+const invoiceStore = useInvoiceStore();
+import html2pdf from "html2pdf.js";
+
+const staffStore = useStaffStore();
+import { useVisitStore } from "@/stores/visits"; // Import the visit store
+
+const visitStore = useVisitStore();
 const requestDGWaiverDialog = ref(false);
 
 import { useRouter } from "vue-router";
 import { DateTime } from "luxon";
-import MPESAInput from "./mpesa.vue";
+import MPESAInput from "./MPESABillPayment.vue";
 // import { loadScript, Buttons } from "@paypal/paypal-js";
+
+const activeInvoice = ref({})// activeInvoiceRaw[0]
+const billItems = ref([])
+const total = computed(() => {
+  return billItems.value.reduce((sum, item) => sum + item["__EMPTY_1"], 0);
+});
+
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
 const slider = ref(null);
 const selectNow = ref(null);
@@ -198,14 +251,14 @@ const userId = localStorage.getItem("sessionId");
 const selectedItem = ref(1);
 const transactionEntity = ref("INDIVIDUAL");
 const departmentId = ref("");
-const paidAmount = ref("5");
+const paidAmount = ref(String(total.value));
 const success = ref(null);
 const error = ref(null);
 const isLoading = ref(false);
 const MPESAInputDialog = ref(false);
 const activeOption = ref(0);
 const sliderActive = ref(false);
-const selectedAmount = ref("5");
+const selectedAmount = ref(String(total.value));
 const selectItems = ["1", "2", "5", "10", "20", "50", "100", "200"];
 //  const store = usePaymentsStore();
 const nameRules = [(value) => !!value || "Name is required"];
@@ -219,10 +272,32 @@ const uuidRules = [
   },
 ];
 
-const emailRules = [
-  (value) => !!value || "Email is required",
-  (value) => /.+@.+\..+/.test(value) || "Email must be valid",
-];
+
+onBeforeMount(async () => {
+  console.log({ activeVisit: visitStore.currentVisit });
+
+  // Filter unpaid invoices
+  const activeInvoiceRaw = visitStore.currentVisit.invoices.filter((invoice) => {
+    return invoice.paid === false;
+  });
+
+  // Check if there are any invoices
+  if (visitStore.currentVisit.invoices.length > 0) {
+    activeInvoice.value = activeInvoiceRaw[0];
+
+    // Parse and set billItems as iterable
+    try {
+      const parsedItems = JSON.parse(activeInvoiceRaw[0].items);
+      billItems.value = Array.isArray(parsedItems) ? parsedItems : [];
+    } catch (error) {
+      console.error('Error parsing invoice items:', error);
+      billItems.value = [];
+    }
+  }
+
+  console.log({ activeInvoice: activeInvoice.value, billItems: billItems.value });
+});
+
 // const savedItem = ref(localStorage.getItem('item') || '');
 watch(departmentId, (newValue) => {
   if (newValue.length === 12) {
@@ -233,18 +308,15 @@ watch(departmentId, (newValue) => {
   }
 });
 const saveItems = () => {
-  let paidAmount = "";
-  if (activeOption.value == 0) {
-    paidAmount = String(selectedAmount.value);
-  } else {
-    paidAmount = String(selectedAmount.value);
-  }
+  const paidAmount = String(total.value);
+
   // Save the items as an object to localStorage
   const itemsObject = {
-    payersName: transactionEntity.value,
-    payersEmail: departmentId.value,
+    beneficiary: visitStore.currentVisit.patient.id,
+    invoice: activeInvoice.value.id,
     paidAmount: paidAmount,
-    departmentId:departmentId.value,
+    billingDepartment: visitStore.currentVisit.doctor,
+    billedItems: JSON.stringify(billItems.value),
   };
   localStorage.setItem("creditPurchaseDetails", JSON.stringify(itemsObject));
 };

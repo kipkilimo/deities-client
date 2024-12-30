@@ -1,15 +1,40 @@
+
 <template>
   <div>
-    <h4>Dashboard</h4>
+    <component :is="RoleBasedComponent" />
   </div>
 </template>
 <script setup>
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { useStaffStore } from "@/stores/staff";
 
+// Import role-specific components
+import ClinicalComponent from "./components/Clinical.vue";
+import RecordsComponent from "./components/Records.vue";
+import AdministrativeComponent from "./components/Administrative.vue";
+
+import AccountsComponent from "./components/CashOffice.vue";
+import LaboratoryComponent from "./components/Laboratory.vue";
+import NursingComponent from "./components/Nursing.vue";
+
+// Access the staff store
 const staffStore = useStaffStore();
 
-// Compute the boolean value (optional if you need combined logic elsewhere)
+// Map roles to their respective components
+const roleToComponentMap = {
+  CLINICAL: ClinicalComponent,
+  RECORDS: RecordsComponent,
+  ADMINISTRATIVE: AdministrativeComponent,
+  ACCOUNTANT: AccountsComponent,
+  LABORATORY: LaboratoryComponent,
+  NURSING: NursingComponent,
+};
+
+// Dynamically compute the component to render based on the user's role
+const RoleBasedComponent = computed(() => {
+  const role = staffStore.staff.role || ""; // Adjust this if the role property is named differently
+  return roleToComponentMap[role] || null; // Default to `null` if role is unrecognized
+});
 </script>
 
 <route lang="yaml">

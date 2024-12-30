@@ -1,6 +1,9 @@
 import "./assets/main.css";
 import "uno.css";
 import VueSocialSharing from "vue-social-sharing";
+// import { initializeWebSocket } from "./sockets/websocketClient";
+import VideoPlayer from "@videojs-player/vue";
+import "video.js/dist/video-js.css";
 
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -28,6 +31,8 @@ const app = createApp({
 // app.use(QuillEditor);
 app.use(VueViewer);
 app.use(VueSocialSharing);
+app.use(VideoPlayer);
+
 app
   .use(createPinia())
   .use(vuetify)
@@ -39,4 +44,6 @@ app
       routes,
     })
   );
+
 app.mount("#app");
+// Initialize WebSocket after the app mounts
