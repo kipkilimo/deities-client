@@ -44,7 +44,7 @@
                     <v-spacer />
                 </v-btn>
                 <v-spacer />
-                <v-btn color="red" @click="visitStore.createNewDocumentation = false" density="compact"
+                <v-btn color="red" @click="visitStore.createPatientNotes = false" density="compact"
                     icon="mdi-close"></v-btn>
             </v-card-actions>
         </v-row>
@@ -177,11 +177,11 @@ const roles = [
     "SURGEON",
     "RECORDS",
     "CLINICAL",
-    " PHARMARCY",
+    "PHARMARCY",
     "LABORATORY",
     "ACCOUNTANT",
     "SUPPORT_STAFF",
-    "OTHER",
+    "OTHER_STAFF",
 ];
 
 // Map departments to roles
@@ -195,7 +195,7 @@ const departmentToRoleMap = {
 const amaneDepartments = ["LABORATORY", "NURSING", "PHARMARCY", "CLINICAL", "RECORDS"];
 // Function to get role by department
 function getRoleByDepartment(department) {
-    return departmentToRoleMap[department] || "OTHER"; // Default to "OTHER" if no match is found
+    return departmentToRoleMap[department] || "OTHER_STAFF"; // Default to "OTHER_STAFF" if no match is found
 }
 // Visit type options
 

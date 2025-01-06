@@ -24716,7 +24716,7 @@ class CFFTopDict extends CFFDict {
   }
 }
 exports.CFFTopDict = CFFTopDict;
-const CFFPrivateDictLayout = [[6, "BlueValues", "delta", null], [7, "OtherBlues", "delta", null], [8, "FamilyBlues", "delta", null], [9, "FamilyOtherBlues", "delta", null], [[12, 9], "BlueScale", "num", 0.039625], [[12, 10], "BlueShift", "num", 7], [[12, 11], "BlueFuzz", "num", 1], [10, "StdHW", "num", null], [11, "StdVW", "num", null], [[12, 12], "StemSnapH", "delta", null], [[12, 13], "StemSnapV", "delta", null], [[12, 14], "ForceBold", "num", 0], [[12, 17], "LanguageGroup", "num", 0], [[12, 18], "ExpansionFactor", "num", 0.06], [[12, 19], "initialRandomSeed", "num", 0], [20, "defaultWidthX", "num", 0], [21, "nominalWidthX", "num", 0], [19, "Subrs", "offset", null]];
+  const CFFPrivateDictLayout = [[6, "BlueValues", "delta", null], [7, "otherBlues", "delta", null], [8, "FamilyBlues", "delta", null], [9, "FamilyotherBlues", "delta", null], [[12, 9], "BlueScale", "num", 0.039625], [[12, 10], "BlueShift", "num", 7], [[12, 11], "BlueFuzz", "num", 1], [10, "StdHW", "num", null], [11, "StdVW", "num", null], [[12, 12], "StemSnapH", "delta", null], [[12, 13], "StemSnapV", "delta", null], [[12, 14], "ForceBold", "num", 0], [[12, 17], "LanguageGroup", "num", 0], [[12, 18], "ExpansionFactor", "num", 0.06], [[12, 19], "initialRandomSeed", "num", 0], [20, "defaultWidthX", "num", 0], [21, "nominalWidthX", "num", 0], [19, "Subrs", "offset", null]];
 class CFFPrivateDict extends CFFDict {
   static get tables() {
     return (0, _util.shadow)(this, "tables", this.createTables(CFFPrivateDictLayout));
@@ -35847,7 +35847,7 @@ class Type1Font {
     cff.charStrings = charStringsIndex;
     const privateDict = new _cff_parser.CFFPrivateDict();
     privateDict.setByName("Subrs", null);
-    const fields = ["BlueValues", "OtherBlues", "FamilyBlues", "FamilyOtherBlues", "StemSnapH", "StemSnapV", "BlueShift", "BlueFuzz", "BlueScale", "LanguageGroup", "ExpansionFactor", "ForceBold", "StdHW", "StdVW"];
+    const fields = ["BlueValues", "otherBlues", "FamilyBlues", "FamilyotherBlues", "StemSnapH", "StemSnapV", "BlueShift", "BlueFuzz", "BlueScale", "LanguageGroup", "ExpansionFactor", "ForceBold", "StdHW", "StdVW"];
     for (i = 0, ii = fields.length; i < ii; i++) {
       const field = fields[i];
       if (!(field in properties.privateData)) {
@@ -36333,9 +36333,9 @@ class Type1Parser {
           }
           break;
         case "BlueValues":
-        case "OtherBlues":
+        case "otherBlues":
         case "FamilyBlues":
-        case "FamilyOtherBlues":
+        case "FamilyotherBlues":
           const blueArray = this.readNumberArray();
           if (blueArray.length > 0 && blueArray.length % 2 === 0 && HINTING_ENABLED) {
             program.properties.privateData[token] = blueArray;
@@ -58327,7 +58327,7 @@ class PDFWorkerStreamRangeReader {
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+  // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 var exports = __webpack_exports__;
 

@@ -28,9 +28,10 @@
                             </v-col>
                             <v-col cols="3">
                                 <v-card-text>Visit Number</v-card-text>
-                                <v-card-title class="text-h3 mt-4" style="font-family: Monaco">{{
-                                    visit.visitNumber
-                                }}</v-card-title>
+                                <v-card-title class="text-h3 mt-4" style="font-family: 'Orbitron', monospace;">
+                                    {{ visit.visitNumber }}
+                                </v-card-title>
+
                             </v-col>
                         </v-row>
                         <v-card-text>
@@ -384,7 +385,7 @@
                         hour: '2-digit', // Two-digit hour (e.g., 05)
                         minute: '2-digit', // Two-digit minute (e.g., 36)
                         hour12: true // Ensures 12-hour format with AM/PM
-                    }).format(new Date(activeInvoice.date)) }}
+                        }).format(new Date(activeInvoice.date)) }}
 
                     </p>
 
@@ -556,3 +557,11 @@ const printReceiptPDF = async () => {
         .save()
 };
 </script>
+<style>
+@font-face {
+  font-family: 'Orbitron';
+  src: url('/public/Orbitron-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+</style>

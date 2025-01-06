@@ -85,11 +85,11 @@ const roles = [
     "SURGEON",
     "RECORDS",
     "CLINICAL",
-    " PHARMARCY",
+    "PHARMARCY",
     "LABORATORY",
     "ACCOUNTANT",
     "SUPPORT_STAFF",
-    "OTHER",
+    "OTHER_STAFF",
 ];
 
 // Form validation rules

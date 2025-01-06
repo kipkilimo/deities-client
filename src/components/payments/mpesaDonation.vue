@@ -1,11 +1,6 @@
 <template>
   <div>
-    <v-card
-      class="mx-auto pa-8 pb-4"
-      elevation="8"
-      max-width="448"
-      rounded="lg"
-    >
+    <v-card class="mx-auto pa-8 pb-4" elevation="8" max-width="448" rounded="lg">
       <!-- Error alert -->
       <v-container>
         <v-alert
@@ -62,13 +57,9 @@
 
             <!-- MPESA instructions -->
             <v-card class="mb-12" color="surface-variant" variant="tonal">
-              <v-card-text
-                class="text-medium-emphasis text-caption indigo-text"
-              >
+              <v-card-text class="text-medium-emphasis text-caption indigo-text">
                 This process will initiate an MPESA transaction.
-                <p>
-                  When prompted on your phone, enter your MPESA PIN and submit.
-                </p>
+                <p>When prompted on your phone, enter your MPESA PIN and submit.</p>
               </v-card-text>
             </v-card>
 
@@ -128,14 +119,35 @@ const handleDonationViaMpesa = async () => {
     console.log({ retrievedDonationDetails });
     var lastNine = phone_number.value.slice(-9);
     const phone_number_full = `254${lastNine}`;
+
+    /*
+    beneficiary: visitStore.currentVisit.patient.id,
+    invoice: activeInvoice.value.id,
+    paidAmount: paidAmount,
+    billingDepartment: visitStore.currentVisit.doctor,
+    billedItems: JSON.stringify(billItems.value),
+
+    ///
+      donor: String
+      message: String
+      paidAmount: String!
+      paymentPhoneNumber: String!
+      transactionReferenceNumber: String
+      paymentMethod: String
+      createdAt: String
+    
+    */
     const vals = {
-      userId: userId,
+      donor: "Amane Donor",
+      message: "Best wishes to Amane Hospital.",
       paymentPhoneNumber: phone_number_full,
       paidAmount: String(
         (Number(retrievedDonationDetails.paidAmount) * DOLLAR_RATE).toFixed(0)
       ),
-      departmentId: retrievedDonationDetails.departmentId,
-      transactionEntity: retrievedDonationDetails.payersName,
+      transactionEntity: "Amane Donor",
+      transactionReferenceNumber: "",
+      paymentMethod: "MPESA",
+      createdAt: new Date(Date.now()),
     };
 
     await paymentsStore.handleDonationViaMpesa(vals);

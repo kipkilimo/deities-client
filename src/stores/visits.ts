@@ -39,7 +39,10 @@ export const useVisitStore = defineStore("visit", {
   state: () => ({
     fetchingVisits: false,
     createNewVisit: false,
-    createNewDocumentation: false,
+    createPatientNotes: false,
+    viewPatientRecords: false,
+    closeCurrentVisitAlert: false,
+    createServicesReport: false,
     visits: [] as Visit[], // Store all visits
     currentVisit: null as Visit | null,
   }),
@@ -206,6 +209,7 @@ export const useVisitStore = defineStore("visit", {
               id
               personalInfo {
                 fullName
+                patientId
               }
             }
           }

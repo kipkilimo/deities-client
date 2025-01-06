@@ -1,69 +1,142 @@
 <template>
-  <v-container fluid max-height="99.6vh" class="mt-6"
-    style="overflow: hidden; padding: 0; margin: 0; box-sizing: border-box;">
+  <v-container
+    fluid
+    max-height="99.6vh"
+    class="mt-6"
+    style="overflow: hidden; padding: 0; margin: 0; box-sizing: border-box"
+  >
     <v-row>
       <!-- Placeholder v-sheet while visits are being fetched -->
-      <v-col cols="3" v-if="visitStore.visits.length === 0" class="d-flex align-center justify-center">
-        <v-sheet width="100%" height="66vh" style="background-color: #d5edee; border-radius: 8px; padding: 0px">
-          <v-progress-circular indeterminate color="primary" class="me-2"></v-progress-circular>
+      <v-col
+        cols="3"
+        v-if="visitStore.visits.length === 0"
+        class="d-flex align-center justify-center"
+      >
+        <v-sheet
+          width="100%"
+          height="66vh"
+          style="background-color: #d5edee; border-radius: 8px; padding: 0px"
+        >
+          <v-progress-circular
+            indeterminate
+            color="primary"
+            class="me-2"
+          ></v-progress-circular>
           Fetching visits...
         </v-sheet>
       </v-col>
 
-      <!-- Render visits when available -->
-      <v-col v-if="mostRecentVisits.length > 0" v-for="(visit, index) in mostRecentVisits" :key="index" cols="3"
-        class="mt-1" height="66vh" :style="{ backgroundColor: '#d5edee', borderRadius: '8px', padding: '0px' }">
-        <v-card outlined class="elevation-0 mt-2 ml-4" width="96%"
-          :color="visit.patient.personalInfo.gender === 'Male' ? '#34495e' : '#34495e'"
-          style="color: white; position: relative; overflow: hidden; height: 12.6rem;">
-          <v-card-title align-center class="text-h4 mt-1" style="font-family: mono">
-            {{ visit.visitNumber }}
-          </v-card-title>
-          <v-divider />
-          <v-row class="ma-1">
-            <v-col cols="12">
-              <v-icon small class="me-2" style="color: white">mdi-calendar-clock</v-icon>
-              {{
-                new Intl.DateTimeFormat("en-GB", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                  hour: "numeric",
-                  minute: "numeric",
-                  hour12: true,
-                }).format(new Date(visit.visitStartDateTime))
-              }}
-            </v-col>
-            <v-col cols="12">
-              <v-icon small style="color: white">mdi-doctor</v-icon>
-              {{ visit.doctor }}
-              <v-chip small color="primary" class="mt-0 ml-2" variant="outlined"
-                style="color: white; border-color: white">
-                {{ visit.visitStatus }}
-              </v-chip>
-            </v-col>
-          </v-row>
-        </v-card>
+      <v-col cols="3" class="mt-1" v-if="visitStore.visits.length > 0">
+        <v-col
+          v-for="(visit, index) in mostRecentVisits"
+          :key="index"
+          cols="12"
+          class="mt-2"
+          height="66vh"
+          :style="{
+            backgroundColor: '#d5edee',
+            borderRadius: '8px',
+            padding: '0px',
+          }"
+        >
+          <v-card
+            outlined
+            class="elevation-0 mt-2 ml-4"
+            width="96%"
+            :color="visit.patient.personalInfo.gender === 'Male' ? '#34495e' : '#34495e'"
+            style="color: white; position: relative; overflow: hidden; height: 12.6rem"
+          >
+            <v-card-title class="text-h4 mt-4" style="font-family: 'Orbitron', monospace">
+              {{ visit.visitNumber }}
+            </v-card-title>
+            <v-divider />
+            <v-row class="ma-1">
+              <v-col cols="12">
+                <v-icon small class="me-2" style="color: white"
+                  >mdi-calendar-clock</v-icon
+                >
+                {{
+                  new Intl.DateTimeFormat("en-GB", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                    hour12: true,
+                  }).format(new Date(visit.visitStartDateTime))
+                }}
+              </v-col>
+              <v-col cols="12">
+                <v-icon small style="color: white">mdi-doctor</v-icon>
+                {{ visit.doctor }}
+                <v-chip
+                  small
+                  color="primary"
+                  class="mt-0 ml-2"
+                  variant="outlined"
+                  style="color: white; border-color: white"
+                >
+                  {{ visit.visitStatus }}
+                </v-chip>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-col>
       </v-col>
 
       <v-col cols="9" height="66vh">
-        <v-card max-height="100%" color="#ddfdfd" style="width: 100%; height: 73vh; object-fit: cover;overflow:
-          hidden; border-radius: 8px;">
-          <video-player :src="videoUrls[currentVideoIndex]"
+        <v-card
+          max-height="100%"
+          class="mr-1"
+          color="#ddfdfd"
+          style="
+            width: 100%;
+            height: 73vh;
+            object-fit: cover;
+            overflow: hidden;
+            border-radius: 8px;
+          "
+        >
+          <video-player
+            :src="videoUrls[currentVideoIndex]"
             poster="https://videosolutions.pro/wp-content/uploads/2023/08/play-button-background-video-solutions.svg"
-            :volume="0.225" :loop="false" :autoplay="true" controls
-            style="width: 100%; height: 73vh; object-fit: cover;" @ended="playNextVideo"></video-player>
+            :volume="0.225"
+            :loop="false"
+            :autoplay="true"
+            controls
+            style="width: 100%; height: 73vh; object-fit: cover"
+            @ended="playNextVideo"
+          ></video-player>
         </v-card>
       </v-col>
     </v-row>
 
-    <v-row align="center" justify="space-between" class="mt-4"
-      :style="{ backgroundColor: '#ddfdfd', borderRadius: '8px', padding: '0px' }" max-height="8.4rem">
+    <v-row
+      align="center"
+      justify="space-between"
+      class="mt-4"
+      :style="{
+        backgroundColor: '#ddfdfd',
+        borderRadius: '8px',
+        padding: '0px',
+      }"
+      max-height="8.4rem"
+    >
       <v-col cols="3">
-        <v-card v-if="mostRecentVisits.length > 0 && showActiveVisitCard" outlined class="elevation-0 mt-2 ml-2"
-          width="100%" :color="currentPatientVisit.patient.personalInfo.gender === 'Male' ? '#00a0b8' : '#00a0b8'"
-          style="color: white; position: relative; overflow: hidden; height: 12.6rem;">
-          <div style="
+        <v-card
+          v-if="mostRecentVisits.length > 0 && showActiveVisitCard"
+          outlined
+          class="elevation-0 mt-2 ml-2"
+          width="100%"
+          :color="
+            currentPatientVisit.patient.personalInfo.gender === 'Male'
+              ? '#00a0b8'
+              : '#00a0b8'
+          "
+          style="color: white; position: relative; overflow: hidden; height: 12.6rem"
+        >
+          <div
+            style="
               position: absolute;
               top: 0;
               left: 0;
@@ -77,34 +150,58 @@
               animation: sunburst 4s linear infinite;
               pointer-events: none;
               z-index: -1;
-            "></div>
+            "
+          ></div>
 
           <v-row>
             <v-col cols="10">
-              <v-card-subtitle align-center class="text-h5 mt-2 text-white"
-                style="font-family: mono; color: #000000 !important;">
+              <v-card-subtitle
+                align-center
+                class="text-h5 mt-2 text-white"
+                style="font-family: mono; color: #000000 !important"
+              >
                 <strong>{{ currentTime }}</strong>
               </v-card-subtitle>
             </v-col>
             <v-col cols="2">
-              <v-img class="mt-2" max-height="2.1rem"
-                src="https://cdn.pixabay.com/animation/2022/07/29/03/42/03-42-11-849_512.gif"></v-img>
+              <v-img
+                class="mt-2"
+                max-height="2.1rem"
+                src="https://cdn.pixabay.com/animation/2022/07/29/03/42/03-42-11-849_512.gif"
+              ></v-img>
             </v-col>
           </v-row>
           <v-divider />
 
-          <v-row class="ma-1" style="display: flex; flex-direction: column;">
-            <v-col cols="12">
-              <v-card-text v-if="isVisible" class="text-h5 mt-1 ml-2" style="font-family: mono;">
-                {{ currentPatientVisit.visitNumber }} | Added {{ timeAgo }}.
+          <v-row>
+            <v-col cols="4">
+              <v-card-text
+                v-if="isVisible"
+                class="text-h5 mt-1 ml-2"
+                style="font-family: 'Orbitron', monospace"
+              >
+                {{ currentPatientVisit.visitNumber }}
               </v-card-text>
             </v-col>
-            <v-col cols="9" style="color: white;">
+            <v-col cols="8">
+              <p class="text-h5 mt-4 ml-0">| Added {{ timeAgo }}.</p>
+            </v-col>
+          </v-row>
+
+          <v-divider />
+          <v-row class="ma-1" style="display: flex; flex-direction: column">
+            <v-col cols="9" style="color: white">
               <v-icon small style="color: white">mdi-doctor</v-icon>
               <span v-if="currentPatientVisit.doctor">
-                {{ currentPatientVisit.doctor }}</span>
-              <v-chip small color="primary" class="mt-0 ml-2" variant="outlined"
-                style="color: white; border-color: white;">
+                {{ currentPatientVisit.doctor }}</span
+              >
+              <v-chip
+                small
+                color="primary"
+                class="mt-0 ml-2"
+                variant="outlined"
+                style="color: white; border-color: white"
+              >
                 {{ currentPatientVisit.visitStatus }}
               </v-chip>
             </v-col>
@@ -114,9 +211,21 @@
 
       <v-col cols="9">
         <v-row>
-          <v-col v-for="(service, index) in currentServices" :key="index" cols="12" md="3" lg="3">
-            <v-card outlined class="elevation-0 mt-2" width="100%" height="12.6rem"
-              :color="departmentColors[activeDepartmentIndex]" style="color: white">
+          <v-col
+            v-for="(service, index) in currentServices"
+            :key="index"
+            cols="12"
+            md="3"
+            lg="3"
+          >
+            <v-card
+              outlined
+              class="elevation-0 mt-2 mr-1"
+              width="100%"
+              height="12.6rem"
+              :color="departmentColors[activeDepartmentIndex]"
+              style="color: white"
+            >
               <v-list-item class="mb-2">
                 <template v-slot:prepend>
                   <v-avatar color="surface-light" size="32">
@@ -135,8 +244,7 @@
                   {{ service.service }}
                 </v-card-title>
                 <v-card-subtitle class="me-1 mt-5">
-                  <span class="me-1 mt-5">
-                    KES {{ service.price.toLocaleString() }}</span>
+                  <span class="me-1 mt-5"> KES {{ service.price.toLocaleString() }}</span>
                   <v-icon color="success" icon="mdi-medical-bag" size="small"></v-icon>
                 </v-card-subtitle>
               </v-card-item>
@@ -165,8 +273,6 @@ const videoUrls = ref([
 
 const currentVideoIndex = ref(0);
 const videoUrl = ref(videoUrls.value[currentVideoIndex.value]);
-
-
 
 function checkVideoEnd(event) {
   const video = event.target;
@@ -212,7 +318,7 @@ function updateTime() {
 
 onMounted(() => {
   updateTime(); // Set the initial time
-  setInterval(updateTime, 1000); // Update the time every second 
+  setInterval(updateTime, 1000); // Update the time every second
 });
 
 const createdAt = ref("2024-12-07T14:00:00Z"); // Example ISO timestamp, replace with your own value
@@ -323,7 +429,7 @@ const currentServices = computed(() => {
 });
 // State to manage visibility
 const mostRecentVisits = ref([]);
-const showActiveVisitCard = ref(false)
+const showActiveVisitCard = ref(false);
 
 const currentPatientVisit = ref(null);
 watch(
@@ -340,22 +446,23 @@ watch(
       .sort((a, b) => new Date(b.visitStartDateTime) - new Date(a.visitStartDateTime)) // Sort by date
       .slice(0, 4); // Take the first 4 items
     showActiveVisitCard.value = true;
-    currentPatientVisit.value = mostRecentVisits.value[0]
+    currentPatientVisit.value = mostRecentVisits.value[0];
   },
   { immediate: true } // Populate immediately on load
 );
 
 // Computed property to dynamically update "time ago"
-const timeAgo = computed(() => calculateTimeAgo(currentPatientVisit.value.visitStartDateTime));
+const timeAgo = computed(() =>
+  calculateTimeAgo(currentPatientVisit.value.visitStartDateTime)
+);
 let timerId = null;
-
 
 // WebSocket setup
 const wsBaseUrl = import.meta.env.VITE_BASE_SOCKET_URL || "ws://localhost:4000";
 const wsPath = "/terminal";
 const wsUrl = `${wsBaseUrl}${wsPath}`;
 // Path to the notification sound
-const notificationSound = new Audio('/notification-1.mp3');
+const notificationSound = new Audio("/notification-1.mp3");
 
 const ws = new WebSocket(wsUrl);
 
@@ -371,14 +478,14 @@ ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     console.log(`[DEBUG] Parsed WebSocket message:`, data);
 
-    if (data.event === 'CALL') {
+    if (data.event === "CALL") {
       console.log(`[DEBUG] 'CALL' event received with data:`, data.data);
-      showActiveVisitCard.value = false
+      showActiveVisitCard.value = false;
       currentPatientVisit.value = data.data;
 
       // Play the notification sound
       notificationSound.play().catch((error) => {
-        console.error('Error playing notification sound:', error);
+        console.error("Error playing notification sound:", error);
       });
       console.log(`[DEBUG] Updated currentPatientVisit:`, currentPatientVisit.value);
 
@@ -395,7 +502,6 @@ ws.onmessage = (event) => {
 ws.onclose = () => {
   console.log(`[DEBUG] WebSocket connection to ${wsUrl} closed.`);
 };
-
 
 // Calculate "time ago" for the patient
 
@@ -432,7 +538,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  ws.off('CALL');
+  ws.off("CALL");
   clearInterval(timerId);
 });
 
@@ -441,7 +547,7 @@ const isVisible = ref(true);
 
 // Duration settings
 const flickerDuration = 7500; // Flicker for  5 seconds
-const showDuration = 14000;   // Stay visible for 15 seconds
+const showDuration = 14000; // Stay visible for 15 seconds
 
 // Function to handle the visibility toggle
 function toggleVisibility() {
@@ -593,5 +699,13 @@ onBeforeMount(async () => {
     transform: translate(150%, -50%) scale(1.5);
     opacity: 0;
   }
+}
+</style>
+<style>
+@font-face {
+  font-family: "Orbitron";
+  src: url("/public/Orbitron-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
 }
 </style>

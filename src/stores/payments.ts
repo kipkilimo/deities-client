@@ -36,7 +36,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
             transactionReferenceNumber: $transactionReferenceNumber
             paymentMethod: $paymentMethod
           ) {
-           id
+            id
           }
         }
       `;
@@ -72,7 +72,6 @@ export const usePaymentsStore = defineStore("paymentStore", {
           $billingDepartment: String!
           $billedItems: String!
           $paymentPhoneNumber: String!
-          $transactionReferenceNumber: String
           $paymentMethod: String
         ) {
           amaneServicesPaymentViaMpesa(
@@ -82,10 +81,9 @@ export const usePaymentsStore = defineStore("paymentStore", {
             billingDepartment: $billingDepartment
             billedItems: $billedItems
             paymentPhoneNumber: $paymentPhoneNumber
-            transactionReferenceNumber: $transactionReferenceNumber
             paymentMethod: $paymentMethod
           ) {
-           id
+            id
           }
         }
       `;
@@ -132,7 +130,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
             transactionReferenceNumber: $transactionReferenceNumber
             paymentMethod: $paymentMethod
           ) {
-           id
+            id
           }
         }
       `;
@@ -149,7 +147,23 @@ export const usePaymentsStore = defineStore("paymentStore", {
         console.error("Error with PayPal payment:", error);
       }
     },
+    /*
+    beneficiary: visitStore.currentVisit.patient.id,
+    invoice: activeInvoice.value.id,
+    paidAmount: paidAmount,
+    billingDepartment: visitStore.currentVisit.doctor,
+    billedItems: JSON.stringify(billItems.value),
 
+    ///
+      donor: String
+      message: String
+      paidAmount: String!
+      paymentPhoneNumber: String!
+      transactionReferenceNumber: String
+      paymentMethod: String
+      createdAt: String
+    
+    */
     async handleDonationViaMpesa(vals: {
       donor: string;
       message: string;
@@ -160,8 +174,8 @@ export const usePaymentsStore = defineStore("paymentStore", {
     }) {
       const DONATION_VIA_MPESA = gql`
         mutation processAmaneMpesaDonation(
-          $donor: String!
-          $message: String!
+          $donor: String
+          $message: String
           $paidAmount: String!
           $paymentPhoneNumber: String!
           $transactionReferenceNumber: String
@@ -175,7 +189,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
             transactionReferenceNumber: $transactionReferenceNumber
             paymentMethod: $paymentMethod
           ) {
-           id
+            id
           }
         }
       `;
@@ -218,7 +232,7 @@ export const usePaymentsStore = defineStore("paymentStore", {
             transactionReferenceNumber: $transactionReferenceNumber
             paymentMethod: $paymentMethod
           ) {
-           id
+            id
           }
         }
       `;

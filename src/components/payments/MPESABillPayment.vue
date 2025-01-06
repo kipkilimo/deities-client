@@ -42,7 +42,7 @@
             <!-- Initiate Payment Button -->
             <v-btn block rounded="4" variant="tonal" class="mb-8" color="#2c9933" size="large"
               :disabled="phone_number.length < 9 || isLoading" :loading="isLoading" @click="handleBillPaymentViaMpesa">
-              Initiate Payment
+              MPESA Prompt Client
             </v-btn>
           </v-col>
         </v-row>
@@ -92,6 +92,7 @@ const handleBillPaymentViaMpesa = async () => {
       billingDepartment: retrievedPaymentDetails.billingDepartment,
       billedItems: retrievedPaymentDetails.billedItems,
       paymentPhoneNumber: phone_number_full,
+      paymentMethod:retrievedPaymentDetails.paymentMethod
     };
 
     const result = await paymentsStore.handlePaymentViaMpesa(vals);
