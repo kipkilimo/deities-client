@@ -24,7 +24,7 @@ dashboard:
     reports: Reports & Analytics
     events: Hospital Events
     resources: Resource Center
-    emergency: Emergency Cases
+    terminal: Access Terminal
     outreach: Community Outreach
     donate: Support Amane Hospital
     logout: Logout

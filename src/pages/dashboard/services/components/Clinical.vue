@@ -618,7 +618,7 @@
         <ViewPatientRecords />
       </v-card>
     </v-dialog>
-    <v-dialog v-model="visitStore.createServicesReport" width="65%" persistent>
+    <v-dialog v-model="visitStore. writeServiceReport" width="65%" persistent>
       <v-card>
         <CreateReport />
       </v-card>
@@ -676,7 +676,7 @@ function writeReport(visit) {
   // add new invoice actually
   selectedVisit.value = visit;
   visitStore.setActiveVisit(visit);
-  visitStore.createServicesReport = true;
+  visitStore. writeServiceReport = true;
 }
 function alertCloseVisit(visit) {
   // to do

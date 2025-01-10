@@ -1,5 +1,5 @@
 <template>
-  <v-container
+  <v-card
     fluid
     max-height="99.6vh"
     class="mt-6"
@@ -31,17 +31,16 @@
           v-for="(visit, index) in mostRecentVisits"
           :key="index"
           cols="12"
-          class="mt-2"
           height="66vh"
           :style="{
-            backgroundColor: '#d5edee',
+            backgroundColor: '#ffffff',
             borderRadius: '8px',
             padding: '0px',
           }"
         >
           <v-card
             outlined
-            class="elevation-0 mt-2 ml-4"
+            class="elevation-0 mb-2 ml-2"
             width="96%"
             :color="visit.patient.personalInfo.gender === 'Male' ? '#34495e' : '#34495e'"
             style="color: white; position: relative; overflow: hidden; height: 12.6rem"
@@ -86,13 +85,11 @@
 
       <v-col cols="9" height="66vh">
         <v-card
-          max-height="100%"
+          max-height="72vh"
           class="mr-1"
           color="#ddfdfd"
           style="
-            width: 100%;
-            height: 73vh;
-            object-fit: cover;
+            width: 100%; 
             overflow: hidden;
             border-radius: 8px;
           "
@@ -126,7 +123,7 @@
         <v-card
           v-if="mostRecentVisits.length > 0 && showActiveVisitCard"
           outlined
-          class="elevation-0 mt-2 ml-2"
+          class="elevation-0 mt-2 ml-2 mb-7"
           width="100%"
           :color="
             currentPatientVisit.patient.personalInfo.gender === 'Male'
@@ -158,7 +155,7 @@
               <v-card-subtitle
                 align-center
                 class="text-h5 mt-2 text-white"
-                style="font-family: mono; color: #000000 !important"
+                style="font-family: 'Orbitron', monospace; color: #000000 !important"
               >
                 <strong>{{ currentTime }}</strong>
               </v-card-subtitle>
@@ -220,7 +217,7 @@
           >
             <v-card
               outlined
-              class="elevation-0 mt-2 mr-1"
+              class="elevation-0 mt-2 mr-1 mb-7"
               width="100%"
               height="12.6rem"
               :color="departmentColors[activeDepartmentIndex]"
@@ -253,7 +250,7 @@
         </v-row>
       </v-col>
     </v-row>
-  </v-container>
+  </v-card>
 </template>
 
 <script setup>
@@ -272,15 +269,6 @@ const videoUrls = ref([
 ]);
 
 const currentVideoIndex = ref(0);
-const videoUrl = ref(videoUrls.value[currentVideoIndex.value]);
-
-function checkVideoEnd(event) {
-  const video = event.target;
-  if (video.currentTime >= video.duration - 0.1) {
-    // Trigger next video if it's almost finished
-    playNextVideo();
-  }
-}
 
 function playNextVideo() {
   if (currentVideoIndex.value < videoUrls.value.length - 1) {
@@ -294,9 +282,10 @@ const currentIndex = ref(0);
 
 const allAmaneServices = ref([]);
 // Reactive variable to store the real-time formatted date
+const showColon = ref(true); // State to toggle colon visibility
 const currentTime = ref("");
 
-function formatTime(date) {
+function formatTime(date, showColon) {
   const options = {
     day: "numeric",
     month: "short",
@@ -306,21 +295,43 @@ function formatTime(date) {
     hour12: true, // Ensures AM/PM formatting
   };
 
-  // Format the date and make AM/PM uppercase
-  const formattedDate = new Intl.DateTimeFormat("en-US", options).format(date);
+  // Format the date
+  let formattedDate = new Intl.DateTimeFormat("en-US", options).format(date);
+
+  // Replace the colon if `showColon` is false
+  if (!showColon) {
+    formattedDate = formattedDate.replace(":", ".");
+  }
+
+  // Make AM/PM uppercase
   return formattedDate.replace(/(AM|PM)/, (match) => match.toUpperCase());
 }
+const updateCurrentTime = () => {
+  const now = new Date();
+  currentTime.value = formatTime(now, showColon.value);
+};
+
+let interval;
+onMounted(() => {
+  // Update the time every second
+  updateCurrentTime();
+  interval = setInterval(() => {
+    showColon.value = !showColon.value; // Toggle colon visibility
+    updateCurrentTime();
+  }, 2000);
+});
+
+onUnmounted(() => {
+  // Clear the interval when the component is unmounted
+  clearInterval(interval);
+});
 
 // Update the time every second
 function updateTime() {
   currentTime.value = formatTime(new Date());
 }
 
-onMounted(() => {
-  updateTime(); // Set the initial time
-  setInterval(updateTime, 1000); // Update the time every second
-});
-
+ 
 const createdAt = ref("2024-12-07T14:00:00Z"); // Example ISO timestamp, replace with your own value
 // Computed property to get the most recent 4 items
 
@@ -352,6 +363,8 @@ function calculateTimeAgo(timestamp) {
     return `${years} year${years !== 1 ? "s" : ""} ago`;
   }
 }
+// Reactive properties
+
 async function fetchServices() {
   try {
     const response = await fetch(

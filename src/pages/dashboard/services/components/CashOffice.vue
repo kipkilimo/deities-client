@@ -576,7 +576,7 @@
 
           <div style="text-align: center; margin-top: 10px">
             <p style="margin: 0">Pay only on MPESA prompt</p>
-            <p style="margin: 0">COUNTY SQUARE BUSINESS SOLUTIONS</p>
+            <p style="margin: 0">COUNTYSQUARE BUSINESS SOLUTIONS</p>
             <p style="margin: 0">Feedback: +254700378241</p>
           </div>
         </div>

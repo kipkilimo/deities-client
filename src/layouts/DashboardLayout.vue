@@ -425,11 +425,11 @@ const sidebarItems = computed(() => [
   },
 
   {
-    title: t("dashboard.sidebar.emergency"),
-    tooltip: "Track and manage emergency cases",
-    value: "emergency",
-    iconClass: "mdi-alert-circle-outline me-4 text-xl",
-    path: "/dashboard/emergency",
+    title: t("dashboard.sidebar.terminal"),
+    tooltip: "View client facing Dashboard",
+    value: "terminal",
+    iconClass: "mdi-console-network-outline me-4 text-xl",
+    path: "/terminal",
   },
 
 

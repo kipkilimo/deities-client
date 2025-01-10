@@ -42,7 +42,7 @@ export const useVisitStore = defineStore("visit", {
     createPatientNotes: false,
     viewPatientRecords: false,
     closeCurrentVisitAlert: false,
-    createServicesReport: false,
+    writeServiceReport: false,
     visits: [] as Visit[], // Store all visits
     currentVisit: null as Visit | null,
   }),
@@ -71,6 +71,9 @@ export const useVisitStore = defineStore("visit", {
       let visitId = "";
       if (visit) {
         visitId = visit.id;
+      }
+      if (visit && visit.doctor !== "Clinical") {
+        return;
       }
       this.getCurrentVisit(visitId);
     },

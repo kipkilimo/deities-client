@@ -151,7 +151,11 @@
 
         <!-- Right Column: Details of Selected Visit  @click="selectVisit(visit)"-->
         <v-col cols="4">
-          <v-card outlined style="height: 85vh; overflow-y: auto" :disabled="inactiveCard===false">
+          <v-card
+            outlined
+            style="height: 85vh; overflow-y: auto"
+            :disabled="inactiveCard === false"
+          >
             <v-card-subtitle>
               <v-row>
                 <v-col cols="8">
@@ -256,7 +260,7 @@
                         <v-list-item v-for="(item, index) in items" :key="index">
                           <v-list-item-content>
                             <div class="text-caption text--secondary">
-                              {{ index + 1 }}. {{ item.description }} 
+                              {{ index + 1 }}. {{ item.description }}
                             </div>
                           </v-list-item-content>
                         </v-list-item>
@@ -485,7 +489,7 @@
     </v-dialog>
 
     <v-dialog v-model="printingNow" width="27rem">
-      <v-card with="81mm"> 
+      <v-card with="81mm">
         <div
           id="pdf"
           style="
@@ -620,6 +624,11 @@
         <CreateNewDocumentation />
       </v-card>
     </v-dialog>
+    <v-dialog v-model="visitStore.writeServiceReport" fullscreen persistent>
+      <v-card>
+        <WriteServiceReport />
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -632,6 +641,7 @@ import html2pdf from "html2pdf.js";
 
 const staffStore = useStaffStore();
 import { useVisitStore } from "@/stores/visits"; // Import the visit store
+import WriteServiceReport from "@/components/dialogs/WriteServiceReport.vue";
 
 const visitStore = useVisitStore();
 const canShowVisits = ref(false); //computed(() => visitStore.canShowVisits);
@@ -707,10 +717,10 @@ function requestExternalServices(visit) {
 }
 
 function writeReport(visit) {
-  // add new invoice actually 
+  // add new invoice actually writeServiceReport
   selectedVisit.value = visit;
   visitStore.setActiveVisit(visit);
-  visitStore.createServicesReport = true;
+  visitStore. writeServiceReport = true;
 }
 function doSomething(visit) {
   // to do

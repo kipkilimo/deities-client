@@ -19,7 +19,7 @@ declare module 'vue' {
     CommonAlerts: typeof import('./components/alerts/CommonAlerts.vue')['default']
     ConfirmCloseVisit: typeof import('./components/dialogs/ConfirmCloseVisit.vue')['default']
     CreateNewDocumentation: typeof import('./components/dialogs/CreateNewDocumentation.vue')['default']
-    CreateReport: typeof import('./components/dialogs/CreateReport.vue')['default']
+    CreateReport: typeof import('./components/dialogs/WriteServiceReport.vue')['default']
     Credits: typeof import('./components/payments/credits.vue')['default']
     FeatureCard: typeof import('./pages/welcome/components/Features/FeatureCard.vue')['default']
     Features: typeof import('./pages/welcome/components/Features/index.vue')['default']
@@ -51,5 +51,6 @@ declare module 'vue' {
     ViewPatientRecords: typeof import('./components/dialogs/ViewPatientRecords.vue')['default']
     ViewServicesReports: typeof import('./components/dialogs/ViewServicesReports.vue')['default']
     WritePatientNotes: typeof import('./components/dialogs/WritePatientNotes.vue')['default']
+    WriteServiceReport: typeof import('./components/dialogs/WriteServiceReport.vue')['default']
   }
 }
